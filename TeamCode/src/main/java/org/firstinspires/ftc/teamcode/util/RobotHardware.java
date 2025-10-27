@@ -53,6 +53,13 @@ public class RobotHardware {
         rightRear = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightRear);
         rightFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightFront);
 
+        imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT, //
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+        ));
+        imu.initialize(parameters);
+        imu.resetYaw();
         mecanum = new Mecanum();
     }
 

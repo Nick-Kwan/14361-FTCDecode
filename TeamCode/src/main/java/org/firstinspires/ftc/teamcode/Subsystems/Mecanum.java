@@ -23,14 +23,14 @@ public class Mecanum implements Subsystem {
 
 
     public void speed(double slowmode) {
-        y = gamepad1.left_stick_y;
-        x = gamepad1.left_stick_x;
+        double y = robot.driver.getLeftY();
+        double x = robot.driver.getLeftX();
         rx = gamepad1.right_stick_x;
 
         heading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
-        rotX = x * Math.cos(-heading) - y * Math.sin(-heading);
-        rotY = x * Math.sin(-heading) + y * Math.cos(-heading);
+        double rotX = x * Math.cos(-heading) - y * Math.sin(-heading);
+        double rotY = x * Math.sin(-heading) + y * Math.cos(-heading);
 
         denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
         frontLeftPower = (rotY + rotX + rx) / denominator;
