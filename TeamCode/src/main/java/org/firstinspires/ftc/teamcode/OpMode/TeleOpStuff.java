@@ -28,6 +28,10 @@ public class TeleOpStuff extends CommandOpMode {
 
         driver.readButtons();
 
-        
+        if(driver.gamepad.left_trigger > 0.1) {
+            robot.mecanum.speed(0.3);
+        } else {
+            robot.mecanum.speed(1);
+        }
     }
 }

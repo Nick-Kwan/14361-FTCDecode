@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
+
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -20,7 +22,7 @@ public class Mecanum implements Subsystem {
     BNO055IMU imu;
 
 
-    public void mecanum(Gamepad gamepad1) {
+    public void speed(double slowmode) {
         y = gamepad1.left_stick_y;
         x = gamepad1.left_stick_x;
         rx = gamepad1.right_stick_x;

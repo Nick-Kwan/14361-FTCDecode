@@ -18,6 +18,8 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.teamcode.Subsystems.Mecanum;
+
 @Config
 public class RobotHardware {
     // Drivetrain variables
@@ -28,6 +30,7 @@ public class RobotHardware {
     // Hardware variables
     private HardwareMap hardwareMap;
     private static RobotHardware instance = null;
+    public Mecanum mecanum;
     private boolean enabled;
 
     public GamepadEx driver;
@@ -49,6 +52,8 @@ public class RobotHardware {
         leftRear = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.leftRear);
         rightRear = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightRear);
         rightFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightFront);
+
+        mecanum = new Mecanum();
     }
 
     // Drivetrain setup
