@@ -27,7 +27,11 @@ public class TeleOpStuff extends CommandOpMode {
         CommandScheduler.getInstance().run();
 
         driver.readButtons();
-
+        if(driver.gamepad.left_trigger > 0.1) {
+            robot.mecanum.periodic(0.3);
+        } else {
+            robot.mecanum.periodic(1);
+        }
         
     }
 }

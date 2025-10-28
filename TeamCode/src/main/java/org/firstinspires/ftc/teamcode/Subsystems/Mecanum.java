@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
+
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -14,21 +16,19 @@ public class Mecanum implements Subsystem {
     private RobotHardware robot;
     private double heading, frontLeftPower, backLeftPower, frontRightPower, backRightPower, rotY, rotX, rx, x, y, denominator;
 
+    public Mecanum() {
+        this.robot = RobotHardware.getInstance();
+    }
 
-
-
-    BNO055IMU imu;
-
-
-    public void mecanum(Gamepad gamepad1) {
-        y = gamepad1.left_stick_y;
-        x = gamepad1.left_stick_x;
+    public void periodic(double num) {
+        double y = gamepad1.left_stick_y;
+        double x = gamepad1.left_stick_x;
         rx = gamepad1.right_stick_x;
 
         heading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
-        rotX = x * Math.cos(-heading) - y * Math.sin(-heading);
-        rotY = x * Math.sin(-heading) + y * Math.cos(-heading);
+        double rotX = x * Math.cos(-heading) - y * Math.sin(-heading);
+        double rotY = x * Math.sin(-heading) + y * Math.cos(-heading);
 
         denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
         frontLeftPower = (rotY + rotX + rx) / denominator;
@@ -36,9 +36,9 @@ public class Mecanum implements Subsystem {
         frontRightPower = (rotY - rotX - rx) / denominator;
         backRightPower = (rotY + rotX - rx) / denominator;
 
-        robot.leftFront.setPower(frontLeftPower);
-        robot.leftRear.setPower(backLeftPower);
-        robot.rightFront.setPower(frontRightPower);
-        robot.rightRear.setPower(backRightPower);
+        robot.leftFront.setPower(frontLeftPower * num);
+        robot.leftRear.setPower(backLeftPower * num);
+        robot.rightFront.setPower(frontRightPower * num);
+        robot.rightRear.setPower(backRightPower * num);
     }
 }

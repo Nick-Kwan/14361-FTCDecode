@@ -18,12 +18,15 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.teamcode.Subsystems.Mecanum;
+
 @Config
 public class RobotHardware {
     // Drivetrain variables
     public DcMotorEx leftFront, leftRear, rightFront, rightRear;
 
     public IMU imu;
+    public Mecanum mecanum;
 
     // Hardware variables
     private HardwareMap hardwareMap;
