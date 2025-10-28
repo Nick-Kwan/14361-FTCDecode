@@ -16,13 +16,11 @@ public class Mecanum implements Subsystem {
     private RobotHardware robot;
     private double heading, frontLeftPower, backLeftPower, frontRightPower, backRightPower, rotY, rotX, rx, x, y, denominator;
 
+    public Mecanum(){
+        this.robot = RobotHardware.getInstance();
+    }
 
-
-
-    BNO055IMU imu;
-
-
-    public void speed(double slowmode) {
+    public void periodic(double slowmode) {
         double y = robot.driver.getLeftY();
         double x = robot.driver.getLeftX();
         rx = gamepad1.right_stick_x;
@@ -38,9 +36,9 @@ public class Mecanum implements Subsystem {
         frontRightPower = (rotY - rotX - rx) / denominator;
         backRightPower = (rotY + rotX - rx) / denominator;
 
-        robot.leftFront.setPower(frontLeftPower);
-        robot.leftRear.setPower(backLeftPower);
-        robot.rightFront.setPower(frontRightPower);
-        robot.rightRear.setPower(backRightPower);
+        robot.leftFront.setPower(frontLeftPower * slowmode);
+        robot.leftRear.setPower(backLeftPower * slowmode);
+        robot.rightFront.setPower(frontRightPower * slowmode);
+        robot.rightRear.setPower(backRightPower * slowmode);
     }
 }
