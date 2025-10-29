@@ -22,8 +22,8 @@ public class Mecanum implements Subsystem {
 
     public void periodic(double slowmode) {
         double y = robot.driver.getLeftY();
-        double x = robot.driver.getLeftX();
-        rx = gamepad1.right_stick_x;
+        double x = robot.driver.getLeftX() * 1.1;
+        rx = robot.driver.getRightX() * 1.1;
 
         heading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
@@ -35,6 +35,7 @@ public class Mecanum implements Subsystem {
         backLeftPower = (rotY - rotX + rx) / denominator;
         frontRightPower = (rotY - rotX - rx) / denominator;
         backRightPower = (rotY + rotX - rx) / denominator;
+
 
         robot.leftFront.setPower(frontLeftPower * slowmode);
         robot.leftRear.setPower(backLeftPower * slowmode);

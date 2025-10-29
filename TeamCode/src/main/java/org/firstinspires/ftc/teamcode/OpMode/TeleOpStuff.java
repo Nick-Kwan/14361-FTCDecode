@@ -32,6 +32,22 @@ public class TeleOpStuff extends CommandOpMode {
             robot.mecanum.periodic(1);
         }
 
+        if (driver.gamepad.ps) {
+            robot.imu.resetYaw();
+        }
+
+        if(driver.gamepad.right_trigger > 0.1) {
+            robot.intake.StartIntaking();
+        }
+
+        if(driver.gamepad.right_bumper) {
+            robot.intake.StopIntaking();
+        }
+
+        if(driver.gamepad.left_bumper) {
+            robot.intake.SpitOut();
+        }
+
         driver.readButtons();
 
     }

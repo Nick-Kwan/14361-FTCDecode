@@ -18,10 +18,15 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Mecanum;
 
 @Config
 public class RobotHardware {
+
+    // Intake variables
+    public DcMotorEx intakeMotor;
+
     // Drivetrain variables
     public DcMotorEx leftFront, leftRear, rightFront, rightRear;
 
@@ -35,6 +40,9 @@ public class RobotHardware {
 
     public GamepadEx driver;
 
+    //Subsystems
+    public Intake intake;
+
     public static RobotHardware getInstance() {
         if (instance == null) {
             instance = new RobotHardware();
@@ -47,23 +55,31 @@ public class RobotHardware {
         this.hardwareMap = hardwareMap;
         this.driver = driver;
 
+        //Intake setup
+        intakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Intake.intakeConstant);
+
         // Drivetrain setup
         leftFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.leftFront);
         leftRear = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.leftRear);
         rightRear = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightRear);
         rightFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightFront);
 
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT, //
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+                RevHubOrientationOnRobot.UsbFacingDirection.UP
         ));
         imu.initialize(parameters);
         imu.resetYaw();
         mecanum = new Mecanum();
+
+        //Subsystems
+        intake = new Intake();
     }
 
-    // Drivetrain setup
 
 
 }

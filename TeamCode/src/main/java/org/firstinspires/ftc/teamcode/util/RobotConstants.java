@@ -16,4 +16,9 @@ public class RobotConstants {
         public static String rightRear = "rightRear";
     }
 
+    @Config
+    public static class Intake {
+        public static String intakeConstant = "intakeMotor";
+    }
+
 }
