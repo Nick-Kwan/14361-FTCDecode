@@ -38,14 +38,8 @@ public class TeleOpStuff extends CommandOpMode {
 
         if(driver.gamepad.right_trigger > 0.1) {
             robot.intake.StartIntaking();
-        }
-
-        if(driver.gamepad.right_bumper) {
+        } else {
             robot.intake.StopIntaking();
-        }
-
-        if(driver.gamepad.left_bumper) {
-            robot.intake.SpitOut();
         }
 
         driver.readButtons();

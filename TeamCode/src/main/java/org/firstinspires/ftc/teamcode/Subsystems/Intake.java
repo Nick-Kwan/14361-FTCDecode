@@ -12,14 +12,12 @@ public class Intake implements Subsystem{
     }
 
     public void StartIntaking(){
-        robot.intakeMotor.setPower(.5);
+        robot.intakeMotor.setPower(1);
     }
 
     public void StopIntaking(){
         robot.intakeMotor.setPower(0);
     }
 
-    public void SpitOut(){
-        robot.intakeMotor.setPower(-.5);
-    }
+    public void SpitOut() {robot.intakeMotor.setPower(-1);}
 }
