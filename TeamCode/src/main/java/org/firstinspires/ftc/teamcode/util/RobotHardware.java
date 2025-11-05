@@ -1,36 +1,43 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.arcrobotics.ftclib.controller.PIDFController;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Mecanum;
+import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
 @Config
 public class RobotHardware {
 
     // Intake variables
     public DcMotorEx intakeMotor;
+    public Servo intakeServo;
+    // Spindexer variables
+    public Servo spindexerLinkageServo;
+    public Servo spindexerServo;
+    public DigitalChannel touchSensor;
+    public DigitalChannel magneticLimitSensor;
+    public ColorSensor colorSensorOne;
+    public ColorSensor colorSensorTwo;
 
     // Drivetrain variables
     public DcMotorEx leftFront, leftRear, rightFront, rightRear;
-
     public IMU imu;
+    public Limelight3A limelight;
+    public Servo turretServo;
+    public DcMotorEx shooter;
 
     // Hardware variables
     private HardwareMap hardwareMap;
@@ -43,6 +50,7 @@ public class RobotHardware {
     //Subsystems
     public Intake intake;
 
+    public Spindexer spindexer;
     public static RobotHardware getInstance() {
         if (instance == null) {
             instance = new RobotHardware();
@@ -56,7 +64,12 @@ public class RobotHardware {
         this.driver = driver;
 
         //Intake setup
-        intakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Intake.intakeConstant);
+        this.intakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Intake.intakeMotor);
+        this.intakeMotor.setPower(RobotConstants.Intake.intakeMotorOff);
+        this.intakeServo = hardwareMap.servo.get(RobotConstants.Intake.intakeServo);
+        this.intakeServo.setPosition(RobotConstants.Intake.intakeServoUp);
+
+
 
         // Drivetrain setup
         leftFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.leftFront);
@@ -74,10 +87,41 @@ public class RobotHardware {
         ));
         imu.initialize(parameters);
         imu.resetYaw();
-        mecanum = new Mecanum();
 
-        //Subsystems
+
+
+        // Spindexer setup
+        this.spindexerLinkageServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerLinkageServo);
+        this.spindexerLinkageServo.setPosition(RobotConstants.Spindexer.spindexerLinkageServoDown);
+        this.spindexerServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerServo);
+        this.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+
+        this.touchSensor = hardwareMap.get(DigitalChannel.class,RobotConstants.Spindexer.touchSensor);
+        this.touchSensor.setMode(DigitalChannel.Mode.INPUT);
+
+        this.magneticLimitSensor = hardwareMap.get(DigitalChannel.class, RobotConstants.Spindexer.magneticLimitSensor);
+        this.magneticLimitSensor.setMode(DigitalChannel.Mode.INPUT);
+
+        this.colorSensorOne = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne);
+        this.colorSensorTwo = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo);
+
+
+        // Limelight and turret setup
+        limelight = hardwareMap.get(Limelight3A.class,RobotConstants.Drivetrain.limelight);
+        limelight.pipelineSwitch(3);
+        imu = hardwareMap.get(IMU.class, "imu");
+    RevHubOrientationOnRobot revOrientation = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP);
+        imu.initialize(new IMU.Parameters(revOrientation));
+
+        this.turretServo = hardwareMap.servo.get(RobotConstants.Drivetrain.turret);
+        this.turretServo.setPosition(RobotConstants.Drivetrain.turretPose);
+
+        this.shooter = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooter);
+
+        mecanum = new Mecanum();
         intake = new Intake();
+        spindexer = new Spindexer();
     }
 
 

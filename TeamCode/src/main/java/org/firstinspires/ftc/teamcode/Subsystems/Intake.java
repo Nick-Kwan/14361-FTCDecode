@@ -11,13 +11,23 @@ public class Intake implements Subsystem{
         this.robot = RobotHardware.getInstance();
     }
 
-    public void StartIntaking(){
-        robot.intakeMotor.setPower(1);
+    public void startIntaking(){
+        robot.intakeMotor.setPower(RobotConstants.Intake.intakeMotorON);
     }
 
-    public void StopIntaking(){
-        robot.intakeMotor.setPower(0);
+    public void stopIntaking(){
+        robot.intakeMotor.setPower(RobotConstants.Intake.intakeMotorOff);
     }
 
-    public void SpitOut() {robot.intakeMotor.setPower(-1);}
+    public void reverseIntaking() {
+        robot.intakeMotor.setPower(RobotConstants.Intake.intakeMotorReverse);
+    }
+
+    public void intakeDown(){
+        robot.intakeServo.setPosition(RobotConstants.Intake.intakeServoDown);
+    }
+
+    public void intakeUp(){
+        robot.intakeServo.setPosition(RobotConstants.Intake.intakeServoUp);
+    }
 }
