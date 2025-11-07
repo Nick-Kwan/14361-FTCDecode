@@ -27,6 +27,7 @@ public class RobotHardware {
     // Spindexer variables
     public Servo spindexerLinkageServo;
     public Servo spindexerServo;
+    public boolean isShooting = true;
     public DigitalChannel touchSensor;
     public DigitalChannel magneticLimitSensor;
     public ColorSensor colorSensorOne;
@@ -111,6 +112,72 @@ public class RobotHardware {
         limelight.pipelineSwitch(3);
         imu = hardwareMap.get(IMU.class, "imu");
     RevHubOrientationOnRobot revOrientation = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP);
+        imu.initialize(new IMU.Parameters(revOrientation));
+
+        this.turretServo = hardwareMap.servo.get(RobotConstants.Drivetrain.turret);
+        this.turretServo.setPosition(RobotConstants.Drivetrain.turretPose);
+
+        this.shooter = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooter);
+
+        mecanum = new Mecanum();
+        intake = new Intake();
+        spindexer = new Spindexer();
+    }
+
+    public void init(final HardwareMap hardwareMap) {
+        this.hardwareMap = hardwareMap;
+
+
+
+        //Intake setup
+        this.intakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Intake.intakeMotor);
+        this.intakeMotor.setPower(RobotConstants.Intake.intakeMotorOff);
+        this.intakeServo = hardwareMap.servo.get(RobotConstants.Intake.intakeServo);
+        this.intakeServo.setPosition(RobotConstants.Intake.intakeServoUp);
+
+
+
+        // Drivetrain setup
+        leftFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.leftFront);
+        leftRear = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.leftRear);
+        rightRear = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightRear);
+        rightFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightFront);
+
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT, //
+                RevHubOrientationOnRobot.UsbFacingDirection.UP
+        ));
+        imu.initialize(parameters);
+        imu.resetYaw();
+
+
+
+        // Spindexer setup
+        this.spindexerLinkageServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerLinkageServo);
+        this.spindexerLinkageServo.setPosition(RobotConstants.Spindexer.spindexerLinkageServoDown);
+        this.spindexerServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerServo);
+        this.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+
+        this.touchSensor = hardwareMap.get(DigitalChannel.class,RobotConstants.Spindexer.touchSensor);
+        this.touchSensor.setMode(DigitalChannel.Mode.INPUT);
+
+        this.magneticLimitSensor = hardwareMap.get(DigitalChannel.class, RobotConstants.Spindexer.magneticLimitSensor);
+        this.magneticLimitSensor.setMode(DigitalChannel.Mode.INPUT);
+
+        this.colorSensorOne = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne);
+        this.colorSensorTwo = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo);
+
+
+        // Limelight and turret setup
+        limelight = hardwareMap.get(Limelight3A.class,RobotConstants.Drivetrain.limelight);
+        limelight.pipelineSwitch(3);
+        imu = hardwareMap.get(IMU.class, "imu");
+        RevHubOrientationOnRobot revOrientation = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP);
         imu.initialize(new IMU.Parameters(revOrientation));
 
