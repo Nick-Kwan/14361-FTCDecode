@@ -27,7 +27,10 @@ public class RobotHardware {
     // Spindexer variables
     public Servo spindexerLinkageServo;
     public Servo spindexerServo;
-    public boolean isShooting = true;
+    public boolean isShootingOne;
+    public boolean isShootingTwo;
+    public boolean isShootingThree;
+    public int shotCounter;
     public DigitalChannel touchSensor;
     public DigitalChannel magneticLimitSensor;
     public ColorSensor colorSensorOne;
@@ -154,6 +157,10 @@ public class RobotHardware {
         ));
         imu.initialize(parameters);
         imu.resetYaw();
+        isShootingOne = true;
+        isShootingTwo = true;
+        isShootingThree = true;
+        shotCounter = 0;
 
 
 
@@ -161,7 +168,7 @@ public class RobotHardware {
         this.spindexerLinkageServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerLinkageServo);
         this.spindexerLinkageServo.setPosition(RobotConstants.Spindexer.spindexerLinkageServoDown);
         this.spindexerServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerServo);
-        this.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+        this.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
 
         this.touchSensor = hardwareMap.get(DigitalChannel.class,RobotConstants.Spindexer.touchSensor);
         this.touchSensor.setMode(DigitalChannel.Mode.INPUT);

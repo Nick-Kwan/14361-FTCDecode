@@ -14,9 +14,9 @@ import org.firstinspires.ftc.teamcode.util.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import com.pedropathing.util.Timer;
 
-@TeleOp(name = "TeleOp")
+@TeleOp(name = "TeleOpBlue")
 
-public class TeleOpStuff extends CommandOpMode {
+public class TeleOpBlue extends CommandOpMode {
     private final RobotHardware robot = RobotHardware.getInstance();
     private GamepadEx driver;
     boolean temp = true;
@@ -48,10 +48,12 @@ public class TeleOpStuff extends CommandOpMode {
         telemetry.addData("Green : ", robot.colorSensorOne.green());
         telemetry.addData("Blue : ", robot.colorSensorOne.blue());
         telemetry.addData("Spin State : " , spindexerState);
+        telemetry.addData("Shooter Power: " , robot.shooter.getPower());
 
         robot.limelight.start();
         YawPitchRollAngles orientation = robot.imu.getRobotYawPitchRollAngles();
         robot.limelight.updateRobotOrientation(orientation.getYaw());
+        robot.limelight.pipelineSwitch(3);
         LLResult llResult = robot.limelight.getLatestResult();
         if (llResult != null && llResult.isValid()){
             Pose3D botPose = llResult.getBotpose();
@@ -133,6 +135,13 @@ public class TeleOpStuff extends CommandOpMode {
         }
         if (driver.gamepad.square){
             robot.shooter.setPower(RobotConstants.Drivetrain.shooterOff);
+        }
+
+        if (driver.gamepad.leftStickButtonWasPressed()){
+            robot.shooter.setPower(robot.shooter.getPower() + 0.05);
+        }
+        if (driver.gamepad.rightStickButtonWasPressed()){
+            robot.shooter.setPower(robot.shooter.getPower() - 0.05);
         }
 //            switch (spindexerState) {
 //

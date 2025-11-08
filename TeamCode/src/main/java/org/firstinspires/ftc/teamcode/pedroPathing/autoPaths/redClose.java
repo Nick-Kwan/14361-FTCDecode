@@ -19,44 +19,34 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
-@Autonomous (name = "Blue Close", group = "Auto")
-public class blueClose  extends OpMode{
+@Autonomous (name = "Red Close", group = "Auto")
+public class redClose  extends OpMode{
 
     private Follower follower;
     private Timer  actionTimer, opmodeTimer;
     private ElapsedTime pathTimer;
     private int pathState;
     public ActionStates actionState = ActionStates.shootOne;
-    public void setActionState(ActionStates state) {
-        actionState = state;
-    }
 
     private final RobotHardware robot = RobotHardware.getInstance();
-    private static double initX = RobotConstants.Auto.initXB;
-    private static double initY = RobotConstants.Auto.initYB;
+    private static double initX = RobotConstants.Auto.initXR;
+    private static double initY = RobotConstants.Auto.initYR;
     private boolean pathTemp = false;
     private boolean actionTempOne, actionTempTwo,actionTempThree,actionTempFour,actionTempFive, actionTempSix = false;
-    public double getInitX(){
-        return initX;
-    }
-    public double getInitY(){
-        return initY;
-    }
-
 
 
     // Setting up the poses for the paths
-    private final Pose startPose = new Pose(initX, initY, Math.toRadians(180));
+    private final Pose startPose = new Pose(initX, initY, Math.toRadians(0));
 
-    private final Pose shootOnePose = new Pose(48, 97, Math.toRadians(130));
+    private final Pose shootOnePose = new Pose(97, 97, Math.toRadians(40));
 
-    private final Pose goingToCollectOnePose = new Pose(45, 86.5, Math.toRadians(180));
-    private final Pose goingToCollectControlOnePose = new Pose(84, 85.5, Math.toRadians(180));
-    private final Pose collectOnePose = new Pose(37,86.5,Math.toRadians(180));
-    private final Pose collectTwoPose = new Pose(32,86.5,Math.toRadians(180));
-    private final Pose collectThreePose = new Pose(25,86.5,Math.toRadians(180));
-    private final Pose shootTwoPose = new Pose(48, 97, Math.toRadians(155));
-    private final Pose collectFourPose = new Pose(40,60,Math.toRadians(180));
+    private final Pose goingToCollectOnePose = new Pose(100, 82.5, Math.toRadians(0));
+    private final Pose goingToCollectControlOnePose = new Pose(55, 85.5, Math.toRadians(0));
+    private final Pose collectOnePose = new Pose(107,82.5,Math.toRadians(0));
+    private final Pose collectTwoPose = new Pose(110,82.5,Math.toRadians(0));
+    private final Pose collectThreePose = new Pose(25,86.5,Math.toRadians(0));
+    private final Pose shootTwoPose = new Pose(97, 97, Math.toRadians(40));
+    private final Pose collectFourPose = new Pose(100,58,Math.toRadians(0));
 
 
     // Creating the paths from the poses
@@ -103,10 +93,10 @@ public class blueClose  extends OpMode{
                 .addPath(new BezierLine(shootTwoPose,collectFourPose))
                 .setLinearHeadingInterpolation(shootTwoPose.getHeading(), collectFourPose.getHeading())
                 .build();
-}
+    }
 
 
-// Running the paths after creating them
+    // Running the paths after creating them
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
@@ -243,37 +233,37 @@ public class blueClose  extends OpMode{
     }
 
     @Override
-        public void init() {
-            CommandScheduler.getInstance().run();
-            robot.init(hardwareMap);
+    public void init() {
+        CommandScheduler.getInstance().run();
+        robot.init(hardwareMap);
 
-            robot.spindexer.shootingState = ShooterStates.One;
-            robot.spindexer.secondShootingState = SecondShooterStates.One;
-            robot.isShootingOne = true;
-            robot.isShootingTwo = true;
-            robot.isShootingThree = true;
+        robot.spindexer.shootingState = ShooterStates.One;
+        robot.spindexer.secondShootingState = SecondShooterStates.One;
+        robot.isShootingOne = true;
+        robot.isShootingTwo = true;
+        robot.isShootingThree = true;
 
-            pathTimer = new ElapsedTime();
-            opmodeTimer = new Timer();
-            actionTimer = new Timer();
-            robot.spindexer.shooterTimer = new ElapsedTime();
-            opmodeTimer.resetTimer();
+        pathTimer = new ElapsedTime();
+        opmodeTimer = new Timer();
+        actionTimer = new Timer();
+        robot.spindexer.shooterTimer = new ElapsedTime();
+        opmodeTimer.resetTimer();
 
-            follower = Constants.createFollower(hardwareMap);
-            follower.setStartingPose(startPose);
-            buildPaths();
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startPose);
+        buildPaths();
 
-            // Feedback to Driver Hub for debugging
-            telemetry.addData("path state", pathState);
-            telemetry.addData("action state", actionState);
-            telemetry.addData("shot counter", robot.shotCounter);
+        // Feedback to Driver Hub for debugging
+        telemetry.addData("path state", pathState);
+        telemetry.addData("action state", actionState);
+        telemetry.addData("shot counter", robot.shotCounter);
 //            telemetry.addData("robot shooting condition one" , robot.isShootingOne);
 //            telemetry.addData("robot shooting condition two" , robot.isShootingTwo);
 //            telemetry.addData("robot shooting condition three" , robot.isShootingThree);
-            telemetry.addData("x", follower.getPose().getX());
-            telemetry.addData("y", follower.getPose().getY());
-            telemetry.addData("heading", follower.getPose().getHeading());
-            telemetry.addData("Touch Sensor : ", !robot.spindexer.getTouchSensorState());
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.addData("Touch Sensor : ", !robot.spindexer.getTouchSensorState());
         telemetry.update();
     }
 

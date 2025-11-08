@@ -16,6 +16,10 @@ public class RobotConstants {
         public static String shooter = "shooter";
         public static double shooterLongOn = -0.625;
         public static double shooterShortOn = -0.55;
+        public static double shooterEightOn = -0.8;
+        public static double shooterAuto = -0.57;
+        public static double shooterShortAuto = -0.4;
+        public static double shooterFullOn = -1;
         public static double shooterOff = 0;
         public static double shooterReverse = 1;
         public static double turretPose = 0.5;
@@ -53,17 +57,27 @@ public class RobotConstants {
         public static double spindexerServoPoseTwo = 0.38
                 ;
         public static double spindexerServoPoseThree = 0.754;
+        public static double spindexerServoPoseFour = 1;
     }
 
     @Config
     public static class Auto {
-        public static double initX = 62.5;
-        public static double initY = 136.5;
-        public double getInitX (){
-            return initX;
+        public static double initXB = 32.5;
+        public static double initYB = 135;
+        public double getInitXB (){
+            return initXB;
         }
-        public double getInitY (){
-            return initY;
+        public double getInitYB (){
+            return initYB;
+        }
+        public static double initXR = 110.5;
+        public static double initYR = 135;
+        public double getInitXR (){
+            return initXR;
+        }
+        public double getInitYR (){
+            return initYR;
         }
     }
+
 }
