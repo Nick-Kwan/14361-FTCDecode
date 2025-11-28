@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.States.ShooterStates.Two;
 
 import org.firstinspires.ftc.teamcode.States.SecondShooterStates;
 import org.firstinspires.ftc.teamcode.States.ShooterStates;
+import org.firstinspires.ftc.teamcode.States.SortingStates;
 import org.firstinspires.ftc.teamcode.States.SpindexerStates;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
@@ -26,18 +27,29 @@ public class Spindexer implements Subsystem{
         this.robot = RobotHardware.getInstance();
     }
     public ShooterStates shootingState = ShooterStates.One;
+    public SortingStates sortState = SortingStates.Checking;
     public SecondShooterStates secondShootingState = SecondShooterStates.One;
     public ElapsedTime shooterTimer = new ElapsedTime();
     public ElapsedTime secondShooterTimer = new ElapsedTime();
     public ElapsedTime thirdShooterTimer = new ElapsedTime();
     public ElapsedTime time = new ElapsedTime();
     private ScheduledExecutorService s = Executors.newScheduledThreadPool(1);
+    //private ElapsedTime pathTimer;
     private boolean shooterTimerTemp;
     public void setSecondShootingState(SecondShooterStates state) {
         secondShootingState = state;
     }
     public void setSpindexerState(ShooterStates state) {
         shootingState = state;
+    }
+    public void setSortingState(SortingStates state) {
+        sortState = state;
+    }
+    public void waitM (double time){
+        robot.pathTimer.reset();
+        while (robot.pathTimer.milliseconds() < time){
+
+        }
     }
 
     public enum DetectedColor{
@@ -75,6 +87,399 @@ public class Spindexer implements Subsystem{
         double allColor = robot.colorSensorOne.red() + robot.colorSensorOne.green() + robot.colorSensorOne.blue();
         return allColor;
     }
+
+    public void sorting (){
+        switch (sortState){
+            case Checking:
+                // Green Purple Purple
+                if (robot.aprilID == 21){
+                    waitM(750);
+                    if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+                        waitM(250);
+                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+                        waitM(750);
+                        if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+                            waitM(250);
+                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            waitM(250);
+                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            waitM(250);
+                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            setSortingState(SortingStates.Exit);
+                        }
+                        else if (robot.colorSensorOne.green() > robot.colorSensorOne.blue()){
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            waitM(250);
+                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            waitM(250);
+                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            setSortingState(SortingStates.Exit);
+                        }
+                    }
+                    else {
+                        waitM(500);
+                        robot.spindexer.spindexerUp();
+                        waitM(500);
+                        robot.spindexer.spindexerDown();
+                        waitM(250);
+                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+                        waitM(500);
+                        robot.spindexer.spindexerUp();
+                        waitM(500);
+                        robot.spindexer.spindexerDown();
+                        waitM(250);
+                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+                        waitM(500);
+                        robot.spindexer.spindexerUp();
+                        waitM(500);
+                        robot.spindexer.spindexerDown();
+                        waitM(250);
+                        setSortingState(SortingStates.Exit);
+                    }
+                }
+                // Purple Green Purple
+                if (robot.aprilID == 22){
+                    waitM(750);
+                    if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+                        waitM(500);
+                        robot.spindexer.spindexerUp();
+                        waitM(500);
+                        robot.spindexer.spindexerDown();
+                        waitM(250);
+                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+                        waitM(750);
+                        if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+                            waitM(250);
+                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            waitM(250);
+                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            setSortingState(SortingStates.Exit);
+                        }
+                        else if (robot.colorSensorOne.green() > robot.colorSensorOne.blue()){
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            waitM(250);
+                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            setSortingState(SortingStates.Exit);
+                        }
+                    }
+                    else {
+                        waitM(250);
+                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+                        waitM(500);
+                        robot.spindexer.spindexerUp();
+                        waitM(500);
+                        robot.spindexer.spindexerDown();
+                        waitM(250);
+                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+                        waitM(500);
+                        robot.spindexer.spindexerUp();
+                        waitM(500);
+                        robot.spindexer.spindexerDown();
+                        waitM(250);
+                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+                        waitM(500);
+                        robot.spindexer.spindexerUp();
+                        waitM(500);
+                        robot.spindexer.spindexerDown();
+                        setSortingState(SortingStates.Exit);
+                    }
+                }
+                // Purple Purple Green
+                if (robot.aprilID == 23){
+                    waitM(750);
+                    if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+                        waitM(500);
+                        robot.spindexer.spindexerUp();
+                        waitM(500);
+                        robot.spindexer.spindexerDown();
+                        waitM(250);
+                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+                        waitM(750);
+                        if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            waitM(250);
+                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            setSortingState(SortingStates.Exit);
+                        }
+                        else if (robot.colorSensorOne.green() > robot.colorSensorOne.blue()){
+                            waitM(250);
+                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            waitM(250);
+                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+                            waitM(500);
+                            robot.spindexer.spindexerUp();
+                            waitM(500);
+                            robot.spindexer.spindexerDown();
+                            setSortingState(SortingStates.Exit);
+                        }
+                    }
+                    else {
+                        waitM(250);
+                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+                        waitM(500);
+                        robot.spindexer.spindexerUp();
+                        waitM(500);
+                        robot.spindexer.spindexerDown();
+                        waitM(250);
+                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+                        waitM(500);
+                        robot.spindexer.spindexerUp();
+                        waitM(500);
+                        robot.spindexer.spindexerDown();
+                        waitM(250);
+                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+                        waitM(500);
+                        robot.spindexer.spindexerUp();
+                        waitM(500);
+                        robot.spindexer.spindexerDown();
+                        setSortingState(SortingStates.Exit);
+                    }
+                }
+                // Green Purple Purple
+//            case ID21:
+//                waitM(750);
+//                if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                    waitM(750);
+//                    if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+//                        waitM(250);
+//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        waitM(250);
+//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        waitM(250);
+//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        setSortingState(SortingStates.Exit);
+//                    }
+//                    else if (robot.colorSensorOne.green() > robot.colorSensorOne.blue()){
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        waitM(250);
+//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        waitM(250);
+//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        setSortingState(SortingStates.Exit);
+//                    }
+//                }
+//                else {
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.spindexer.spindexerDown();
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.spindexer.spindexerDown();
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.spindexer.spindexerDown();
+//                    waitM(250);
+//                    setSortingState(SortingStates.Exit);
+//                }
+                // Purple Green Purple
+//            case ID22:
+//                waitM(750);
+//                if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.spindexer.spindexerDown();
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                    waitM(750);
+//                    if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+//                        waitM(250);
+//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        waitM(250);
+//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        setSortingState(SortingStates.Exit);
+//                    }
+//                    else if (robot.colorSensorOne.green() > robot.colorSensorOne.blue()){
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        waitM(250);
+//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        setSortingState(SortingStates.Exit);
+//                    }
+//                }
+//                else {
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.spindexer.spindexerDown();
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.spindexer.spindexerDown();
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.spindexer.spindexerDown();
+//                    setSortingState(SortingStates.Exit);
+//                }
+                // Purple Purple Green
+//            case ID23:
+//                waitM(750);
+//                if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.spindexer.spindexerDown();
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                    waitM(750);
+//                    if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        waitM(250);
+//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        setSortingState(SortingStates.Exit);
+//                    }
+//                    else if (robot.colorSensorOne.green() > robot.colorSensorOne.blue()){
+//                        waitM(250);
+//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        waitM(250);
+//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                        waitM(500);
+//                        robot.spindexer.spindexerUp();
+//                        waitM(500);
+//                        robot.spindexer.spindexerDown();
+//                        setSortingState(SortingStates.Exit);
+//                    }
+//                }
+//                else {
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.spindexer.spindexerDown();
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.spindexer.spindexerDown();
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.spindexer.spindexerDown();
+//                    setSortingState(SortingStates.Exit);
+//                }
+            case Exit:
+                break;
+
+        }
+    }
+
 
     public void shootingOne () {
         switch (shootingState) {

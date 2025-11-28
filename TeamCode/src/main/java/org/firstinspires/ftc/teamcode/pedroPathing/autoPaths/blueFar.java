@@ -25,12 +25,12 @@ import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
 import java.util.List;
 
-@Autonomous (name = "Blue Close", group = "Auto")
-public class blueClose  extends OpMode{
+@Autonomous (name = "Blue Far", group = "Auto")
+public class blueFar  extends OpMode{
 
     private Follower follower;
     private Timer  actionTimer, opmodeTimer;
-    //private ElapsedTime pathTimer;
+    private ElapsedTime pathTimer;
     private int pathState;
 
     public ActionStates actionState = ActionStates.shootOne;
@@ -79,8 +79,8 @@ public class blueClose  extends OpMode{
     private PathChain goingToCollectOne, collectOne, collectTwo, collectThree, scoreOne, collectFour, collectFive, collectSix, scoreTwo, collectSeven;
 
     public void waitM (double time){
-        robot.pathTimer.reset();
-        while (robot.pathTimer.milliseconds() < time){
+        pathTimer.reset();
+        while (pathTimer.milliseconds() < time){
 
         }
     }
@@ -138,10 +138,10 @@ public class blueClose  extends OpMode{
                 .addPath(new BezierCurve(shootThreePose,collectControlSevenPose,collectSevenPose))
                 .setLinearHeadingInterpolation(shootThreePose.getHeading(), collectSevenPose.getHeading())
                 .build();
-}
+    }
 
 
-// Running the paths after creating them
+    // Running the paths after creating them
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
@@ -230,29 +230,30 @@ public class blueClose  extends OpMode{
                 }
             case 5:
                 if (!follower.isBusy()){
-                    waitM(500);
-                    robot.spindexer.spindexerUp();
-                    waitM(500);
-                    robot.shooter.setPower(RobotConstants.Drivetrain.shooterAuto);
-                    robot.spindexer.spindexerDown();
-                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterShortOn);
-                    waitM(250);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-                    // Shoot the second ball
-                    waitM(500);
-                    robot.spindexer.spindexerUp();
-                    waitM(500);
-                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
-                    robot.spindexer.spindexerDown();
-                    waitM(250);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-                    // Shoot the third ball
-                    waitM(500);
-                    robot.spindexer.spindexerUp();
-                    waitM(500);
-                    robot.spindexer.spindexerDown();
-                    robot.intake.intakeDown();
-                    robot.intake.startIntaking();
+                    robot.spindexer.sorting();
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.shooter.setPower(RobotConstants.Drivetrain.shooterAuto);
+//                    robot.spindexer.spindexerDown();
+//                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterShortOn);
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                    // Shoot the second ball
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
+//                    robot.spindexer.spindexerDown();
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                    // Shoot the third ball
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.spindexer.spindexerDown();
+//                    robot.intake.intakeDown();
+//                    robot.intake.startIntaking();
                     follower.followPath(collectFour);
                     setPathState(6);
                 }
@@ -288,27 +289,28 @@ public class blueClose  extends OpMode{
                 }
             case 9:
                 if (!follower.isBusy()){
-                    waitM(500);
-                    robot.spindexer.spindexerUp();
-                    waitM(500);
-                    robot.shooter.setPower(RobotConstants.Drivetrain.shooterAuto);
-                    robot.spindexer.spindexerDown();
-                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterShortOn);
-                    waitM(250);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-                    // Shoot the second ball
-                    waitM(500);
-                    robot.spindexer.spindexerUp();
-                    waitM(500);
-                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
-                    robot.spindexer.spindexerDown();
-                    waitM(250);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-                    // Shoot the third ball
-                    waitM(500);
-                    robot.spindexer.spindexerUp();
-                    waitM(500);
-                    robot.spindexer.spindexerDown();
+                    robot.spindexer.sorting();
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.shooter.setPower(RobotConstants.Drivetrain.shooterAuto);
+//                    robot.spindexer.spindexerDown();
+//                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterShortOn);
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                    // Shoot the second ball
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
+//                    robot.spindexer.spindexerDown();
+//                    waitM(250);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                    // Shoot the third ball
+//                    waitM(500);
+//                    robot.spindexer.spindexerUp();
+//                    waitM(500);
+//                    robot.spindexer.spindexerDown();
                     follower.followPath(collectSeven);
                     setPathState(10);
                 }
@@ -322,7 +324,7 @@ public class blueClose  extends OpMode{
     /** These change the states of the paths and actions. It will also reset the timers of the individual switches **/
     public void setPathState(int pState) {
         pathState = pState;
-        robot.pathTimer.reset();
+        pathTimer.reset();
     }
 
 
@@ -336,56 +338,56 @@ public class blueClose  extends OpMode{
     }
 
     @Override
-        public void init() {
-            CommandScheduler.getInstance().run();
-            robot.init(hardwareMap);
+    public void init() {
+        CommandScheduler.getInstance().run();
+        robot.init(hardwareMap);
 
-            robot.spindexer.shootingState = ShooterStates.One;
-            robot.spindexer.secondShootingState = SecondShooterStates.One;
-            robot.isShootingOne = true;
-            robot.isShootingTwo = true;
-            robot.isShootingThree = true;
+        robot.spindexer.shootingState = ShooterStates.One;
+        robot.spindexer.secondShootingState = SecondShooterStates.One;
+        robot.isShootingOne = true;
+        robot.isShootingTwo = true;
+        robot.isShootingThree = true;
 
-            robot.pathTimer = new ElapsedTime();
-            opmodeTimer = new Timer();
-            actionTimer = new Timer();
-            robot.spindexer.shooterTimer = new ElapsedTime();
-            opmodeTimer.resetTimer();
+        pathTimer = new ElapsedTime();
+        opmodeTimer = new Timer();
+        actionTimer = new Timer();
+        robot.spindexer.shooterTimer = new ElapsedTime();
+        opmodeTimer.resetTimer();
 
-            follower = Constants.createFollower(hardwareMap);
-            follower.setStartingPose(startPose);
-            buildPaths();
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startPose);
+        buildPaths();
 
-            // Feedback to Driver Hub for debugging
-            telemetry.addData("path state", pathState);
-            telemetry.addData("action state", actionState);
-            telemetry.addData("shot counter", robot.shotCounter);
+        // Feedback to Driver Hub for debugging
+        telemetry.addData("path state", pathState);
+        telemetry.addData("action state", actionState);
+        telemetry.addData("shot counter", robot.shotCounter);
 //            telemetry.addData("robot shooting condition one" , robot.isShootingOne);
 //            telemetry.addData("robot shooting condition two" , robot.isShootingTwo);
 //            telemetry.addData("robot shooting condition three" , robot.isShootingThree);
-            telemetry.addData("x", follower.getPose().getX());
-            telemetry.addData("y", follower.getPose().getY());
-            telemetry.addData("heading", follower.getPose().getHeading());
-            telemetry.addData("Touch Sensor : ", !robot.spindexer.getTouchSensorState());
-            robot.limelight.start();
-            YawPitchRollAngles orientation = robot.imu.getRobotYawPitchRollAngles();
-            robot.limelight.updateRobotOrientation(orientation.getYaw());
-            robot.limelight.pipelineSwitch(1);
-            LLResult llResult = robot.limelight.getLatestResult();
-            if (llResult != null && llResult.isValid()) {
-                Pose3D botPose = llResult.getBotpose();
-                telemetry.addData("Target x", llResult.getTx());
-                telemetry.addData("Target y", llResult.getTy());
-                telemetry.addData("Target Area", llResult.getTa());
-                telemetry.addData("BotPose", botPose.toString());
-                telemetry.addData("Yaw", botPose.getOrientation().getYaw());
-                List<LLResultTypes.FiducialResult> ID = llResult.getFiducialResults();
-                for (LLResultTypes.FiducialResult id : ID) {
-                    robot.aprilID = id.getFiducialId();
-                    telemetry.addData("ID" ,robot.aprilID);
-                }
-                telemetry.update();
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.addData("Touch Sensor : ", !robot.spindexer.getTouchSensorState());
+        robot.limelight.start();
+        YawPitchRollAngles orientation = robot.imu.getRobotYawPitchRollAngles();
+        robot.limelight.updateRobotOrientation(orientation.getYaw());
+        robot.limelight.pipelineSwitch(1);
+        LLResult llResult = robot.limelight.getLatestResult();
+        if (llResult != null && llResult.isValid()) {
+            Pose3D botPose = llResult.getBotpose();
+            telemetry.addData("Target x", llResult.getTx());
+            telemetry.addData("Target y", llResult.getTy());
+            telemetry.addData("Target Area", llResult.getTa());
+            telemetry.addData("BotPose", botPose.toString());
+            telemetry.addData("Yaw", botPose.getOrientation().getYaw());
+            List<LLResultTypes.FiducialResult> ID = llResult.getFiducialResults();
+            for (LLResultTypes.FiducialResult id : ID) {
+                robot.aprilID = id.getFiducialId();
+                telemetry.addData("ID" ,robot.aprilID);
             }
+            telemetry.update();
+        }
     }
 
     @Override
@@ -402,3 +404,4 @@ public class blueClose  extends OpMode{
         setPathState(0);
     }
 }
+

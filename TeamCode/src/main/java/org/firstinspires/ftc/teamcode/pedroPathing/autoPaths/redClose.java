@@ -46,12 +46,21 @@ public class redClose  extends OpMode{
     private final Pose collectTwoPose = new Pose(110,82.5,Math.toRadians(0));
     private final Pose collectThreePose = new Pose(25,86.5,Math.toRadians(0));
     private final Pose shootTwoPose = new Pose(97, 97, Math.toRadians(40));
-    private final Pose collectFourPose = new Pose(100,58,Math.toRadians(0));
+    private final Pose collectFourPose = new Pose(100,58.5,Math.toRadians(0));
+    // Look at control on pedro vis
+    private final Pose collectControlFourPose = new Pose(61.5,61.5,Math.toRadians(0));
+    private final Pose collectFivePose = new Pose(107,58.5,Math.toRadians(0));
+    private final Pose collectSixPose = new Pose(110,58.5,Math.toRadians(0));
+    private final Pose shootThreePose = new Pose(97, 97, Math.toRadians(40));
+    private final Pose collectSevenPose = new Pose(100,34,Math.toRadians(0));
+    // Look at control on pedro vis
+    private final Pose collectControlSevenPose = new Pose(62,32,Math.toRadians(0));
+
 
 
     // Creating the paths from the poses
     private Path scorePreload;
-    private PathChain goingToCollectOne, collectOne, collectTwo, collectThree, scoreOne, collectFour;
+    private PathChain goingToCollectOne, collectOne, collectTwo, collectThree, scoreOne, collectFour, collectFive, collectSix, scoreTwo, collectSeven;
 
     public void waitM (double time){
         pathTimer.reset();
@@ -90,8 +99,28 @@ public class redClose  extends OpMode{
                 .build();
 
         collectFour = follower.pathBuilder()
-                .addPath(new BezierLine(shootTwoPose,collectFourPose))
+                .addPath(new BezierCurve(shootTwoPose,collectControlFourPose,collectFourPose))
                 .setLinearHeadingInterpolation(shootTwoPose.getHeading(), collectFourPose.getHeading())
+                .build();
+
+        collectFive = follower.pathBuilder()
+                .addPath(new BezierLine(collectFourPose,collectFivePose))
+                .setConstantHeadingInterpolation(collectFivePose.getHeading())
+                .build();
+
+        collectSix = follower.pathBuilder()
+                .addPath(new BezierLine(collectFivePose,collectSixPose))
+                .setConstantHeadingInterpolation(collectSixPose.getHeading())
+                .build();
+
+        scoreTwo = follower.pathBuilder()
+                .addPath(new BezierLine(collectSixPose,shootThreePose))
+                .setLinearHeadingInterpolation(collectSixPose.getHeading(), shootThreePose.getHeading())
+                .build();
+
+        collectSeven = follower.pathBuilder()
+                .addPath(new BezierCurve(shootThreePose,collectControlSevenPose,collectSevenPose))
+                .setLinearHeadingInterpolation(shootThreePose.getHeading(), collectSevenPose.getHeading())
                 .build();
     }
 
@@ -119,7 +148,7 @@ public class redClose  extends OpMode{
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     // Shoot the first ball
-                    waitM(1250);
+                    waitM(1750);
                     robot.spindexer.spindexerUp();
                     waitM(500);
                     robot.spindexer.spindexerDown();
@@ -206,10 +235,68 @@ public class redClose  extends OpMode{
                     robot.spindexer.spindexerUp();
                     waitM(500);
                     robot.spindexer.spindexerDown();
+                    robot.intake.intakeDown();
+                    robot.intake.startIntaking();
                     follower.followPath(collectFour);
                     setPathState(6);
                 }
             case 6:
+                if (!follower.isBusy()){
+                    robot.intake.intakeUp();
+                    waitM(500);
+                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+                    waitM(100);
+                    robot.intake.intakeDown();
+                    waitM(500);
+                    follower.followPath(collectFive,true);
+                    setPathState(7);
+                    break;
+                }
+            case 7:
+                if (!follower.isBusy()){
+                    robot.intake.intakeUp();
+                    robot.shooter.setPower(RobotConstants.Drivetrain.shooterShortAuto);
+                    waitM(500);
+                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+                    waitM(100);
+                    robot.intake.intakeDown();
+                    waitM(200);
+                    follower.followPath(collectSix,true);
+                    setPathState(8);
+                }
+            case 8:
+                if (!follower.isBusy()){
+                    robot.intake.intakeUp();
+                    follower.followPath(scoreTwo,true);
+                    setPathState(9);
+                }
+            case 9:
+                if (!follower.isBusy()){
+                    waitM(1000);
+                    robot.spindexer.spindexerUp();
+                    waitM(500);
+                    robot.shooter.setPower(RobotConstants.Drivetrain.shooterAuto);
+                    robot.spindexer.spindexerDown();
+                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterShortOn);
+                    waitM(250);
+                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+                    // Shoot the second ball
+                    waitM(500);
+                    robot.spindexer.spindexerUp();
+                    waitM(500);
+                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
+                    robot.spindexer.spindexerDown();
+                    waitM(250);
+                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+                    // Shoot the third ball
+                    waitM(500);
+                    robot.spindexer.spindexerUp();
+                    waitM(500);
+                    robot.spindexer.spindexerDown();
+                    follower.followPath(collectSeven);
+                    setPathState(10);
+                }
+            case 10:
                 if (!follower.isBusy()){
                     break;
                 }

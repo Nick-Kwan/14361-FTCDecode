@@ -14,8 +14,8 @@ public class RobotConstants {
         public static String limelight = "limelight";
         public static String turret = "turret";
         public static String shooter = "shooter";
-        public static double shooterLongOn = -0.625;
-        public static double shooterShortOn = -0.55;
+        public static double shooterLongOn = -0.55;
+        public static double shooterShortOn = -0.47;
         public static double shooterEightOn = -0.8;
         public static double shooterAuto = -0.57;
         public static double shooterShortAuto = -0.4;
@@ -32,9 +32,9 @@ public class RobotConstants {
         public static String intakeServo = "intakeServo";
 
         // Values
-        public static int intakeMotorON = 1;
+        public static double intakeMotorON = 0.7;
         public static int intakeMotorOff = 0;
-        public static int intakeMotorReverse = -1;
+        public static double intakeMotorReverse = -1.0;
         public static double intakeServoDown = 1.0; //need to tune value
         public static double intakeServoUp = 0.25; //need to tune value
     }

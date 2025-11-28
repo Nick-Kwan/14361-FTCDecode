@@ -3,16 +3,19 @@ package org.firstinspires.ftc.teamcode.util;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Mecanum;
@@ -35,11 +38,14 @@ public class RobotHardware {
     public DigitalChannel magneticLimitSensor;
     public ColorSensor colorSensorOne;
     public ColorSensor colorSensorTwo;
+    public ElapsedTime pathTimer;
+    public PIDFCoefficients pid = new PIDFCoefficients(1.1958759124,0.1195875912,0,11.9587591241);
 
     // Drivetrain variables
     public DcMotorEx leftFront, leftRear, rightFront, rightRear;
     public IMU imu;
     public Limelight3A limelight;
+    public int aprilID;
     public Servo turretServo;
     public DcMotorEx shooter;
 
@@ -113,6 +119,7 @@ public class RobotHardware {
         // Limelight and turret setup
         limelight = hardwareMap.get(Limelight3A.class,RobotConstants.Drivetrain.limelight);
         limelight.pipelineSwitch(3);
+        pathTimer = new ElapsedTime();
         imu = hardwareMap.get(IMU.class, "imu");
     RevHubOrientationOnRobot revOrientation = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP);
@@ -122,6 +129,10 @@ public class RobotHardware {
         this.turretServo.setPosition(RobotConstants.Drivetrain.turretPose);
 
         this.shooter = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooter);
+        this.shooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        this.shooter.setDirection(DcMotorEx.Direction.REVERSE);
+        this.shooter.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER,pid);
+
 
         mecanum = new Mecanum();
         intake = new Intake();
@@ -182,7 +193,8 @@ public class RobotHardware {
 
         // Limelight and turret setup
         limelight = hardwareMap.get(Limelight3A.class,RobotConstants.Drivetrain.limelight);
-        limelight.pipelineSwitch(3);
+        limelight.pipelineSwitch(1);
+        pathTimer = new ElapsedTime();
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revOrientation = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP);
