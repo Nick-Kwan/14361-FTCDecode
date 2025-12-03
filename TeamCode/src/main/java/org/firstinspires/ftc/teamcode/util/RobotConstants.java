@@ -48,6 +48,8 @@ public class RobotConstants {
         public static String magneticLimitSensor = "magneticLimitSensor";
         public static String colorSensorOne = "colorSensorOne";
         public static String colorSensorTwo = "colorSensorTwo";
+        public static String colorSensorThree = "colorSensorThree";
+        public static String colorSensorNA = "colorSensorNA";
 
         // Values
         public static double spindexerLinkageServoDown = 0.62;

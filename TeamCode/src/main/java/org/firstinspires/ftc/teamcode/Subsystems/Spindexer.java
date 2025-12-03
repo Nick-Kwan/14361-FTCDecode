@@ -1,9 +1,13 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import static org.firstinspires.ftc.teamcode.States.AutoIntakeStates.Checking;
+import static org.firstinspires.ftc.teamcode.States.AutoIntakeStates.Exit;
+import static org.firstinspires.ftc.teamcode.States.AutoIntakeStates.One;
 import static org.firstinspires.ftc.teamcode.States.ShooterStates.Four;
 import static org.firstinspires.ftc.teamcode.States.ShooterStates.Three;
 import static org.firstinspires.ftc.teamcode.States.ShooterStates.Two;
 
+import org.firstinspires.ftc.teamcode.States.AutoIntakeStates;
 import org.firstinspires.ftc.teamcode.States.SecondShooterStates;
 import org.firstinspires.ftc.teamcode.States.ShooterStates;
 import org.firstinspires.ftc.teamcode.States.SortingStates;
@@ -28,6 +32,7 @@ public class Spindexer implements Subsystem{
     }
     public ShooterStates shootingState = ShooterStates.One;
     public SortingStates sortState = SortingStates.Checking;
+    public AutoIntakeStates intakeState = AutoIntakeStates.Checking;
     public SecondShooterStates secondShootingState = SecondShooterStates.One;
     public ElapsedTime shooterTimer = new ElapsedTime();
     public ElapsedTime secondShooterTimer = new ElapsedTime();
@@ -35,15 +40,11 @@ public class Spindexer implements Subsystem{
     public ElapsedTime time = new ElapsedTime();
     private ScheduledExecutorService s = Executors.newScheduledThreadPool(1);
     //private ElapsedTime pathTimer;
-    private boolean shooterTimerTemp;
-    public void setSecondShootingState(SecondShooterStates state) {
-        secondShootingState = state;
-    }
-    public void setSpindexerState(ShooterStates state) {
-        shootingState = state;
-    }
     public void setSortingState(SortingStates state) {
         sortState = state;
+    }
+    public void setAutoIntakeState(AutoIntakeStates state) {
+        intakeState = state;
     }
     public void waitM (double time){
         robot.pathTimer.reset();
@@ -51,19 +52,32 @@ public class Spindexer implements Subsystem{
 
         }
     }
-
-    public enum DetectedColor{
-        RED,
-        BLUE,
-        YELLOW,
-        UNKOWN
-    }
     public void spindexerUp() {
         robot.spindexerLinkageServo.setPosition(RobotConstants.Spindexer.spindexerLinkageServoUp);
     }
     public void spindexerDown() {
         robot.spindexerLinkageServo.setPosition(RobotConstants.Spindexer.spindexerLinkageServoDown);
     }
+
+    public void setPoseOne(){
+        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+        robot.atPoseOne = true;
+        robot.atPoseTwo = false;
+        robot.atPoseThree = false;
+    }
+    public void setPoseTwo(){
+        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+        robot.atPoseOne = false;
+        robot.atPoseTwo = true;
+        robot.atPoseThree = false;
+    }
+    public void setPoseThree(){
+        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+        robot.atPoseOne = false;
+        robot.atPoseTwo = false;
+        robot.atPoseThree = true;
+    }
+
 
     public void shooterOn() {
         robot.shooter.setPower(RobotConstants.Drivetrain.shooterLongOn);
@@ -83,12 +97,117 @@ public class Spindexer implements Subsystem{
     }
 
 
-    public double detectColor (){
+    public double detectColorOne (){
         double allColor = robot.colorSensorOne.red() + robot.colorSensorOne.green() + robot.colorSensorOne.blue();
         return allColor;
     }
+    public double detectColorTwo (){
+        double allColor = robot.colorSensorTwo.red() + robot.colorSensorTwo.green() + robot.colorSensorTwo.blue();
+        return allColor;
+    }
+    public double detectColorThree (){
+        double allColor = robot.colorSensorThree.red() + robot.colorSensorThree.green() + robot.colorSensorThree.blue();
+        return allColor;
+    }
+
+
+
+    public void autoIntake (){
+        setAutoIntakeState(Checking);
+        switch (intakeState){
+            case Checking:
+                // When the Spindexer is at Pose One
+                if (robot.atPoseOne && !robot.atPoseTwo && !robot.atPoseThree) {
+                    // All the slots have balls
+                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && (robot.colorSensorTwo.green() > 3000 || robot.colorSensorTwo.blue() > 3000) && (robot.colorSensorThree.green() > 3000 || robot.colorSensorThree.blue() > 3000)){
+                        robot.spindexer.setPoseOne();
+                        setAutoIntakeState(Exit);
+                    }
+                    // The first slot is empty
+                    if (robot.colorSensorOne.red() < 1000){
+                        robot.spindexer.setPoseOne();
+                        setAutoIntakeState(Exit);
+                    }
+                    // The second slot is empty and the other two slots are taken
+                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && robot.colorSensorTwo.red() < 1000 && (robot.colorSensorThree.green() > 3000 || robot.colorSensorThree.blue() > 3000)){
+                        robot.spindexer.setPoseTwo();
+                        setAutoIntakeState(Exit);
+                    }
+                    // The third slot is empty and the other two slots are taken
+                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && (robot.colorSensorTwo.green() > 3000 || robot.colorSensorTwo.blue() > 3000) && robot.colorSensorThree.red() < 1000){
+                        robot.spindexer.setPoseThree();
+                        setAutoIntakeState(Exit);
+                    }
+                    // The first slot is taken and the other two slots are empty
+                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && robot.colorSensorTwo.red() < 1000 && robot.colorSensorThree.red() < 1000){
+                        robot.spindexer.setPoseTwo();
+                        setAutoIntakeState(Exit);
+                    }
+                }
+                // When the Spindexer is at Pose Two
+                if (!robot.atPoseOne && robot.atPoseTwo && !robot.atPoseThree) {
+                    // All the slots have balls
+                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && (robot.colorSensorTwo.green() > 3000 || robot.colorSensorTwo.blue() > 3000) && (robot.colorSensorThree.green() > 3000 || robot.colorSensorThree.blue() > 3000)){
+                        robot.spindexer.setPoseTwo();
+                        setAutoIntakeState(Exit);
+                    }
+                    // The first slot is empty
+                    if (robot.colorSensorOne.red() < 1000){
+                        robot.spindexer.setPoseTwo();
+                        setAutoIntakeState(Exit);
+                    }
+                    // The second slot is empty and the other two slots are taken
+                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && robot.colorSensorTwo.red() < 1000 && (robot.colorSensorThree.green() > 3000 || robot.colorSensorThree.blue() > 3000)){
+                        robot.spindexer.setPoseThree();
+                        setAutoIntakeState(Exit);
+                    }
+                    // The third slot is empty and the other two slots are taken
+                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && (robot.colorSensorTwo.green() > 3000 || robot.colorSensorTwo.blue() > 3000) && robot.colorSensorThree.red() < 1000){
+                        robot.spindexer.setPoseOne();
+                        setAutoIntakeState(Exit);
+                    }
+                    // The first slot is taken and the other two slots are empty
+                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && robot.colorSensorTwo.red() < 1000 && robot.colorSensorThree.red() < 1000){
+                        robot.spindexer.setPoseThree();
+                        setAutoIntakeState(Exit);
+                    }
+                }
+                // When the Spindexer is at Pose Three
+                if (!robot.atPoseOne && !robot.atPoseTwo && robot.atPoseThree) {
+                    // All the slots have balls
+                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && (robot.colorSensorTwo.green() > 3000 || robot.colorSensorTwo.blue() > 3000) && (robot.colorSensorThree.green() > 3000 || robot.colorSensorThree.blue() > 3000)){
+                        robot.spindexer.setPoseThree();
+                        setAutoIntakeState(Exit);
+                    }
+                    // The first slot is empty
+                    if (robot.colorSensorOne.red() < 1000){
+                        robot.spindexer.setPoseThree();
+                        setAutoIntakeState(Exit);
+                    }
+                    // The second slot is empty and the other two slots are taken
+                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && robot.colorSensorTwo.red() < 1000 && (robot.colorSensorThree.green() > 3000 || robot.colorSensorThree.blue() > 3000)){
+                        robot.spindexer.setPoseOne();
+                        setAutoIntakeState(Exit);
+                    }
+                    // The third slot is empty and the other two slots are taken
+                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && (robot.colorSensorTwo.green() > 3000 || robot.colorSensorTwo.blue() > 3000) && robot.colorSensorThree.red() < 10000){
+                        robot.spindexer.setPoseTwo();
+                        setAutoIntakeState(Exit);
+                    }
+                    // The first slot is taken and the other two slots are empty
+                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && robot.colorSensorTwo.red() < 1000 && robot.colorSensorThree.red() < 1000){
+                        robot.spindexer.setPoseOne();
+                        setAutoIntakeState(Exit);
+                    }
+                }
+            case Exit:
+                break;
+
+        }
+    }
 
     public void sorting (){
+        setSortingState(SortingStates.Checking);
         switch (sortState){
             case Checking:
                 // Green Purple Purple
@@ -284,196 +403,6 @@ public class Spindexer implements Subsystem{
                         setSortingState(SortingStates.Exit);
                     }
                 }
-                // Green Purple Purple
-//            case ID21:
-//                waitM(750);
-//                if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
-//                    waitM(250);
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//                    waitM(750);
-//                    if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
-//                        waitM(250);
-//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        waitM(250);
-//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        waitM(250);
-//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        setSortingState(SortingStates.Exit);
-//                    }
-//                    else if (robot.colorSensorOne.green() > robot.colorSensorOne.blue()){
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        waitM(250);
-//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        waitM(250);
-//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        setSortingState(SortingStates.Exit);
-//                    }
-//                }
-//                else {
-//                    waitM(500);
-//                    robot.spindexer.spindexerUp();
-//                    waitM(500);
-//                    robot.spindexer.spindexerDown();
-//                    waitM(250);
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//                    waitM(500);
-//                    robot.spindexer.spindexerUp();
-//                    waitM(500);
-//                    robot.spindexer.spindexerDown();
-//                    waitM(250);
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                    waitM(500);
-//                    robot.spindexer.spindexerUp();
-//                    waitM(500);
-//                    robot.spindexer.spindexerDown();
-//                    waitM(250);
-//                    setSortingState(SortingStates.Exit);
-//                }
-                // Purple Green Purple
-//            case ID22:
-//                waitM(750);
-//                if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
-//                    waitM(500);
-//                    robot.spindexer.spindexerUp();
-//                    waitM(500);
-//                    robot.spindexer.spindexerDown();
-//                    waitM(250);
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//                    waitM(750);
-//                    if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
-//                        waitM(250);
-//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        waitM(250);
-//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        setSortingState(SortingStates.Exit);
-//                    }
-//                    else if (robot.colorSensorOne.green() > robot.colorSensorOne.blue()){
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        waitM(250);
-//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        setSortingState(SortingStates.Exit);
-//                    }
-//                }
-//                else {
-//                    waitM(250);
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//                    waitM(500);
-//                    robot.spindexer.spindexerUp();
-//                    waitM(500);
-//                    robot.spindexer.spindexerDown();
-//                    waitM(250);
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
-//                    waitM(500);
-//                    robot.spindexer.spindexerUp();
-//                    waitM(500);
-//                    robot.spindexer.spindexerDown();
-//                    waitM(250);
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                    waitM(500);
-//                    robot.spindexer.spindexerUp();
-//                    waitM(500);
-//                    robot.spindexer.spindexerDown();
-//                    setSortingState(SortingStates.Exit);
-//                }
-                // Purple Purple Green
-//            case ID23:
-//                waitM(750);
-//                if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
-//                    waitM(500);
-//                    robot.spindexer.spindexerUp();
-//                    waitM(500);
-//                    robot.spindexer.spindexerDown();
-//                    waitM(250);
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//                    waitM(750);
-//                    if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        waitM(250);
-//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        setSortingState(SortingStates.Exit);
-//                    }
-//                    else if (robot.colorSensorOne.green() > robot.colorSensorOne.blue()){
-//                        waitM(250);
-//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        waitM(250);
-//                        robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//                        waitM(500);
-//                        robot.spindexer.spindexerUp();
-//                        waitM(500);
-//                        robot.spindexer.spindexerDown();
-//                        setSortingState(SortingStates.Exit);
-//                    }
-//                }
-//                else {
-//                    waitM(250);
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//                    waitM(500);
-//                    robot.spindexer.spindexerUp();
-//                    waitM(500);
-//                    robot.spindexer.spindexerDown();
-//                    waitM(250);
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                    waitM(500);
-//                    robot.spindexer.spindexerUp();
-//                    waitM(500);
-//                    robot.spindexer.spindexerDown();
-//                    waitM(250);
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
-//                    waitM(500);
-//                    robot.spindexer.spindexerUp();
-//                    waitM(500);
-//                    robot.spindexer.spindexerDown();
-//                    setSortingState(SortingStates.Exit);
-//                }
             case Exit:
                 break;
 
@@ -481,376 +410,6 @@ public class Spindexer implements Subsystem{
     }
 
 
-    public void shootingOne () {
-        switch (shootingState) {
 
-
-            case One:
-
-                switch (secondShootingState) {
-                    case One:
-                        if (shooterTimerTemp) {
-                            shooterTimer.reset();
-                            shooterTimerTemp = false;
-                        }
-                        if (shooterTimer.seconds() > 1) {
-                            robot.spindexer.spindexerUp();
-                            shooterTimerTemp = true;
-                            shooterTimer.reset();
-                            setSecondShootingState(SecondShooterStates.Two);
-                        }
-                    case Two:
-                        if (shooterTimerTemp) {
-                            shooterTimer.reset();
-                            shooterTimerTemp = false;
-                        }
-                        if (shooterTimer.seconds() > 1) {
-                            robot.spindexer.spindexerDown();
-                            shooterTimerTemp = true;
-                            shooterTimer.reset();
-                            setSecondShootingState(SecondShooterStates.Three);
-                        }
-                    case Three:
-                        if (shooterTimerTemp) {
-                            shooterTimer.reset();
-                            shooterTimerTemp = false;
-                        }
-                        if (shooterTimer.seconds() > 1) {
-                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-                            shooterTimerTemp = true;
-                            secondShooterTimer.reset();
-                            robot.shotCounter ++;
-                            //robot.isShootingOne = false;
-                            setSpindexerState(Two);
-                            break;
-                        }
-                }
-            case Two:
-                if (robot.shotCounter == 1) {
-                    break;
-                }
-                break;
-        }
-    }
-
-    public void shootingTwo () {
-        switch (shootingState) {
-
-
-            case One:
-
-                switch (secondShootingState) {
-                    case One:
-                        if (shooterTimerTemp) {
-                            shooterTimer.reset();
-                            shooterTimerTemp = false;
-                        }
-                        if (shooterTimer.seconds() > 1) {
-                            robot.spindexer.spindexerUp();
-                            shooterTimerTemp = true;
-                            shooterTimer.reset();
-                            setSecondShootingState(SecondShooterStates.Two);
-                        }
-                    case Two:
-                        if (shooterTimerTemp) {
-                            shooterTimer.reset();
-                            shooterTimerTemp = false;
-                        }
-                        if (shooterTimer.seconds() > 1) {
-                            robot.spindexer.spindexerDown();
-                            shooterTimerTemp = true;
-                            shooterTimer.reset();
-                            setSecondShootingState(SecondShooterStates.Three);
-                        }
-                    case Three:
-                        if (shooterTimerTemp) {
-                            shooterTimer.reset();
-                            shooterTimerTemp = false;
-                        }
-                        if (shooterTimer.seconds() > 1) {
-                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
-                            shooterTimerTemp = true;
-                            secondShooterTimer.reset();
-                            //robot.isShootingTwo = false;
-                            robot.shotCounter ++;
-                            setSpindexerState(Two);
-                            break;
-                        }
-                }
-            case Two:
-                if (robot.shotCounter == 2) {
-                    break;
-                }
-                break;
-        }
-    }
-    public void shootingThree () {
-        switch (shootingState) {
-
-
-            case One:
-
-                switch (secondShootingState) {
-                    case One:
-                        if (shooterTimerTemp) {
-                            shooterTimer.reset();
-                            shooterTimerTemp = false;
-                        }
-                        if (shooterTimer.seconds() > 1) {
-                            robot.spindexer.spindexerUp();
-                            shooterTimerTemp = true;
-                            shooterTimer.reset();
-                            setSecondShootingState(SecondShooterStates.Two);
-                        }
-                    case Two:
-                        if (shooterTimerTemp) {
-                            shooterTimer.reset();
-                            shooterTimerTemp = false;
-                        }
-                        if (shooterTimer.seconds() > 1) {
-                            robot.spindexer.spindexerDown();
-                            shooterTimerTemp = true;
-                            shooterTimer.reset();
-                            setSecondShootingState(SecondShooterStates.Three);
-                        }
-                    case Three:
-                        if (shooterTimerTemp) {
-                            shooterTimer.reset();
-                            shooterTimerTemp = false;
-                        }
-                        if (shooterTimer.seconds() > 1) {
-                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-                            shooterTimerTemp = true;
-                            secondShooterTimer.reset();
-                            robot.shotCounter++;
-                            //robot.isShootingThree = false;
-                            setSpindexerState(Two);
-                            break;
-                        }
-                }
-            case Two:
-                if (robot.shotCounter == 3) {
-                    break;
-                }
-                break;
-        }
-    }
-//                switch (secondShootingState) {
-//                    case One:
-//                        if (shooterTimerTemp) {
-//                            secondShooterTimer.reset();
-//                            shooterTimerTemp = false;
-//                        }
-//                        if (secondShooterTimer.seconds() > 1) {
-//                            robot.spindexer.spindexerUp();
-//                            shooterTimerTemp = true;
-//                            secondShooterTimer.reset();
-//                            setSecondShootingState(SecondShooterStates.Two);
-//                        }
-//                    case Two:
-//                        if (shooterTimerTemp) {
-//                            secondShooterTimer.reset();
-//                            shooterTimerTemp = false;
-//                        }
-//                        if (secondShooterTimer.seconds() > 1) {
-//                            robot.spindexer.spindexerDown();
-//                            shooterTimerTemp = true;
-//                            secondShooterTimer.reset();
-//                            setSecondShootingState(SecondShooterStates.Three);
-//                        }
-//                    case Three:
-//                        if (shooterTimerTemp) {
-//                            secondShooterTimer.reset();
-//                            shooterTimerTemp = false;
-//                        }
-//                        if (secondShooterTimer.seconds() > 1) {
-//                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
-//                            shooterTimerTemp = true;
-//                            thirdShooterTimer.reset();
-//                            setSpindexerState(Three);
-//                            break;
-//                        }
-//                }
-//            case Three:
-//                switch (secondShootingState) {
-//                    case One:
-//                        if (shooterTimerTemp) {
-//                            thirdShooterTimer.reset();
-//                            shooterTimerTemp = false;
-//                        }
-//                        if (thirdShooterTimer.seconds() > 1) {
-//                            robot.spindexer.spindexerUp();
-//                            shooterTimerTemp = true;
-//                            thirdShooterTimer.reset();
-//                            setSecondShootingState(SecondShooterStates.Two);
-//                        }
-//                    case Two:
-//                        if (shooterTimerTemp) {
-//                            thirdShooterTimer.reset();
-//                            shooterTimerTemp = false;
-//                        }
-//                        if (thirdShooterTimer.seconds() > 1) {
-//                            robot.spindexer.spindexerDown();
-//                            shooterTimerTemp = true;
-//                            thirdShooterTimer.reset();
-//                            setSecondShootingState(SecondShooterStates.Three);
-//                        }
-//                    case Three:
-//                        if (shooterTimerTemp) {
-//                            thirdShooterTimer.reset();
-//                            shooterTimerTemp = false;
-//                        }
-//                        if (thirdShooterTimer.seconds() > 1) {
-//                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                            shooterTimerTemp = true;
-//                            //thirdShooterTimer.reset();
-//                            robot.isShooting = false;
-//                            setSpindexerState(Four);
-//                            break;
-//                        }
-//                }
-//
-//            case Four:
-//                if (!robot.isShooting){
-//                    break;
-//
-//                }
-//                setSecondShootingState(SecondShooterStates.One);
-//                switch (secondShootingState) {
-//                    case One:
-//                        if (shooterTimerTemp) {
-//                            shooterTimer.reset();
-//                            shooterTimerTemp = false;
-//                        }
-//                        if (shooterTimer.seconds() > 1) {
-//                            robot.spindexer.spindexerUp();
-//                            shooterTimerTemp = true;
-//                            shooterTimer.reset();
-//                            setSecondShootingState(SecondShooterStates.Two);
-//                        }
-//                    case Two:
-//                        if (shooterTimerTemp) {
-//                            shooterTimer.reset();
-//                            shooterTimerTemp = false;
-//                        }
-//                        if (shooterTimer.seconds() > 1) {
-//                            robot.spindexer.spindexerDown();
-//                            shooterTimerTemp = true;
-//                            shooterTimer.reset();
-//                            setSecondShootingState(SecondShooterStates.Three);
-//                        }
-//                    case Three:
-//                        if (shooterTimerTemp) {
-//                            shooterTimer.reset();
-//                            shooterTimerTemp = false;
-//                        }
-//                        if (shooterTimer.seconds() > 1) {
-//                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
-//                            shooterTimerTemp = true;
-//                            shooterTimer.reset();
-//                            setSpindexerState(Three);
-//                            break;
-//                        }
-//                }
-//            case Three:
-//                setSecondShootingState(SecondShooterStates.One);
-//                switch (secondShootingState) {
-//                    case One:
-//                        if (shooterTimerTemp) {
-//                            shooterTimer.reset();
-//                            shooterTimerTemp = false;
-//                        }
-//                        if (shooterTimer.seconds() > 1) {
-//                            robot.spindexer.spindexerUp();
-//                            shooterTimerTemp = true;
-//                            shooterTimer.reset();
-//                            setSecondShootingState(SecondShooterStates.Two);
-//                        }
-//                    case Two:
-//                        if (shooterTimerTemp) {
-//                            shooterTimer.reset();
-//                            shooterTimerTemp = false;
-//                        }
-//                        if (shooterTimer.seconds() > 1) {
-//                            robot.spindexer.spindexerDown();
-//                            shooterTimerTemp = true;
-//                            shooterTimer.reset();
-//                            setSecondShootingState(SecondShooterStates.Three);
-//                        }
-//                    case Three:
-//                        if (shooterTimerTemp) {
-//                            shooterTimer.reset();
-//                            shooterTimerTemp = false;
-//                        }
-//                        if (shooterTimer.seconds() > 1) {
-//                            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                            shooterTimerTemp = true;
-//                            shooterTimer.reset();
-//                            robot.isShooting = false;
-//                            setSpindexerState(Four);
-//                            break;
-//                        }
-//                }
-//            case Four:
-//                if (!robot.isShooting){
-//                    break;
-//                }
-
-//                if (shooterTimerTemp) {
-//                    shooterTimer.resetTimer();
-//                    shooterTimerTemp = false;
-//                }
-////                if (shooterTimer.getElapsedTimeSeconds() < 1 && robot.spindexer.getTouchSensorState()){
-////                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-////                    robot.spindexer.spindexerUp();
-////                }
-//                if (shooterTimer.getElapsedTimeSeconds() > 1){
-//                    robot.spindexer.spindexerUp();
-//                }
-//                if (shooterTimer.getElapsedTimeSeconds() > 2){
-//                    robot.spindexer.spindexerDown();
-//                }
-//                if (shooterTimer.getElapsedTimeSeconds() > 2.5){
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//                    shooterTimerTemp = true;
-//                    setSpindexerState(Three);
-//                }
-
-//                if (shooterTimerTemp) {
-//                    shooterTimer.resetTimer();
-//                    shooterTimerTemp = false;
-//                }
-////                if (shooterTimer.getElapsedTimeSeconds() > 0.3){
-////                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
-////                }
-//                if (shooterTimer.getElapsedTimeSeconds() > 1){
-//                    robot.spindexer.spindexerUp();
-//                }
-//                if (shooterTimer.getElapsedTimeSeconds() > 2){
-//                    robot.spindexer.spindexerDown();
-//                }
-//                if (shooterTimer.getElapsedTimeSeconds() > 2.5){
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
-//                    shooterTimerTemp = true;
-//                    setSpindexerState(Four);
-//                }
-
-//                if (shooterTimerTemp) {
-//                    shooterTimer.resetTimer();
-//                    shooterTimerTemp = false;
-//                }
-////                if (shooterTimer.getElapsedTimeSeconds() > 0.3){
-////                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-////                }
-//                if (shooterTimer.getElapsedTimeSeconds() > 1){
-//                    robot.spindexer.spindexerUp();
-//                }
-//                if (shooterTimer.getElapsedTimeSeconds() > 2){
-//                    robot.spindexer.spindexerDown();
-//                }
-//                if (shooterTimer.getElapsedTimeSeconds() > 2.5){
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                    robot.isShooting = false;
-//                }
                 }
 

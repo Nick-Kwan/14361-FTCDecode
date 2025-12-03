@@ -36,8 +36,11 @@ public class RobotHardware {
     public int shotCounter;
     public DigitalChannel touchSensor;
     public DigitalChannel magneticLimitSensor;
-    public ColorSensor colorSensorOne;
     public ColorSensor colorSensorTwo;
+    public ColorSensor colorSensorNA;
+    public ColorSensor colorSensorOne;
+    public ColorSensor colorSensorThree;
+    public boolean atPoseOne, atPoseTwo, atPoseThree;
     public ElapsedTime pathTimer;
     public PIDFCoefficients pid = new PIDFCoefficients(1.1958759124,0.1195875912,0,11.9587591241);
 
@@ -105,6 +108,7 @@ public class RobotHardware {
         this.spindexerLinkageServo.setPosition(RobotConstants.Spindexer.spindexerLinkageServoDown);
         this.spindexerServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerServo);
         this.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+        //spindexer.setPoseOne();
 
         this.touchSensor = hardwareMap.get(DigitalChannel.class,RobotConstants.Spindexer.touchSensor);
         this.touchSensor.setMode(DigitalChannel.Mode.INPUT);
@@ -114,6 +118,8 @@ public class RobotHardware {
 
         this.colorSensorOne = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne);
         this.colorSensorTwo = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo);
+        this.colorSensorThree = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree);
+        this.colorSensorNA = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorNA);
 
 
         // Limelight and turret setup
@@ -180,6 +186,7 @@ public class RobotHardware {
         this.spindexerLinkageServo.setPosition(RobotConstants.Spindexer.spindexerLinkageServoDown);
         this.spindexerServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerServo);
         this.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+        //spindexer.setPoseThree();
 
         this.touchSensor = hardwareMap.get(DigitalChannel.class,RobotConstants.Spindexer.touchSensor);
         this.touchSensor.setMode(DigitalChannel.Mode.INPUT);
@@ -189,6 +196,8 @@ public class RobotHardware {
 
         this.colorSensorOne = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne);
         this.colorSensorTwo = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo);
+        this.colorSensorThree = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree);
+        this.colorSensorNA = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorNA);
 
 
         // Limelight and turret setup

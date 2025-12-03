@@ -43,10 +43,9 @@ public class TeleOpRed extends CommandOpMode {
         CommandScheduler.getInstance().run();
         telemetry.addData("Magnet State : ", robot.spindexer.isLimitSwitchClosed());
         telemetry.addData("Touch Sensor : ", !robot.spindexer.getTouchSensorState());
-        telemetry.addData("Color Sensor : ", robot.spindexer.detectColor());
-        telemetry.addData("Red : ", robot.colorSensorOne.red());
-        telemetry.addData("Green : ", robot.colorSensorOne.green());
-        telemetry.addData("Blue : ", robot.colorSensorOne.blue());
+        telemetry.addData("Color One : ", robot.spindexer.detectColorOne());
+        telemetry.addData("Color Two : ", robot.spindexer.detectColorTwo());
+        telemetry.addData("Color Three : ", robot.spindexer.detectColorThree());
         telemetry.addData("Spin State : " , spindexerState);
         telemetry.addData("Shooter Power: " , robot.shooter.getPower());
 
@@ -143,38 +142,6 @@ public class TeleOpRed extends CommandOpMode {
         if (driver.gamepad.rightStickButtonWasPressed()){
             robot.shooter.setPower(robot.shooter.getPower() - 0.05);
         }
-//            switch (spindexerState) {
-//
-//                case poseOne:
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                    if (driver.gamepad.dpadLeftWasPressed()) {
-//                        setSpindexerState(SpindexerStates.poseThree);
-//                    }
-//                    if (driver.gamepad.dpadRightWasPressed()) {
-//                        setSpindexerState(SpindexerStates.poseTwo);
-//                    }
-//                    break;
-//                case poseTwo:
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//                    if (driver.gamepad.dpadLeftWasPressed()) {
-//                        setSpindexerState(SpindexerStates.poseOne);
-//                    }
-//                    if (driver.gamepad.dpadRightWasPressed()) {
-//                        setSpindexerState(SpindexerStates.poseThree);
-//                    }
-//                    break;
-//                case poseThree:
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
-//                    if (driver.gamepad.dpadLeftWasPressed()) {
-//                        setSpindexerState(SpindexerStates.poseTwo);
-//                    }
-//                    if (driver.gamepad.dpadRightWasPressed()) {
-//                        setSpindexerState(SpindexerStates.poseOne);
-//                    }
-//                    break;
-//            }
-
-//        }
 
 
         telemetry.update();

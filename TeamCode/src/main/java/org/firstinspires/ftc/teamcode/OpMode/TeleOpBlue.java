@@ -30,7 +30,6 @@ public class TeleOpBlue extends CommandOpMode {
     public void setSpindexerState(SpindexerStates state) {
         spindexerState = state;
     }
-
     @Override
     public void initialize() {
         CommandScheduler.getInstance().reset();
@@ -47,11 +46,9 @@ public class TeleOpBlue extends CommandOpMode {
         CommandScheduler.getInstance().run();
         telemetry.addData("Magnet State : ", robot.spindexer.isLimitSwitchClosed());
         telemetry.addData("Touch Sensor : ", !robot.spindexer.getTouchSensorState());
-        telemetry.addData("Color Blue : ", robot.colorSensorOne.blue());
-        telemetry.addData("Color Green : ", robot.colorSensorOne.green());
-        telemetry.addData("Red : ", robot.colorSensorOne.red());
-        telemetry.addData("Green : ", robot.colorSensorOne.green());
-        telemetry.addData("Blue : ", robot.colorSensorOne.blue());
+        telemetry.addData("Color One All : ", robot.spindexer.detectColorOne());
+        telemetry.addData("Color Two All : ", robot.spindexer.detectColorTwo());
+        telemetry.addData("Color Three All : ", robot.spindexer.detectColorThree());
         telemetry.addData("Spin State : " , spindexerState);
         telemetry.addData("Shooter Velocity " , (robot.shooter.getVelocity()/28) * 60);
 
@@ -96,6 +93,9 @@ public class TeleOpBlue extends CommandOpMode {
         }
 
 
+
+        //robot.spindexer.autoIntake();
+
         if(driver.gamepad.left_trigger > 0.1) {
             robot.mecanum.periodic(0.3);
         } else {
@@ -127,31 +127,19 @@ public class TeleOpBlue extends CommandOpMode {
         }
 
         if (driver.gamepad.dpad_left) {
-            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+            robot.spindexer.setPoseOne();
+            //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
         }
 
         if (driver.gamepad.dpad_up) {
-            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+            robot.spindexer.setPoseTwo();
+            //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
         }
 
         if (driver.gamepad.dpad_right) {
-            robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+            robot.spindexer.setPoseThree();
+            //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
         }
-
-//        if (!robot.spindexer.getTouchSensorState()) {
-//
-//            if (driver.gamepad.dpad_left) {
-//                robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//            }
-//
-//            if (driver.gamepad.dpad_up) {
-//                robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//            }
-//
-//            if (driver.gamepad.dpad_right) {
-//                robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
-//            }
-//        }
 
         if (driver.gamepad.triangle){
             robot.shooter.setVelocity(((double) 2500 /60) * 28);
@@ -174,38 +162,6 @@ public class TeleOpBlue extends CommandOpMode {
             robot.spindexer.setSortingState(SortingStates.Checking);
             robot.spindexer.sorting();
         }
-//            switch (spindexerState) {
-//
-//                case poseOne:
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-//                    if (driver.gamepad.dpadLeftWasPressed()) {
-//                        setSpindexerState(SpindexerStates.poseThree);
-//                    }
-//                    if (driver.gamepad.dpadRightWasPressed()) {
-//                        setSpindexerState(SpindexerStates.poseTwo);
-//                    }
-//                    break;
-//                case poseTwo:
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//                    if (driver.gamepad.dpadLeftWasPressed()) {
-//                        setSpindexerState(SpindexerStates.poseOne);
-//                    }
-//                    if (driver.gamepad.dpadRightWasPressed()) {
-//                        setSpindexerState(SpindexerStates.poseThree);
-//                    }
-//                    break;
-//                case poseThree:
-//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
-//                    if (driver.gamepad.dpadLeftWasPressed()) {
-//                        setSpindexerState(SpindexerStates.poseTwo);
-//                    }
-//                    if (driver.gamepad.dpadRightWasPressed()) {
-//                        setSpindexerState(SpindexerStates.poseOne);
-//                    }
-//                    break;
-//            }
-
-//        }
 
 
         telemetry.update();
