@@ -27,7 +27,7 @@ public class PIDTuning extends OpMode{
     @Override
     public void init() {
         pid = new PIDFCoefficients(p,i,d,f);
-        shooter = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooter);
+        shooter = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooterOne);
         shooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         shooter.setDirection(DcMotorEx.Direction.REVERSE);
         shooter.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER,pid);

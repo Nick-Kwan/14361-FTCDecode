@@ -132,7 +132,7 @@ public class redClose  extends OpMode{
                 robot.isShootingOne = true;
                 robot.isShootingTwo = true;
                 robot.isShootingThree = true;
-                robot.shooter.setPower(RobotConstants.Drivetrain.shooterAuto);
+                robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterAuto);
                 robot.intake.startIntaking();
                 //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
                 follower.followPath(scorePreload);
@@ -152,14 +152,14 @@ public class redClose  extends OpMode{
                     robot.spindexer.spindexerUp();
                     waitM(500);
                     robot.spindexer.spindexerDown();
-                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterShortOn);
+                    //robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterShortOn);
                     waitM(250);
                     robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
                     // Shoot the second ball
                     waitM(500);
                     robot.spindexer.spindexerUp();
                     waitM(500);
-                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
+                    //robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
                     robot.spindexer.spindexerDown();
                     waitM(250);
                     robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
@@ -196,7 +196,7 @@ public class redClose  extends OpMode{
             case 3:
                 if (!follower.isBusy()){
                     robot.intake.intakeUp();
-                    robot.shooter.setPower(RobotConstants.Drivetrain.shooterShortAuto);
+                    robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterShortAuto);
                     waitM(500);
                     robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
                     waitM(100);
@@ -217,16 +217,16 @@ public class redClose  extends OpMode{
                     waitM(500);
                     robot.spindexer.spindexerUp();
                     waitM(500);
-                    robot.shooter.setPower(RobotConstants.Drivetrain.shooterAuto);
+                    robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterAuto);
                     robot.spindexer.spindexerDown();
-                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterShortOn);
+                    //robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterShortOn);
                     waitM(250);
                     robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
                     // Shoot the second ball
                     waitM(500);
                     robot.spindexer.spindexerUp();
                     waitM(500);
-                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
+                    //robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
                     robot.spindexer.spindexerDown();
                     waitM(250);
                     robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
@@ -255,7 +255,7 @@ public class redClose  extends OpMode{
             case 7:
                 if (!follower.isBusy()){
                     robot.intake.intakeUp();
-                    robot.shooter.setPower(RobotConstants.Drivetrain.shooterShortAuto);
+                    robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterShortAuto);
                     waitM(500);
                     robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
                     waitM(100);
@@ -275,16 +275,16 @@ public class redClose  extends OpMode{
                     waitM(1000);
                     robot.spindexer.spindexerUp();
                     waitM(500);
-                    robot.shooter.setPower(RobotConstants.Drivetrain.shooterAuto);
+                    robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterAuto);
                     robot.spindexer.spindexerDown();
-                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterShortOn);
+                    //robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterShortOn);
                     waitM(250);
                     robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
                     // Shoot the second ball
                     waitM(500);
                     robot.spindexer.spindexerUp();
                     waitM(500);
-                    //robot.shooter.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
+                    //robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
                     robot.spindexer.spindexerDown();
                     waitM(250);
                     robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);

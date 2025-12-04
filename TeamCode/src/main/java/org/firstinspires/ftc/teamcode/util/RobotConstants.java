@@ -13,9 +13,12 @@ public class RobotConstants {
         public static String rightRear = "rightRear";
         public static String limelight = "limelight";
         public static String turret = "turret";
-        public static String shooter = "shooter";
-        public static double shooterLongOn = -0.55;
-        public static double shooterShortOn = -0.47;
+        public static String shooterOne = "shooterOne";
+        public static String shooterTwo = "shooterTwo";
+        public static String adjustableHoodServo = "adjustableHoodServo";
+
+        public static double shooterLongOn = 0.55;
+        public static double shooterShortOn = 0.47;
         public static double shooterEightOn = -0.8;
         public static double shooterAuto = -0.57;
         public static double shooterShortAuto = -0.4;
@@ -23,6 +26,10 @@ public class RobotConstants {
         public static double shooterOff = 0;
         public static double shooterReverse = 1;
         public static double turretPose = 0.5;
+        public static double hoodPoseMid = 0.5;
+        public static double hoodPoseLong = 0.21;
+        public static double hoodPoseRetract = 0;
+        public static double hoodPoseFull = 1;
     }
 
     @Config
@@ -46,13 +53,15 @@ public class RobotConstants {
         public static String spindexerServo = "spindexerServo";
         public static String touchSensor = "touchSensor";
         public static String magneticLimitSensor = "magneticLimitSensor";
-        public static String colorSensorOne = "colorSensorOne";
-        public static String colorSensorTwo = "colorSensorTwo";
-        public static String colorSensorThree = "colorSensorThree";
-        public static String colorSensorNA = "colorSensorNA";
+        public static String colorSensorOne_1 = "colorSensorOne_1";
+        public static String colorSensorTwo_1 = "colorSensorTwo_1";
+        public static String colorSensorThree_1 = "colorSensorThree_1";
+        public static String colorSensorOne_2 = "colorSensorOne_2";
+        public static String colorSensorTwo_2 = "colorSensorTwo_2";
+        public static String colorSensorThree_2 = "colorSensorThree_2";
 
         // Values
-        public static double spindexerLinkageServoDown = 0.62;
+        public static double spindexerLinkageServoDown = 0.67;
         public static double spindexerLinkageServoUp = 0;
         // Change values
         public static double spindexerServoPoseOne = 0.006;

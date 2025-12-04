@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.arcrobotics.ftclib.hardware.motors.MotorGroup;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -21,6 +24,9 @@ import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Mecanum;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Config
 public class RobotHardware {
 
@@ -36,10 +42,13 @@ public class RobotHardware {
     public int shotCounter;
     public DigitalChannel touchSensor;
     public DigitalChannel magneticLimitSensor;
-    public ColorSensor colorSensorTwo;
+    public ColorSensor colorSensorOne_1;
+    public ColorSensor colorSensorOne_2;
+    public ColorSensor colorSensorTwo_1;
+    public ColorSensor colorSensorTwo_2;
     public ColorSensor colorSensorNA;
-    public ColorSensor colorSensorOne;
-    public ColorSensor colorSensorThree;
+    public ColorSensor colorSensorThree_1;
+    public ColorSensor colorSensorThree_2;
     public boolean atPoseOne, atPoseTwo, atPoseThree;
     public ElapsedTime pathTimer;
     public PIDFCoefficients pid = new PIDFCoefficients(1.1958759124,0.1195875912,0,11.9587591241);
@@ -50,7 +59,15 @@ public class RobotHardware {
     public Limelight3A limelight;
     public int aprilID;
     public Servo turretServo;
-    public DcMotorEx shooter;
+    public DcMotor shooterOne;
+    public DcMotor shooterTwo;
+    public Servo adjustableHoodServo;
+    public Motor m_shooterOne;
+    public Motor m_shooterTwo;
+    public MotorGroup shooterMotors;
+    public static double kP = 20;
+    public static double kV = 0.7;
+    public List<LynxModule> hubs;
 
     // Hardware variables
     private HardwareMap hardwareMap;
@@ -116,10 +133,12 @@ public class RobotHardware {
         this.magneticLimitSensor = hardwareMap.get(DigitalChannel.class, RobotConstants.Spindexer.magneticLimitSensor);
         this.magneticLimitSensor.setMode(DigitalChannel.Mode.INPUT);
 
-        this.colorSensorOne = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne);
-        this.colorSensorTwo = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo);
-        this.colorSensorThree = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree);
-        this.colorSensorNA = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorNA);
+        this.colorSensorOne_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne_1);
+        this.colorSensorTwo_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo_1);
+        this.colorSensorThree_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree_1);
+        this.colorSensorOne_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne_2);
+        this.colorSensorTwo_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo_2);
+        this.colorSensorThree_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree_2);
 
 
         // Limelight and turret setup
@@ -134,11 +153,26 @@ public class RobotHardware {
         this.turretServo = hardwareMap.servo.get(RobotConstants.Drivetrain.turret);
         this.turretServo.setPosition(RobotConstants.Drivetrain.turretPose);
 
-        this.shooter = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooter);
-        this.shooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        this.shooter.setDirection(DcMotorEx.Direction.REVERSE);
-        this.shooter.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER,pid);
+        this.shooterOne = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterOne);
+        this.shooterOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.shooterOne.setDirection(DcMotor.Direction.REVERSE);
+        this.shooterTwo = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterTwo);
+        this.shooterTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        this.m_shooterOne = new Motor(hardwareMap, "shooterOne", Motor.GoBILDA.BARE);
+        this.shooterOne = m_shooterOne.motor;
+        this.m_shooterTwo = new Motor(hardwareMap, "shooterTwo", Motor.GoBILDA.BARE);
+        this.shooterTwo = m_shooterTwo.motor;
+        this.shooterMotors = new MotorGroup(this.m_shooterOne,this.m_shooterTwo);
+
+        this.shooterMotors.setRunMode(Motor.RunMode.RawPower);
+//        this.shooterMotors.setVeloCoefficients(kP, 0, 0);
+//        this.shooterMotors.setFeedforwardCoefficients(0, kV);
+        this.hubs = hardwareMap.getAll(LynxModule.class);
+        this.hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
+
+        this.adjustableHoodServo = hardwareMap.servo.get(RobotConstants.Drivetrain.adjustableHoodServo);
+        this.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseMid);
 
         mecanum = new Mecanum();
         intake = new Intake();
@@ -194,10 +228,12 @@ public class RobotHardware {
         this.magneticLimitSensor = hardwareMap.get(DigitalChannel.class, RobotConstants.Spindexer.magneticLimitSensor);
         this.magneticLimitSensor.setMode(DigitalChannel.Mode.INPUT);
 
-        this.colorSensorOne = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne);
-        this.colorSensorTwo = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo);
-        this.colorSensorThree = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree);
-        this.colorSensorNA = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorNA);
+        this.colorSensorOne_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne_1);
+        this.colorSensorTwo_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo_1);
+        this.colorSensorThree_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree_1);
+        this.colorSensorOne_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne_2);
+        this.colorSensorTwo_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo_2);
+        this.colorSensorThree_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree_2);
 
 
         // Limelight and turret setup
@@ -212,7 +248,11 @@ public class RobotHardware {
         this.turretServo = hardwareMap.servo.get(RobotConstants.Drivetrain.turret);
         this.turretServo.setPosition(RobotConstants.Drivetrain.turretPose);
 
-        this.shooter = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooter);
+        this.shooterOne = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooterOne);
+        this.shooterOne.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        this.shooterOne.setDirection(DcMotorEx.Direction.REVERSE);
+        this.shooterTwo = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooterTwo);
+        this.shooterTwo.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         mecanum = new Mecanum();
         intake = new Intake();

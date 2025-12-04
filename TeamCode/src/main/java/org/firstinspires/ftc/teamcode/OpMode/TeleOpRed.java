@@ -43,11 +43,11 @@ public class TeleOpRed extends CommandOpMode {
         CommandScheduler.getInstance().run();
         telemetry.addData("Magnet State : ", robot.spindexer.isLimitSwitchClosed());
         telemetry.addData("Touch Sensor : ", !robot.spindexer.getTouchSensorState());
-        telemetry.addData("Color One : ", robot.spindexer.detectColorOne());
-        telemetry.addData("Color Two : ", robot.spindexer.detectColorTwo());
-        telemetry.addData("Color Three : ", robot.spindexer.detectColorThree());
+        telemetry.addData("Color One : ", robot.spindexer.detectColorOne_1());
+        telemetry.addData("Color Two : ", robot.spindexer.detectColorTwo_1());
+        telemetry.addData("Color Three : ", robot.spindexer.detectColorThree_1());
         telemetry.addData("Spin State : " , spindexerState);
-        telemetry.addData("Shooter Power: " , robot.shooter.getPower());
+        telemetry.addData("Shooter Power: " , robot.shooterOne.getPower());
 
         robot.limelight.start();
         YawPitchRollAngles orientation = robot.imu.getRobotYawPitchRollAngles();
@@ -127,20 +127,20 @@ public class TeleOpRed extends CommandOpMode {
         }
 
         if (driver.gamepad.triangle){
-            robot.shooter.setPower(RobotConstants.Drivetrain.shooterShortOn);
+            robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterShortOn);
         }
         if (driver.gamepad.circle){
-            robot.shooter.setPower(RobotConstants.Drivetrain.shooterLongOn);
+            robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterLongOn);
         }
         if (driver.gamepad.square){
-            robot.shooter.setPower(RobotConstants.Drivetrain.shooterOff);
+            robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterOff);
         }
 
         if (driver.gamepad.leftStickButtonWasPressed()){
-            robot.shooter.setPower(robot.shooter.getPower() + 0.05);
+            robot.shooterOne.setPower(robot.shooterOne.getPower() + 0.05);
         }
         if (driver.gamepad.rightStickButtonWasPressed()){
-            robot.shooter.setPower(robot.shooter.getPower() - 0.05);
+            robot.shooterOne.setPower(robot.shooterOne.getPower() - 0.05);
         }
 
 

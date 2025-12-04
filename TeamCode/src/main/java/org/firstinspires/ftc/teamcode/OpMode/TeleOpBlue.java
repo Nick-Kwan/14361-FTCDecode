@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
@@ -46,11 +47,14 @@ public class TeleOpBlue extends CommandOpMode {
         CommandScheduler.getInstance().run();
         telemetry.addData("Magnet State : ", robot.spindexer.isLimitSwitchClosed());
         telemetry.addData("Touch Sensor : ", !robot.spindexer.getTouchSensorState());
-        telemetry.addData("Color One All : ", robot.spindexer.detectColorOne());
-        telemetry.addData("Color Two All : ", robot.spindexer.detectColorTwo());
-        telemetry.addData("Color Three All : ", robot.spindexer.detectColorThree());
+//        telemetry.addData("Color 1.1 : ", robot.spindexer.detectColorOne_1());
+//        telemetry.addData("Color 2.1 : ", robot.spindexer.detectColorTwo_1());
+//        telemetry.addData("Color 3.1 : ", robot.spindexer.detectColorThree_1());
+//        telemetry.addData("Color 1.2 : ", robot.spindexer.detectColorOne_2());
+//        telemetry.addData("Color 2.2 : ", robot.spindexer.detectColorTwo_2());
+//        telemetry.addData("Color 3.2 : ", robot.spindexer.detectColorThree_2());
         telemetry.addData("Spin State : " , spindexerState);
-        telemetry.addData("Shooter Velocity " , (robot.shooter.getVelocity()/28) * 60);
+        //telemetry.addData("Shooter Velocity " , (robot.shooterOne.getVelocity()/28) * 60);
 
         robot.limelight.start();
         YawPitchRollAngles orientation = robot.imu.getRobotYawPitchRollAngles();
@@ -74,10 +78,10 @@ public class TeleOpBlue extends CommandOpMode {
             }
             telemetry.addData("April Tag ID(Fiducial results) ", llResult.getFiducialResults());
             if (llResult.getTx() > 2){
-                robot.turretServo.setPosition(robot.turretServo.getPosition() + 0.015);
+                robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
             }
             else if (llResult.getTx() < -2){
-                robot.turretServo.setPosition(robot.turretServo.getPosition() - 0.015);
+                robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
             }
             temp = true;
         }
@@ -91,10 +95,9 @@ public class TeleOpBlue extends CommandOpMode {
                 temp = true;
             }
         }
+        robot.hubs.forEach(LynxModule::clearBulkCache);
 
 
-
-        //robot.spindexer.autoIntake();
 
         if(driver.gamepad.left_trigger > 0.1) {
             robot.mecanum.periodic(0.3);
@@ -109,6 +112,7 @@ public class TeleOpBlue extends CommandOpMode {
         if(driver.gamepad.right_trigger > 0.1) {
             robot.intake.startIntaking();
             robot.intake.intakeDown();
+            robot.spindexer.autoIntake();
         }
         else if (driver.gamepad.right_bumper){
             robot.intake.reverseIntaking();
@@ -126,37 +130,80 @@ public class TeleOpBlue extends CommandOpMode {
             robot.spindexer.spindexerDown();
         }
 
-        if (driver.gamepad.dpad_left) {
-            robot.spindexer.setPoseOne();
-            //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
-        }
+        if (!robot.spindexer.getTouchSensorState()){
+            if (driver.gamepad.dpad_left) {
+                robot.spindexer.setPoseOne();
+                //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+            }
 
-        if (driver.gamepad.dpad_up) {
-            robot.spindexer.setPoseTwo();
-            //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-        }
+            if (driver.gamepad.dpad_up) {
+                robot.spindexer.setPoseTwo();
+                //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+            }
 
-        if (driver.gamepad.dpad_right) {
-            robot.spindexer.setPoseThree();
-            //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+            if (driver.gamepad.dpad_right) {
+                robot.spindexer.setPoseThree();
+                //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+            }
         }
+//        if (driver.gamepad.dpad_left) {
+//            robot.spindexer.setPoseOne();
+//            //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//        }
+//
+//        if (driver.gamepad.dpad_up) {
+//            robot.spindexer.setPoseTwo();
+//            //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//        }
+//
+//        if (driver.gamepad.dpad_right) {
+//            robot.spindexer.setPoseThree();
+//            //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+//        }
 
         if (driver.gamepad.triangle){
-            robot.shooter.setVelocity(((double) 2500 /60) * 28);
+            robot.shooterMotors.set(0.6);
+            robot.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseMid);
+//            robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterShortOn);
+//            robot.shooterTwo.setPower(RobotConstants.Drivetrain.shooterShortOn);
         }
         if (driver.gamepad.circle){
-            robot.shooter.setVelocity(((double) 3500 /60) * 28);
+            robot.shooterMotors.set(0.75);
+            robot.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseLong);
+//            robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterLongOn);
+//            robot.shooterTwo.setPower(RobotConstants.Drivetrain.shooterLongOn);
         }
         if (driver.gamepad.square){
-            robot.shooter.setPower(RobotConstants.Drivetrain.shooterOff);
+            robot.shooterMotors.set(0.0);
+//            robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterOff);
+//            robot.shooterTwo.setPower(RobotConstants.Drivetrain.shooterOff);
         }
 
         if (driver.gamepad.leftStickButtonWasPressed()){
-            robot.shooter.setVelocity(robot.shooter.getVelocity() - 50);
+            robot.shooterOne.setPower(robot.shooterOne.getPower() + 0.05);
+            robot.shooterTwo.setPower(robot.shooterOne.getPower() + 0.05);
         }
         if (driver.gamepad.rightStickButtonWasPressed()){
-            robot.shooter.setVelocity(robot.shooter.getVelocity() + 50);
+            robot.shooterOne.setPower(robot.shooterOne.getPower() - 0.05);
+            robot.shooterTwo.setPower(robot.shooterOne.getPower() - 0.05);
         }
+
+//        if (driver.gamepad.triangle){
+//            robot.shooterOne.setVelocity(((double) 2500 /60) * 28);
+//        }
+//        if (driver.gamepad.circle){
+//            robot.shooterOne.setVelocity(((double) 3500 /60) * 28);
+//        }
+//        if (driver.gamepad.square){
+//            robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterOff);
+//        }
+//
+//        if (driver.gamepad.leftStickButtonWasPressed()){
+//            robot.shooterOne.setVelocity(robot.shooterOne.getVelocity() - 50);
+//        }
+//        if (driver.gamepad.rightStickButtonWasPressed()){
+//            robot.shooterOne.setVelocity(robot.shooterOne.getVelocity() + 50);
+//        }
 
         if (driver.gamepad.leftBumperWasPressed()){
             robot.spindexer.setSortingState(SortingStates.Checking);

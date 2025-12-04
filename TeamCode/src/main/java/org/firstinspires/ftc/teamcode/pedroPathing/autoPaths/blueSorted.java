@@ -139,7 +139,7 @@ public class blueSorted extends OpMode{
                 robot.isShootingTwo = true;
                 robot.isShootingThree = true;
                 robot.aprilID = 21;
-                robot.shooter.setPower(RobotConstants.Drivetrain.shooterAuto);
+                robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterAuto);
                 robot.intake.startIntaking();
                 //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
                 follower.followPath(scorePreload);

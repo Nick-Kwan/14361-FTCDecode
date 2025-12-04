@@ -31,7 +31,7 @@ public class turret extends OpMode {
         controller = new PIDController(p,i,d);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        shooterMotor =hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooter);
+        shooterMotor =hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooterOne);
 
     }
 

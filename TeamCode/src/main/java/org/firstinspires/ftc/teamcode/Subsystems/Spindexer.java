@@ -2,26 +2,19 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import static org.firstinspires.ftc.teamcode.States.AutoIntakeStates.Checking;
 import static org.firstinspires.ftc.teamcode.States.AutoIntakeStates.Exit;
-import static org.firstinspires.ftc.teamcode.States.AutoIntakeStates.One;
-import static org.firstinspires.ftc.teamcode.States.ShooterStates.Four;
-import static org.firstinspires.ftc.teamcode.States.ShooterStates.Three;
-import static org.firstinspires.ftc.teamcode.States.ShooterStates.Two;
 
 import org.firstinspires.ftc.teamcode.States.AutoIntakeStates;
 import org.firstinspires.ftc.teamcode.States.SecondShooterStates;
 import org.firstinspires.ftc.teamcode.States.ShooterStates;
 import org.firstinspires.ftc.teamcode.States.SortingStates;
-import org.firstinspires.ftc.teamcode.States.SpindexerStates;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
 
 import com.arcrobotics.ftclib.command.Subsystem;
-import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class Spindexer implements Subsystem{
     private RobotHardware robot;
@@ -80,13 +73,13 @@ public class Spindexer implements Subsystem{
 
 
     public void shooterOn() {
-        robot.shooter.setPower(RobotConstants.Drivetrain.shooterLongOn);
+        robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterLongOn);
     }
     public void shooterOff() {
-        robot.shooter.setPower(RobotConstants.Drivetrain.shooterOff);
+        robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterOff);
     }
     public void shooterReverse() {
-        robot.shooter.setPower(RobotConstants.Drivetrain.shooterReverse);
+        robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterReverse);
     }
 
     public boolean getTouchSensorState() {
@@ -97,18 +90,31 @@ public class Spindexer implements Subsystem{
     }
 
 
-    public double detectColorOne (){
-        double allColor = robot.colorSensorOne.red() + robot.colorSensorOne.green() + robot.colorSensorOne.blue();
+    public double detectColorOne_1(){
+        double allColor = robot.colorSensorOne_1.red() + robot.colorSensorOne_1.green() + robot.colorSensorOne_1.blue();
         return allColor;
     }
-    public double detectColorTwo (){
-        double allColor = robot.colorSensorTwo.red() + robot.colorSensorTwo.green() + robot.colorSensorTwo.blue();
+    public double detectColorTwo_1(){
+        double allColor = robot.colorSensorTwo_1.red() + robot.colorSensorTwo_1.green() + robot.colorSensorTwo_1.blue();
         return allColor;
     }
-    public double detectColorThree (){
-        double allColor = robot.colorSensorThree.red() + robot.colorSensorThree.green() + robot.colorSensorThree.blue();
+    public double detectColorThree_1(){
+        double allColor = robot.colorSensorThree_1.red() + robot.colorSensorThree_1.green() + robot.colorSensorThree_1.blue();
         return allColor;
     }
+    public double detectColorOne_2(){
+        double allColor = robot.colorSensorOne_2.red() + robot.colorSensorOne_2.green() + robot.colorSensorOne_2.blue();
+        return allColor;
+    }
+    public double detectColorTwo_2(){
+        double allColor = robot.colorSensorTwo_2.red() + robot.colorSensorTwo_2.green() + robot.colorSensorTwo_2.blue();
+        return allColor;
+    }
+    public double detectColorThree_2(){
+        double allColor = robot.colorSensorThree_2.red() + robot.colorSensorThree_2.green() + robot.colorSensorThree_2.blue();
+        return allColor;
+    }
+
 
 
 
@@ -119,83 +125,85 @@ public class Spindexer implements Subsystem{
                 // When the Spindexer is at Pose One
                 if (robot.atPoseOne && !robot.atPoseTwo && !robot.atPoseThree) {
                     // All the slots have balls
-                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && (robot.colorSensorTwo.green() > 3000 || robot.colorSensorTwo.blue() > 3000) && (robot.colorSensorThree.green() > 3000 || robot.colorSensorThree.blue() > 3000)){
+                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
                         robot.spindexer.setPoseOne();
                         setAutoIntakeState(Exit);
                     }
                     // The first slot is empty
-                    if (robot.colorSensorOne.red() < 1000){
+                    if (robot.spindexer.detectColorOne_1() > 1000){
                         robot.spindexer.setPoseOne();
                         setAutoIntakeState(Exit);
                     }
                     // The second slot is empty and the other two slots are taken
-                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && robot.colorSensorTwo.red() < 1000 && (robot.colorSensorThree.green() > 3000 || robot.colorSensorThree.blue() > 3000)){
+                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
                         robot.spindexer.setPoseTwo();
                         setAutoIntakeState(Exit);
                     }
                     // The third slot is empty and the other two slots are taken
-                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && (robot.colorSensorTwo.green() > 3000 || robot.colorSensorTwo.blue() > 3000) && robot.colorSensorThree.red() < 1000){
+                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && robot.spindexer.detectColorThree_1() < 1000){
                         robot.spindexer.setPoseThree();
                         setAutoIntakeState(Exit);
                     }
                     // The first slot is taken and the other two slots are empty
-                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && robot.colorSensorTwo.red() < 1000 && robot.colorSensorThree.red() < 1000){
+                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && robot.spindexer.detectColorThree_1() < 1000){
                         robot.spindexer.setPoseTwo();
                         setAutoIntakeState(Exit);
                     }
                 }
                 // When the Spindexer is at Pose Two
-                if (!robot.atPoseOne && robot.atPoseTwo && !robot.atPoseThree) {
+                // Pose: Two Two Three One Three
+                else if (!robot.atPoseOne && robot.atPoseTwo && !robot.atPoseThree) {
                     // All the slots have balls
-                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && (robot.colorSensorTwo.green() > 3000 || robot.colorSensorTwo.blue() > 3000) && (robot.colorSensorThree.green() > 3000 || robot.colorSensorThree.blue() > 3000)){
+                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
                         robot.spindexer.setPoseTwo();
                         setAutoIntakeState(Exit);
                     }
                     // The first slot is empty
-                    if (robot.colorSensorOne.red() < 1000){
+                    if (robot.spindexer.detectColorOne_1() > 1000){
                         robot.spindexer.setPoseTwo();
                         setAutoIntakeState(Exit);
                     }
                     // The second slot is empty and the other two slots are taken
-                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && robot.colorSensorTwo.red() < 1000 && (robot.colorSensorThree.green() > 3000 || robot.colorSensorThree.blue() > 3000)){
+                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
                         robot.spindexer.setPoseThree();
                         setAutoIntakeState(Exit);
                     }
                     // The third slot is empty and the other two slots are taken
-                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && (robot.colorSensorTwo.green() > 3000 || robot.colorSensorTwo.blue() > 3000) && robot.colorSensorThree.red() < 1000){
+                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && robot.spindexer.detectColorThree_1() < 1000){
                         robot.spindexer.setPoseOne();
                         setAutoIntakeState(Exit);
                     }
                     // The first slot is taken and the other two slots are empty
-                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && robot.colorSensorTwo.red() < 1000 && robot.colorSensorThree.red() < 1000){
+                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && robot.spindexer.detectColorThree_1() < 1000){
                         robot.spindexer.setPoseThree();
                         setAutoIntakeState(Exit);
                     }
                 }
                 // When the Spindexer is at Pose Three
-                if (!robot.atPoseOne && !robot.atPoseTwo && robot.atPoseThree) {
+                // Pose: Three Three One Two One
+                else if (!robot.atPoseOne && !robot.atPoseTwo && robot.atPoseThree) {
                     // All the slots have balls
-                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && (robot.colorSensorTwo.green() > 3000 || robot.colorSensorTwo.blue() > 3000) && (robot.colorSensorThree.green() > 3000 || robot.colorSensorThree.blue() > 3000)){
+                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
                         robot.spindexer.setPoseThree();
                         setAutoIntakeState(Exit);
                     }
                     // The first slot is empty
-                    if (robot.colorSensorOne.red() < 1000){
+                    if (robot.spindexer.detectColorOne_1() > 1000){
                         robot.spindexer.setPoseThree();
                         setAutoIntakeState(Exit);
                     }
                     // The second slot is empty and the other two slots are taken
-                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && robot.colorSensorTwo.red() < 1000 && (robot.colorSensorThree.green() > 3000 || robot.colorSensorThree.blue() > 3000)){
+                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
                         robot.spindexer.setPoseOne();
                         setAutoIntakeState(Exit);
                     }
                     // The third slot is empty and the other two slots are taken
-                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && (robot.colorSensorTwo.green() > 3000 || robot.colorSensorTwo.blue() > 3000) && robot.colorSensorThree.red() < 10000){
+                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && robot.spindexer.detectColorThree_1() < 1000){
                         robot.spindexer.setPoseTwo();
                         setAutoIntakeState(Exit);
                     }
                     // The first slot is taken and the other two slots are empty
-                    if ((robot.colorSensorOne.green() > 3000 || robot.colorSensorOne.blue() > 3000) && robot.colorSensorTwo.red() < 1000 && robot.colorSensorThree.red() < 1000){
+                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && robot.spindexer.detectColorThree_1() < 1000){
                         robot.spindexer.setPoseOne();
                         setAutoIntakeState(Exit);
                     }
@@ -213,11 +221,11 @@ public class Spindexer implements Subsystem{
                 // Green Purple Purple
                 if (robot.aprilID == 21){
                     waitM(750);
-                    if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+                    if (robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
                         waitM(250);
                         robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
                         waitM(750);
-                        if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+                        if (robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
                             waitM(250);
                             robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
                             waitM(500);
@@ -238,7 +246,7 @@ public class Spindexer implements Subsystem{
                             robot.spindexer.spindexerDown();
                             setSortingState(SortingStates.Exit);
                         }
-                        else if (robot.colorSensorOne.green() > robot.colorSensorOne.blue()){
+                        else if (robot.colorSensorOne_1.green() > robot.colorSensorOne_1.blue()){
                             waitM(500);
                             robot.spindexer.spindexerUp();
                             waitM(500);
@@ -282,7 +290,7 @@ public class Spindexer implements Subsystem{
                 // Purple Green Purple
                 if (robot.aprilID == 22){
                     waitM(750);
-                    if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+                    if (robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
                         waitM(500);
                         robot.spindexer.spindexerUp();
                         waitM(500);
@@ -290,7 +298,7 @@ public class Spindexer implements Subsystem{
                         waitM(250);
                         robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
                         waitM(750);
-                        if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+                        if (robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
                             waitM(250);
                             robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
                             waitM(500);
@@ -305,7 +313,7 @@ public class Spindexer implements Subsystem{
                             robot.spindexer.spindexerDown();
                             setSortingState(SortingStates.Exit);
                         }
-                        else if (robot.colorSensorOne.green() > robot.colorSensorOne.blue()){
+                        else if (robot.colorSensorOne_1.green() > robot.colorSensorOne_1.blue()){
                             waitM(500);
                             robot.spindexer.spindexerUp();
                             waitM(500);
@@ -344,7 +352,7 @@ public class Spindexer implements Subsystem{
                 // Purple Purple Green
                 if (robot.aprilID == 23){
                     waitM(750);
-                    if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+                    if (robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
                         waitM(500);
                         robot.spindexer.spindexerUp();
                         waitM(500);
@@ -352,7 +360,7 @@ public class Spindexer implements Subsystem{
                         waitM(250);
                         robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
                         waitM(750);
-                        if (robot.colorSensorOne.blue() > robot.colorSensorOne.green()){
+                        if (robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
                             waitM(500);
                             robot.spindexer.spindexerUp();
                             waitM(500);
@@ -365,7 +373,7 @@ public class Spindexer implements Subsystem{
                             robot.spindexer.spindexerDown();
                             setSortingState(SortingStates.Exit);
                         }
-                        else if (robot.colorSensorOne.green() > robot.colorSensorOne.blue()){
+                        else if (robot.colorSensorOne_1.green() > robot.colorSensorOne_1.blue()){
                             waitM(250);
                             robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
                             waitM(500);
