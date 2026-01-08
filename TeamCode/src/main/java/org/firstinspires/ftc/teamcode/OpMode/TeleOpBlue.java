@@ -4,18 +4,17 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.States.SortingStates;
-import org.firstinspires.ftc.teamcode.States.SpindexerStates;
+import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.List;
 
@@ -27,10 +26,7 @@ public class TeleOpBlue extends CommandOpMode {
     boolean temp = true;
 
     private Timer llResetTimer;
-    private SpindexerStates spindexerState = SpindexerStates.poseOne;
-    public void setSpindexerState(SpindexerStates state) {
-        spindexerState = state;
-    }
+    private boolean timerTaskTemp;
     @Override
     public void initialize() {
         CommandScheduler.getInstance().reset();
@@ -39,21 +35,32 @@ public class TeleOpBlue extends CommandOpMode {
 
         robot.init(hardwareMap,driver);
         llResetTimer = new Timer();
+        robot.pathTimer = new ElapsedTime();
     }
 
     @Override
     public void run() {
-
+        // Telemetry and Limelight
         CommandScheduler.getInstance().run();
         telemetry.addData("Magnet State : ", robot.spindexer.isLimitSwitchClosed());
         telemetry.addData("Touch Sensor : ", !robot.spindexer.getTouchSensorState());
+        telemetry.addData("April Tag ID # : ", robot.aprilID);
+        List<Double> velocities = robot.shooterMotors.getVelocities();
+        telemetry.addData("Left Flywheel Velocity", velocities.get(0));
+        telemetry.addData("Right Flywheel Velocity", velocities.get(1));
+//        telemetry.addData("Spindexer Voltage" , robot.spindexerServoInput.getVoltage() / 3.3);
+//        telemetry.addData("Power" , robot.power);
+//        telemetry.addData("Target" , robot.target);
+//        //telemetry.addData("Current" , robot.spindexer.getSpindexerTurns());
+//        telemetry.addData("Previous" , robot.prevPose);
+//        telemetry.addData("Turns" , robot.turns);
+
 //        telemetry.addData("Color 1.1 : ", robot.spindexer.detectColorOne_1());
 //        telemetry.addData("Color 2.1 : ", robot.spindexer.detectColorTwo_1());
 //        telemetry.addData("Color 3.1 : ", robot.spindexer.detectColorThree_1());
 //        telemetry.addData("Color 1.2 : ", robot.spindexer.detectColorOne_2());
 //        telemetry.addData("Color 2.2 : ", robot.spindexer.detectColorTwo_2());
 //        telemetry.addData("Color 3.2 : ", robot.spindexer.detectColorThree_2());
-        telemetry.addData("Spin State : " , spindexerState);
         //telemetry.addData("Shooter Velocity " , (robot.shooterOne.getVelocity()/28) * 60);
 
         robot.limelight.start();
@@ -71,17 +78,17 @@ public class TeleOpBlue extends CommandOpMode {
 //            telemetry.addData("Barcode results ", llResult.getBarcodeResults());
 //            telemetry.addData("Classifier results ", llResult.getClassifierResults());
 //            telemetry.addData("Detector results ", llResult.getDetectorResults());
-            List<LLResultTypes.FiducialResult> ID = llResult.getFiducialResults();
-            for (LLResultTypes.FiducialResult id : ID) {
-                robot.aprilID = id.getFiducialId();
-                telemetry.addData("ID" ,robot.aprilID);
-            }
+//            List<LLResultTypes.FiducialResult> ID = llResult.getFiducialResults();
+//            for (LLResultTypes.FiducialResult id : ID) {
+//                robot.aprilID = id.getFiducialId();
+//                telemetry.addData("ID" ,robot.aprilID);
+//            }
             telemetry.addData("April Tag ID(Fiducial results) ", llResult.getFiducialResults());
-            if (llResult.getTx() > 2){
-                robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
+            if (llResult.getTx() > 1.5){
+                robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 600);
             }
-            else if (llResult.getTx() < -2){
-                robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
+            else if (llResult.getTx() < -1.5){
+                robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 600);
             }
             temp = true;
         }
@@ -98,7 +105,16 @@ public class TeleOpBlue extends CommandOpMode {
         robot.hubs.forEach(LynxModule::clearBulkCache);
 
 
+//        // TimerTask commands
+//        TimerTask startIntake = new TimerTask() {
+//            public void run() {
+//                robot.intake.startIntaking();
+//            }
+//        };
 
+
+        // Controls
+//        robot.spindexer.setSpindexerServo();
         if(driver.gamepad.left_trigger > 0.1) {
             robot.mecanum.periodic(0.3);
         } else {
@@ -112,7 +128,7 @@ public class TeleOpBlue extends CommandOpMode {
         if(driver.gamepad.right_trigger > 0.1) {
             robot.intake.startIntaking();
             robot.intake.intakeDown();
-            robot.spindexer.autoIntake();
+//            robot.spindexer.autoIntake();
         }
         else if (driver.gamepad.right_bumper){
             robot.intake.reverseIntaking();
@@ -124,25 +140,35 @@ public class TeleOpBlue extends CommandOpMode {
         }
 
         if (driver.gamepad.a){
+            //robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(),1000 );
             robot.spindexer.spindexerUp();
         }
         else {
+            //robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 1000);
             robot.spindexer.spindexerDown();
         }
 
         if (!robot.spindexer.getTouchSensorState()){
-            if (driver.gamepad.dpad_left) {
-                robot.spindexer.setPoseOne();
+            if (driver.gamepad.dpadLeftWasPressed()) {
+                robot.spindexer.setPose(Spindexer.SpindexerStates.moveLeft);
+//                robot.turns = robot.spindexer.getSpindexerTurns();
+//                robot.spindexer.setSpindexerPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                robot.spindexer.setPoseOne();
                 //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
             }
 
-            if (driver.gamepad.dpad_up) {
+            if (driver.gamepad.dpadUpWasPressed()) {
+//                robot.turns = robot.spindexer.getSpindexerTurns();
+//                robot.spindexer.setSpindexerPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
                 robot.spindexer.setPoseTwo();
                 //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
             }
 
-            if (driver.gamepad.dpad_right) {
-                robot.spindexer.setPoseThree();
+            if (driver.gamepad.dpadRightWasPressed()) {
+                  robot.spindexer.setPose(Spindexer.SpindexerStates.moveRight);
+//                robot.turns = robot.spindexer.getSpindexerTurns();
+//                robot.spindexer.setSpindexerPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+//                robot.spindexer.setPoseThree();
                 //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
             }
         }
@@ -180,12 +206,10 @@ public class TeleOpBlue extends CommandOpMode {
         }
 
         if (driver.gamepad.leftStickButtonWasPressed()){
-            robot.shooterOne.setPower(robot.shooterOne.getPower() + 0.05);
-            robot.shooterTwo.setPower(robot.shooterOne.getPower() + 0.05);
+            robot.adjustableHoodServo.setPosition(robot.adjustableHoodServo.getPosition() + 0.05);
         }
         if (driver.gamepad.rightStickButtonWasPressed()){
-            robot.shooterOne.setPower(robot.shooterOne.getPower() - 0.05);
-            robot.shooterTwo.setPower(robot.shooterOne.getPower() - 0.05);
+            robot.adjustableHoodServo.setPosition(robot.adjustableHoodServo.getPosition() - 0.05);
         }
 
 //        if (driver.gamepad.triangle){
@@ -205,10 +229,11 @@ public class TeleOpBlue extends CommandOpMode {
 //            robot.shooterOne.setVelocity(robot.shooterOne.getVelocity() + 50);
 //        }
 
-        if (driver.gamepad.leftBumperWasPressed()){
-            robot.spindexer.setSortingState(SortingStates.Checking);
-            robot.spindexer.sorting();
+        if (driver.gamepad.leftBumperWasPressed()) {
+            robot.spindexer.setPoseTwo();
+            robot.spindexer.sortingTeleOp();
         }
+
 
 
         telemetry.update();

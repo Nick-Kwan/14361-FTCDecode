@@ -26,10 +26,17 @@ public class RobotConstants {
         public static double shooterOff = 0;
         public static double shooterReverse = 1;
         public static double turretPose = 0.5;
-        public static double hoodPoseMid = 0.5;
+        public static double turretPoseAuto = 0.8;
+        public static double turretMeowPose = 0.3;
+        public static double turretBlueAutoPose = 1;
+        public static double turretRedAutoPose = 0;
+        public static double hoodPoseMid = 0.45;
+        public static double hoodPoseAuto = 0.35;
         public static double hoodPoseLong = 0.21;
         public static double hoodPoseRetract = 0;
         public static double hoodPoseFull = 1;
+        public static double initX = 18.5;
+        public static double initY = 114;
     }
 
     @Config
@@ -40,6 +47,7 @@ public class RobotConstants {
 
         // Values
         public static double intakeMotorON = 0.7;
+        public static double intakeMotorFull = 0.45;
         public static int intakeMotorOff = 0;
         public static double intakeMotorReverse = -1.0;
         public static double intakeServoDown = 1.0; //need to tune value
@@ -59,16 +67,21 @@ public class RobotConstants {
         public static String colorSensorOne_2 = "colorSensorOne_2";
         public static String colorSensorTwo_2 = "colorSensorTwo_2";
         public static String colorSensorThree_2 = "colorSensorThree_2";
+        public static String spindexerServoInput = "spindexerServoInput";
+        public static String spindexerServoPID = "spindexerServoPID";
 
         // Values
         public static double spindexerLinkageServoDown = 0.67;
         public static double spindexerLinkageServoUp = 0;
         // Change values
-        public static double spindexerServoPoseOne = 0.006;
-        public static double spindexerServoPoseTwo = 0.38
-                ;
-        public static double spindexerServoPoseThree = 0.754;
+        public static double spindexerServoPoseOne = 0.035;
+        public static double spindexerServoPoseTwo = 0.42;
+        public static double spindexerServoPoseThree = 0.8;
         public static double spindexerServoPoseFour = 1;
+        public static double spinP = 0.7;
+        public static double spinI = 0;
+        public static double spinD = 0.001;
+        public static double spinF = 0;
     }
 
     @Config

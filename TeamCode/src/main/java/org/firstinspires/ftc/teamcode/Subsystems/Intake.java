@@ -15,6 +15,9 @@ public class Intake implements Subsystem{
         robot.intakeMotor.setPower(RobotConstants.Intake.intakeMotorON);
     }
 
+    public void startIntakingMax(){
+        robot.intakeMotor.setPower(RobotConstants.Intake.intakeMotorFull);
+    }
     public void stopIntaking(){
         robot.intakeMotor.setPower(RobotConstants.Intake.intakeMotorOff);
     }

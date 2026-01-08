@@ -170,7 +170,7 @@ public class blueClose  extends OpMode{
                     robot.spindexer.spindexerDown();
                     //robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterShortOn);
                     waitM(250);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
                     // Shoot the second ball
                     waitM(500);
                     robot.spindexer.spindexerUp();
@@ -178,7 +178,7 @@ public class blueClose  extends OpMode{
                     //robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
                     robot.spindexer.spindexerDown();
                     waitM(250);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
                     // Shoot the third ball
                     waitM(500);
                     robot.spindexer.spindexerUp();
@@ -199,7 +199,7 @@ public class blueClose  extends OpMode{
                 if (!follower.isBusy()){
                     robot.intake.intakeUp();
                     waitM(500);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
                     waitM(100);
                     robot.intake.intakeDown();
                     waitM(500);
@@ -214,7 +214,7 @@ public class blueClose  extends OpMode{
                     robot.intake.intakeUp();
                     robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterShortAuto);
                     waitM(500);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
                     waitM(100);
                     robot.intake.intakeDown();
                     waitM(200);
@@ -237,7 +237,7 @@ public class blueClose  extends OpMode{
                     robot.spindexer.spindexerDown();
                     //robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterShortOn);
                     waitM(250);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
                     // Shoot the second ball
                     waitM(500);
                     robot.spindexer.spindexerUp();
@@ -245,7 +245,7 @@ public class blueClose  extends OpMode{
                     //robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
                     robot.spindexer.spindexerDown();
                     waitM(250);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
                     // Shoot the third ball
                     waitM(500);
                     robot.spindexer.spindexerUp();
@@ -260,7 +260,7 @@ public class blueClose  extends OpMode{
                 if (!follower.isBusy()){
                     robot.intake.intakeUp();
                     waitM(500);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
                     waitM(100);
                     robot.intake.intakeDown();
                     waitM(500);
@@ -273,7 +273,7 @@ public class blueClose  extends OpMode{
                     robot.intake.intakeUp();
                     robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterShortAuto);
                     waitM(500);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
                     waitM(100);
                     robot.intake.intakeDown();
                     waitM(200);
@@ -295,7 +295,7 @@ public class blueClose  extends OpMode{
                     robot.spindexer.spindexerDown();
                     //robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterShortOn);
                     waitM(250);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
                     // Shoot the second ball
                     waitM(500);
                     robot.spindexer.spindexerUp();
@@ -303,7 +303,7 @@ public class blueClose  extends OpMode{
                     //robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterSixSevenOn);
                     robot.spindexer.spindexerDown();
                     waitM(250);
-                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+//                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
                     // Shoot the third ball
                     waitM(500);
                     robot.spindexer.spindexerUp();

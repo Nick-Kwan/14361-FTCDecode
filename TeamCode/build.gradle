@@ -37,6 +37,8 @@ dependencies {
     //implementation "com.bylazar:ftcontrol:VERSION"
  //   implementation "com.github.jdhs-ftc:road-runner-ftc-otos:8e83c17ff7"
     implementation 'org.ftclib.ftclib:core:2.0.1'
+//    implementation "org.solverslib:core:0.3.3" // core
+//    implementation "org.solverslib:pedroPathing:0.3.3" // pedroPathing
   //  implementation 'org.team11260:fast-load:0.1.2'
     implementation 'org.apache.commons:commons-math3:3.6.1'
  //   implementation 'com.pedropathing:pedro:2.0.4'
