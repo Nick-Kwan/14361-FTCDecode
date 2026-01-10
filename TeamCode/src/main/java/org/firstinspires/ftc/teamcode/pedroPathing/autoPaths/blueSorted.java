@@ -67,24 +67,27 @@ public class blueSorted extends OpMode{
     // Setting up the poses for the paths
     private final Pose startPose = new Pose(initX, initY, Math.toRadians(90));
 
-    private final Pose shootOnePose = new Pose(52.5, 90, Math.toRadians(170));
+    private final Pose shootOnePose = new Pose(52.5, 90, Math.toRadians(180));
     private final Pose collectOnePose = new Pose(22,86,Math.toRadians(180));
     private final Pose collectControlOnePose = new Pose(70,86,Math.toRadians(180));
     //private final Pose releasePose = new Pose(20,75,Math.toRadians(90));
-    private final Pose shootTwoPose = new Pose(54.5, 89, Math.toRadians(180));
+    private final Pose shootTwoPose = new Pose(54.5, 89, Math.toRadians(185));
     private final Pose prepareCollectTwoPose = new Pose(50,60,Math.toRadians(180));
     //private final Pose prepareCollectControlTwoPose = new Pose(63.5,62,Math.toRadians(180));
     //private final Pose shootControlTwoPose = new Pose(76, 57.5, Math.toRadians(130));
     //private final Pose shootTwoControlPose = new Pose(44.5, 71.5, Math.toRadians(110));
-    private final Pose collectTwoPose = new Pose(26,59,Math.toRadians(180));
-    private final Pose collectControlTwoPose = new Pose(72,59,Math.toRadians(180));
-    private final Pose shootThreePose = new Pose(56.5, 86.5, Math.toRadians(180));
-    private final Pose parkPose = new Pose(25,90,Math.toRadians(180));
+    private final Pose collectTwoPose = new Pose(26,59,Math.toRadians(185));
+    private final Pose collectControlTwoPose = new Pose(72,59,Math.toRadians(185));
+    private final Pose shootThreePose = new Pose(56.5, 86.5, Math.toRadians(190));
+    private final Pose collectThreePose = new Pose(22,36,Math.toRadians(190));
+    private final Pose collectControlThreePose = new Pose(80,32,Math.toRadians(190));
+    private final Pose shootFourPose = new Pose(56.5, 88, Math.toRadians(190));
+    private final Pose parkPose = new Pose(22,88,Math.toRadians(190));
 
     // Not in use rn
-    private final Pose collectThreePose = new Pose(25,34,Math.toRadians(180));
-    private final Pose collectControlThreePose = new Pose(76,33,Math.toRadians(180));
-    private final Pose shootFourPose = new Pose(43.5, 99, Math.toRadians(130));
+//    private final Pose collectThreePose = new Pose(25,34,Math.toRadians(180));
+//    private final Pose collectControlThreePose = new Pose(76,33,Math.toRadians(180));
+//    private final Pose shootFourPose = new Pose(43.5, 99, Math.toRadians(130));
 
 
     // Creating the paths from the poses
@@ -143,6 +146,19 @@ public class blueSorted extends OpMode{
                 .setLinearHeadingInterpolation(collectTwoPose.getHeading(),shootThreePose.getHeading())
                 .build();
 
+        collectThree = follower.pathBuilder()
+                .addPath(new BezierCurve(shootThreePose,collectControlThreePose,collectThreePose))
+                .setLinearHeadingInterpolation(shootThreePose.getHeading(),collectThreePose.getHeading())
+                .addParametricCallback(0.2,setPoseThree)
+                .addParametricCallback(0.79,setPoseTwo)
+                .addParametricCallback(0.89,setPoseOne)
+                .build();
+
+        scoreThree = follower.pathBuilder()
+                .addPath(new BezierCurve(collectThreePose, shootFourPose))
+                .setLinearHeadingInterpolation(collectThreePose.getHeading(),shootFourPose.getHeading())
+                .build();
+
         park = follower.pathBuilder()
                 .addPath(new BezierCurve(shootThreePose,parkPose))
                 .setLinearHeadingInterpolation(shootThreePose.getHeading(),parkPose.getHeading())
@@ -155,7 +171,7 @@ public class blueSorted extends OpMode{
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                robot.shooterMotors.set(0.62);
+                robot.intake.setTargetVelocity(0.41);
                 robot.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseAuto);
                 robot.spindexer.setPoseTwo();
                 follower.setMaxPower(0.67);
@@ -173,6 +189,7 @@ public class blueSorted extends OpMode{
                 if(!follower.isBusy()) {
                     // Shoot the first ball
                     robot.turretServo.setPosition(RobotConstants.Drivetrain.turretPoseAuto);
+                    waitM(250);
                     //waitM(1250);
                     robot.spindexer.sortingBlueAuto();
                     waitM(250);
@@ -229,12 +246,12 @@ public class blueSorted extends OpMode{
 
             case 4:
                 if (!follower.isBusy()){
-                    while (llResult.isValid() && (llResult.getTx() > 1 || llResult.getTx() < -1)){
+                    while (llResult.isValid() && (llResult.getTx() > 2 || llResult.getTx() < -2)){
 //                            if (llResult.getTx() > 2){
 //                                robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 550);
 //                            }
 //                            else if (llResult.getTx() < -2){
-                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 650);
+                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
                         waitM(100);
                         llResult = robot.limelight.getLatestResult();
 //                            }
@@ -247,7 +264,6 @@ public class blueSorted extends OpMode{
                     //waitM(250);
                     robot.intake.intakeUp();
                     robot.turretServo.setPosition(RobotConstants.Drivetrain.turretPoseAuto);
-                    waitM(250);
                     robot.spindexer.setPoseTwo();
                     waitM(250);
                     robot.spindexer.sortingBlueAuto();
@@ -260,6 +276,7 @@ public class blueSorted extends OpMode{
                     setPathState(6);
                 }
             case 5:
+                // SKIP TS
                 if (!follower.isBusy()){
                     follower.setMaxPower(0.3);
                     follower.followPath(collectTwo,true);
@@ -270,19 +287,18 @@ public class blueSorted extends OpMode{
                     follower.setMaxPower(0.67);
                     waitM(500);
                     //robot.spindexer.setPoseThree();
-                    robot.intake.intakeUp();
                     robot.intake.startIntakingMax();
                     follower.followPath(scoreTwo);
                     setPathState(7);
                 }
             case 7:
                 if (!follower.isBusy()){
-                    while (llResult.isValid() && (llResult.getTx() > 1 || llResult.getTx() < -1)){
+                    while (llResult.isValid() && (llResult.getTx() > 2 || llResult.getTx() < -2)){
 //                            if (llResult.getTx() > 2){
 //                                robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 550);
 //                            }
 //                            else if (llResult.getTx() < -2){
-                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 650);
+                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
                         waitM(100);
                         llResult = robot.limelight.getLatestResult();
 //                            }
@@ -293,23 +309,51 @@ public class blueSorted extends OpMode{
                     //waitM(500);
                     robot.spindexer.setPoseTwo();
                     robot.turretServo.setPosition(RobotConstants.Drivetrain.turretPoseAuto);
+                    robot.intake.intakeUp();
                     waitM(250);
                     robot.spindexer.sortingBlueAuto();
                     waitM(250);
                     robot.spindexer.setPoseThree();
-                    robot.intake.intakeUp();
-                    robot.intake.stopIntaking();
+                    robot.intake.intakeDown();
+                    robot.intake.startIntaking();
                     follower.setMaxPower(0.5);
-                    follower.followPath(park);
+                    follower.followPath(collectThree);
                     setPathState(8);
                 }
             case 8:
                 if (!follower.isBusy()){
-                    break;
+                    follower.setMaxPower(0.67);
+                    waitM(500);
+                    robot.intake.startIntakingMax();
+                    follower.followPath(scoreThree);
+                    setPathState(9);
                 }
             case 9:
                 if (!follower.isBusy()){
-                    robot.spindexer.sortingBlueAuto();
+                    while (llResult.isValid() && (llResult.getTx() > 2 || llResult.getTx() < -2)){
+//                            if (llResult.getTx() > 2){
+//                                robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 550);
+//                            }
+//                            else if (llResult.getTx() < -2){
+                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
+                        waitM(100);
+                        llResult = robot.limelight.getLatestResult();
+//                            }
+//                            else {
+//                                break;
+//                            }
+                    }
+                    //waitM(500);
+                    robot.spindexer.setPoseThree();
+                    robot.turretServo.setPosition(RobotConstants.Drivetrain.turretPoseAuto);
+                    waitM(250);
+                    robot.spindexer.noSorting();
+                    //robot.spindexer.sortingBlueAuto();
+                    waitM(250);
+                    robot.spindexer.setPoseThree();
+                    robot.intake.intakeUp();
+                    robot.intake.stopIntaking();
+                    follower.setMaxPower(0.67);
                     follower.followPath(park);
                     setPathState(10);
                 }
@@ -334,6 +378,7 @@ public class blueSorted extends OpMode{
 //            autonomousPathUpdate();
             orientation = robot.imu.getRobotYawPitchRollAngles();
             robot.limelight.updateRobotOrientation(orientation.getYaw());
+            robot.intake.setShooterVelocity();
             llResult = robot.limelight.getLatestResult();
             if (robot.aprilID < 20){
                 robot.limelight.pipelineSwitch(0);
@@ -357,10 +402,10 @@ public class blueSorted extends OpMode{
                 }
                 if (limelightTemp){
                     if (llResult.getTx() > 2){
-                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 670);
+                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
                     }
                     else if (llResult.getTx() < -2){
-                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 670);
+                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
                     }
                     limelightLoopTemp = true;
                 }
@@ -388,6 +433,7 @@ public class blueSorted extends OpMode{
         follower.update();
         autonomousPathUpdate();
         robot.limelight.start();
+        robot.intake.setShooterVelocity();
         orientation = robot.imu.getRobotYawPitchRollAngles();
         robot.limelight.updateRobotOrientation(orientation.getYaw());
         llResult = robot.limelight.getLatestResult();
@@ -418,10 +464,10 @@ public class blueSorted extends OpMode{
                 }
                 if (limelightTemp){
                     if (llResult.getTx() > 2){
-                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 670);
+                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
                     }
                     else if (llResult.getTx() < -2){
-                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 670);
+                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
                     }
                     limelightLoopTemp = true;
                 }

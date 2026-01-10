@@ -115,6 +115,7 @@ public class TeleOpBlue extends CommandOpMode {
 
         // Controls
 //        robot.spindexer.setSpindexerServo();
+        robot.intake.setShooterVelocity();
         if(driver.gamepad.left_trigger > 0.1) {
             robot.mecanum.periodic(0.3);
         } else {
@@ -160,7 +161,7 @@ public class TeleOpBlue extends CommandOpMode {
             if (driver.gamepad.dpadUpWasPressed()) {
 //                robot.turns = robot.spindexer.getSpindexerTurns();
 //                robot.spindexer.setSpindexerPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-                robot.spindexer.setPoseTwo();
+//                robot.spindexer.setPoseTwo();
                 //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
             }
 
@@ -177,10 +178,10 @@ public class TeleOpBlue extends CommandOpMode {
 //            //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
 //        }
 //
-//        if (driver.gamepad.dpad_up) {
-//            robot.spindexer.setPoseTwo();
-//            //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-//        }
+        if (driver.gamepad.dpad_up) {
+            robot.spindexer.setPoseTwo();
+            //robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
+        }
 //
 //        if (driver.gamepad.dpad_right) {
 //            robot.spindexer.setPoseThree();
@@ -188,19 +189,27 @@ public class TeleOpBlue extends CommandOpMode {
 //        }
 
         if (driver.gamepad.triangle){
-            robot.shooterMotors.set(0.6);
+            // 1500 Velocity for close
+            robot.intake.setTargetVelocity(0.567);
+            //robot.shooterMotors.set(RobotConstants.Drivetrain.target);
+//            robot.shooterOne.setVelocity(RobotConstants.Drivetrain.target);
+//            robot.shooterTwo.setVelocity(RobotConstants.Drivetrain.target);
+            //robot.intake.setTargetVelocity(RobotConstants.Drivetrain.target);
             robot.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseMid);
 //            robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterShortOn);
 //            robot.shooterTwo.setPower(RobotConstants.Drivetrain.shooterShortOn);
         }
         if (driver.gamepad.circle){
-            robot.shooterMotors.set(0.75);
+            // 1780 Velocity for far
+            robot.intake.setTargetVelocity(0.73);
+            //robot.shooterMotors.set(RobotConstants.Drivetrain.targetFar);
             robot.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseLong);
 //            robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterLongOn);
 //            robot.shooterTwo.setPower(RobotConstants.Drivetrain.shooterLongOn);
         }
         if (driver.gamepad.square){
-            robot.shooterMotors.set(0.0);
+            robot.shooterMotors.stopMotor();
+            robot.target = 0;
 //            robot.shooterOne.setPower(RobotConstants.Drivetrain.shooterOff);
 //            robot.shooterTwo.setPower(RobotConstants.Drivetrain.shooterOff);
         }
@@ -230,8 +239,25 @@ public class TeleOpBlue extends CommandOpMode {
 //        }
 
         if (driver.gamepad.leftBumperWasPressed()) {
+            robot.spindexer.setPoseThree();
+            robot.spindexer.waitM(450);
+            robot.spindexer.spindexerUp();
+            robot.spindexer.waitM(150);
+            robot.spindexer.spindexerDown();
+            robot.spindexer.waitM(150);
             robot.spindexer.setPoseTwo();
-            robot.spindexer.sortingTeleOp();
+            robot.spindexer.waitM(450);
+            robot.spindexer.spindexerUp();
+            robot.spindexer.waitM(150);
+            robot.spindexer.spindexerDown();
+            robot.spindexer.waitM(150);
+            robot.spindexer.setPoseOne();
+            robot.spindexer.waitM(450);
+            robot.spindexer.spindexerUp();
+            robot.spindexer.waitM(150);
+            robot.spindexer.spindexerDown();
+
+            //robot.spindexer.sortingTeleOp();
         }
 
 

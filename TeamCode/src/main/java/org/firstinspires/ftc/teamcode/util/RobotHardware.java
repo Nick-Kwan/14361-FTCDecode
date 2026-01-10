@@ -32,7 +32,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Mecanum;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.pedroPathing.autoPaths.blueSorted;
-
+import org.firstinspires.ftc.teamcode.pedroPathing.autoPaths.redSorted;
 
 
 import java.util.ArrayList;
@@ -92,6 +92,8 @@ public class RobotHardware {
     public Servo turretServo;
     public DcMotor shooterOne;
     public DcMotor shooterTwo;
+    public PIDFController shooterPID;
+    public double avgVelocity;
     public Servo adjustableHoodServo;
     public Motor m_shooterOne;
     public Motor m_shooterTwo;
@@ -116,6 +118,7 @@ public class RobotHardware {
     public Spindexer spindexer;
     public timerTaskCommands timerTaskCommands;
     public blueSorted blueSorted;
+    public redSorted redSorted;
     public static RobotHardware getInstance() {
         if (instance == null) {
             instance = new RobotHardware();
@@ -205,21 +208,35 @@ public class RobotHardware {
         this.turretServo = hardwareMap.servo.get(RobotConstants.Drivetrain.turret);
         this.turretServo.setPosition(RobotConstants.Drivetrain.turretPose);
 
-        this.shooterOne = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterOne);
-        this.shooterOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        this.shooterOne.setDirection(DcMotor.Direction.REVERSE);
-        this.shooterTwo = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterTwo);
-        this.shooterTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        this.shooterOne = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterOne);
+////        this.shooterOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+////        this.shooterOne.setDirection(DcMotor.Direction.REVERSE);
+//        this.shooterTwo = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterTwo);
+//        this.shooterTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         this.m_shooterOne = new Motor(hardwareMap, "shooterOne", Motor.GoBILDA.BARE);
-        this.shooterOne = m_shooterOne.motor;
-        this.m_shooterTwo = new Motor(hardwareMap, "shooterTwo", Motor.GoBILDA.BARE);
-        this.shooterTwo = m_shooterTwo.motor;
-        this.shooterMotors = new MotorGroup(this.m_shooterOne,this.m_shooterTwo);
+        this.m_shooterOne.setInverted(true);
+        this.m_shooterOne.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
 
-        this.shooterMotors.setRunMode(Motor.RunMode.RawPower);
+        this.m_shooterTwo = new Motor(hardwareMap, "shooterTwo", Motor.GoBILDA.BARE);
+        this.m_shooterTwo.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+
+        this.shooterMotors = new MotorGroup(m_shooterTwo,m_shooterOne);
+        this.shooterMotors.setRunMode(Motor.RunMode.VelocityControl);
+        this.shooterMotors.setVeloCoefficients(RobotConstants.Drivetrain.shootP,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD);
+        target = 0;
+
         this.hubs = hardwareMap.getAll(LynxModule.class);
         this.hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
+
+//        this.shooterOne = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooterOne);
+//        this.shooterOne.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+//        this.shooterOne.setDirection(DcMotorEx.Direction.REVERSE);
+//        this.shooterTwo = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooterTwo);
+//        this.shooterTwo.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+//
+//        this.shooterPID = new PIDFController(RobotConstants.Drivetrain.shootP,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD,RobotConstants.Drivetrain.shootF);
+//        this.target = RobotConstants.Drivetrain.target;
 
         this.adjustableHoodServo = hardwareMap.servo.get(RobotConstants.Drivetrain.adjustableHoodServo);
         this.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseMid);
@@ -229,6 +246,7 @@ public class RobotHardware {
         spindexer = new Spindexer();
         timerTaskCommands = new timerTaskCommands();
         blueSorted = new blueSorted();
+        redSorted = new redSorted();
 
     }
 
@@ -307,19 +325,34 @@ public class RobotHardware {
         this.turretServo = hardwareMap.servo.get(RobotConstants.Drivetrain.turret);
         //this.turretServo.setPosition(RobotConstants.Drivetrain.turretAutoPose);
 
-        this.shooterOne = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterOne);
-        this.shooterOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        this.shooterOne.setDirection(DcMotor.Direction.REVERSE);
-        this.shooterTwo = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterTwo);
-        this.shooterTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        this.shooterOne = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterOne);
+//        this.shooterOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        this.shooterOne.setDirection(DcMotor.Direction.REVERSE);
+//        this.shooterTwo = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterTwo);
+//        this.shooterTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//
+//        this.m_shooterOne = new Motor(hardwareMap, "shooterOne", Motor.GoBILDA.BARE);
+//        this.shooterOne = m_shooterOne.motor;
+//        this.m_shooterTwo = new Motor(hardwareMap, "shooterTwo", Motor.GoBILDA.BARE);
+//        this.shooterTwo = m_shooterTwo.motor;
+//        this.shooterMotors = new MotorGroup(this.m_shooterOne,this.m_shooterTwo);
+//
+//        this.shooterMotors.setRunMode(Motor.RunMode.RawPower);
+//        this.hubs = hardwareMap.getAll(LynxModule.class);
+//        this.hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
 
         this.m_shooterOne = new Motor(hardwareMap, "shooterOne", Motor.GoBILDA.BARE);
-        this.shooterOne = m_shooterOne.motor;
-        this.m_shooterTwo = new Motor(hardwareMap, "shooterTwo", Motor.GoBILDA.BARE);
-        this.shooterTwo = m_shooterTwo.motor;
-        this.shooterMotors = new MotorGroup(this.m_shooterOne,this.m_shooterTwo);
+        this.m_shooterOne.setInverted(true);
+        this.m_shooterOne.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
 
-        this.shooterMotors.setRunMode(Motor.RunMode.RawPower);
+        this.m_shooterTwo = new Motor(hardwareMap, "shooterTwo", Motor.GoBILDA.BARE);
+        this.m_shooterTwo.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+
+        this.shooterMotors = new MotorGroup(m_shooterTwo,m_shooterOne);
+        this.shooterMotors.setRunMode(Motor.RunMode.VelocityControl);
+        this.shooterMotors.setVeloCoefficients(RobotConstants.Drivetrain.shootP,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD);
+        target = 0;
+
         this.hubs = hardwareMap.getAll(LynxModule.class);
         this.hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
 
@@ -331,6 +364,7 @@ public class RobotHardware {
         spindexer = new Spindexer();
         timerTaskCommands = new timerTaskCommands();
         blueSorted = new blueSorted();
+        redSorted = new redSorted();
     }
 
 

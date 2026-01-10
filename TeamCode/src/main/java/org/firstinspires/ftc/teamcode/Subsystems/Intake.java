@@ -33,4 +33,21 @@ public class Intake implements Subsystem{
     public void intakeUp(){
         robot.intakeServo.setPosition(RobotConstants.Intake.intakeServoUp);
     }
+
+
+    public void setTargetVelocity(double t){
+        robot.target = t;
+    }
+
+    public void setShooterVelocity(){
+        robot.shooterMotors.set(robot.target);
+//        double velocityOne = robot.shooterOne.getVelocity();
+//        double velocityTwo = robot.shooterTwo.getVelocity();
+//
+//        double avgVelocity = (velocityOne + velocityTwo) / 2;
+//
+//        double vel = robot.shooterPID.calculate(avgVelocity, robot.target);
+//        robot.shooterOne.setVelocity(vel);
+//        robot.shooterTwo.setVelocity(vel);
+    }
 }

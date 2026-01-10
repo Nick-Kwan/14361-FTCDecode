@@ -29,14 +29,21 @@ public class RobotConstants {
         public static double turretPoseAuto = 0.8;
         public static double turretMeowPose = 0.3;
         public static double turretBlueAutoPose = 1;
-        public static double turretRedAutoPose = 0;
-        public static double hoodPoseMid = 0.45;
-        public static double hoodPoseAuto = 0.35;
+        public static double turretRedAutoPose = 0.2;
+        public static double hoodPoseMid = 0.5;
+        public static double hoodPoseAuto = 0.5;
         public static double hoodPoseLong = 0.21;
         public static double hoodPoseRetract = 0;
         public static double hoodPoseFull = 1;
         public static double initX = 18.5;
         public static double initY = 114;
+        public static double target = 0.45;
+        public static double targetFar = 0.537;
+        public static double shootP = 0.4;
+        public static double shootI = 0;
+        public static double shootD = 0;
+        public static double shootF = 0;
+        public static double shootV = 0.7;
     }
 
     @Config
@@ -46,8 +53,8 @@ public class RobotConstants {
         public static String intakeServo = "intakeServo";
 
         // Values
-        public static double intakeMotorON = 0.7;
-        public static double intakeMotorFull = 0.45;
+        public static double intakeMotorON = 0.85;
+        public static double intakeMotorFull = 0.85;
         public static int intakeMotorOff = 0;
         public static double intakeMotorReverse = -1.0;
         public static double intakeServoDown = 1.0; //need to tune value
@@ -94,8 +101,8 @@ public class RobotConstants {
         public double getInitYB (){
             return initYB;
         }
-        public static double initXR = 110.5;
-        public static double initYR = 135;
+        public static double initXR = 125.5;
+        public static double initYR = 114;
         public double getInitXR (){
             return initXR;
         }

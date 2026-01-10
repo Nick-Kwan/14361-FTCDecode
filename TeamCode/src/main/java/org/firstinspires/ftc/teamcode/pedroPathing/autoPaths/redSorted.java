@@ -45,7 +45,7 @@ public class redSorted extends OpMode{
         actionState = state;
     }
 
-    private final RobotHardware robot = RobotHardware.getInstance();
+    private RobotHardware robot = RobotHardware.getInstance();
 
     private static double initX = 125.5;
     private static double initY = 114;
@@ -58,29 +58,29 @@ public class redSorted extends OpMode{
         return initY;
     }
 
-
+    public redSorted(){
+        this.robot = RobotHardware.getInstance();
+    }
 
     // Setting up the poses for the paths
     private final Pose startPose = new Pose(initX, initY, Math.toRadians(90));
 
-    private final Pose shootOnePose = new Pose(90.5, 90, Math.toRadians(40));
-    private final Pose collectOnePose = new Pose(119,80,Math.toRadians(-10));
-    private final Pose collectControlOnePose = new Pose(74,84,Math.toRadians(-10));
+    private final Pose shootOnePose = new Pose(90.5, 90, Math.toRadians(0));
+    private final Pose collectOnePose = new Pose(117,81,Math.toRadians(0));
+    private final Pose collectControlOnePose = new Pose(75,76,Math.toRadians(0));
     //private final Pose releasePose = new Pose(20,75,Math.toRadians(90));
-    private final Pose shootTwoPose = new Pose(88.5, 89, Math.toRadians(0));
-    private final Pose prepareCollectTwoPose = new Pose(88,57,Math.toRadians(-10));
+    private final Pose shootTwoPose = new Pose(90, 89, Math.toRadians(5));
+    //private final Pose prepareCollectTwoPose = new Pose(118.5,57.5,Math.toRadians(0));
     //private final Pose prepareCollectControlTwoPose = new Pose(63.5,62,Math.toRadians(180));
     //private final Pose shootControlTwoPose = new Pose(76, 57.5, Math.toRadians(130));
     //private final Pose shootTwoControlPose = new Pose(44.5, 71.5, Math.toRadians(110));
-    private final Pose collectTwoPose = new Pose(113,57,Math.toRadians(-10));
-    // private final Pose collectControlTwoPose = new Pose(77,54.5,Math.toRadians(180));
-    private final Pose shootThreePose = new Pose(84, 90, Math.toRadians(0));
-    private final Pose parkPose = new Pose(115,90,Math.toRadians(0));
-
-    // Not in use rn
-    private final Pose collectThreePose = new Pose(25,34,Math.toRadians(180));
-    private final Pose collectControlThreePose = new Pose(76,33,Math.toRadians(180));
-    private final Pose shootFourPose = new Pose(43.5, 99, Math.toRadians(130));
+    private final Pose collectTwoPose = new Pose(118.5,56,Math.toRadians(5));
+    private final Pose collectControlTwoPose = new Pose(72,51,Math.toRadians(5));
+    private final Pose shootThreePose = new Pose(87, 86.5, Math.toRadians(10));
+    private final Pose collectThreePose = new Pose(122,30,Math.toRadians(10));
+    private final Pose collectControlThreePose = new Pose(80,24,Math.toRadians(10));
+    private final Pose shootFourPose = new Pose(90, 88, Math.toRadians(10));
+    private final Pose parkPose = new Pose(120,88,Math.toRadians(10));
 
 
 
@@ -101,12 +101,9 @@ public class redSorted extends OpMode{
 
 
 
-    public void waitM (double time){
-        pathTimer.reset();
-        while (pathTimer.milliseconds() < time){
 
-        }
-    }
+
+
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = new Path(new BezierLine(startPose, shootOnePose));
@@ -116,7 +113,7 @@ public class redSorted extends OpMode{
                 .addPath(new BezierCurve(shootOnePose,collectControlOnePose,collectOnePose))
                 .setLinearHeadingInterpolation(shootOnePose.getHeading(),collectOnePose.getHeading())
                 .addParametricCallback(0.2,setPoseThree)
-                .addParametricCallback(0.77,setPoseTwo)
+                .addParametricCallback(0.84,setPoseTwo)
                 .addParametricCallback(0.93,setPoseOne)
                 //.addParametricCallback(0.75,setPoseTwo)
                 .build();
@@ -131,22 +128,35 @@ public class redSorted extends OpMode{
                 .setLinearHeadingInterpolation(collectOnePose.getHeading(),shootTwoPose.getHeading())
                 .build();
 
-        prepareCollectTwo = follower.pathBuilder()
-                .addPath(new BezierCurve(shootTwoPose,prepareCollectTwoPose))
-                .setLinearHeadingInterpolation(shootTwoPose.getHeading(), prepareCollectTwoPose.getHeading())
-                .build();
+//        prepareCollectTwo = follower.pathBuilder()
+//                .addPath(new BezierCurve(shootTwoPose,prepareCollectTwoPose))
+//                .setLinearHeadingInterpolation(shootTwoPose.getHeading(), prepareCollectTwoPose.getHeading())
+//                .build();
 
         collectTwo = follower.pathBuilder()
-                .addPath(new BezierCurve(prepareCollectTwoPose,collectTwoPose))
-                .setLinearHeadingInterpolation(prepareCollectTwoPose.getHeading(),collectTwoPose.getHeading())
+                .addPath(new BezierCurve(shootTwoPose,collectControlTwoPose,collectTwoPose))
+                .setLinearHeadingInterpolation(shootTwoPose.getHeading(),collectTwoPose.getHeading())
                 .addParametricCallback(0.2,setPoseThree)
-                .addParametricCallback(0.725,setPoseTwo)
-                .addParametricCallback(0.85,setPoseOne)
+                .addParametricCallback(0.83,setPoseTwo)
+                .addParametricCallback(0.92,setPoseOne)
                 .build();
 
         scoreTwo = follower.pathBuilder()
                 .addPath(new BezierCurve(collectTwoPose,shootThreePose))
                 .setLinearHeadingInterpolation(collectTwoPose.getHeading(),shootThreePose.getHeading())
+                .build();
+
+        collectThree = follower.pathBuilder()
+                .addPath(new BezierCurve(shootThreePose,collectControlThreePose,collectThreePose))
+                .setLinearHeadingInterpolation(shootThreePose.getHeading(),collectThreePose.getHeading())
+                .addParametricCallback(0.2,setPoseThree)
+                .addParametricCallback(0.79,setPoseTwo)
+                .addParametricCallback(0.89,setPoseOne)
+                .build();
+
+        scoreThree = follower.pathBuilder()
+                .addPath(new BezierCurve(collectThreePose, shootFourPose))
+                .setLinearHeadingInterpolation(collectThreePose.getHeading(),shootFourPose.getHeading())
                 .build();
 
         park = follower.pathBuilder()
@@ -161,9 +171,9 @@ public class redSorted extends OpMode{
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                robot.shooterMotors.set(0.62);
+                robot.intake.setTargetVelocity(0.41);
                 robot.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseAuto);
-                robot.spindexer.setPoseThree();
+                robot.spindexer.setPoseTwo();
                 follower.setMaxPower(0.67);
                 follower.followPath(scorePreload);
                 setPathState(1);
@@ -178,16 +188,19 @@ public class redSorted extends OpMode{
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     // Shoot the first ball
-                    robot.turretServo.setPosition(RobotConstants.Drivetrain.turretPose);
+                    robot.turretServo.setPosition(RobotConstants.Drivetrain.turretRedAutoPose);
+                    waitM(100);
                     //waitM(1250);
-                    //robot.spindexer.sorting();
+                    robot.spindexer.sortingRedAuto();
+                    waitM(250);
+                    robot.spindexer.setPoseThree();
                     robot.intake.intakeDown();
                     robot.intake.startIntaking();
                     // Go to pick up the first set
                     //follower.setMaxPower(0.65);
                     //robot.spindexer.setPoseOne();
-                    follower.setMaxPower(0.5);
-                    follower.followPath(collectOne);
+                    follower.setMaxPower(0.6);
+                    follower.followPath(collectOne,true);
                     actionTimer.resetTimer();
 //                    waitM(300);
 //                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
@@ -222,7 +235,6 @@ public class redSorted extends OpMode{
             case 3:
                 if (!follower.isBusy()){
                     follower.setMaxPower(0.67);
-                    robot.intake.intakeUp();
                     robot.intake.startIntakingMax();
                     //robot.intake.intakeUp();
                     waitM(500);
@@ -234,38 +246,33 @@ public class redSorted extends OpMode{
 
             case 4:
                 if (!follower.isBusy()){
-                    while (llResult.isValid() && (llResult.getTx() > 1 || llResult.getTx() < -1)){
-//                            if (llResult.getTx() > 2){
-//                                robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 550);
-//                            }
-//                            else if (llResult.getTx() < -2){
-                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 650);
+                    while (llResult.isValid() && (llResult.getTx() > 2 || llResult.getTx() < -2)){
+                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
                         waitM(100);
                         llResult = robot.limelight.getLatestResult();
-//                            }
-//                            else {
-//                                break;
-//                            }
                     }
-                    robot.spindexer.setPoseThree();
-                    //robot.turretServo.setPosition(RobotConstants.Drivetrain.turretMeowPose);
                     //waitM(500);
                     //robot.spindexer.setSortingState(SortingStates.Checking);
                     //waitM(250);
                     robot.intake.intakeUp();
-
-                    //robot.spindexer.sorting();
+                    robot.turretServo.setPosition(RobotConstants.Drivetrain.turretRedAutoPose);
+                    waitM(250);
+                    robot.spindexer.setPoseTwo();
+                    waitM(250);
+                    robot.spindexer.sortingRedAuto();
                     waitM(250);
                     robot.intake.intakeDown();
                     robot.intake.startIntaking();
                     robot.spindexer.setPoseThree();
-                    follower.followPath(prepareCollectTwo);
-                    setPathState(5);
+                    follower.setMaxPower(0.6);
+                    follower.followPath(collectTwo,true);
+                    setPathState(6);
                 }
             case 5:
+                // SKIP TS
                 if (!follower.isBusy()){
                     follower.setMaxPower(0.3);
-                    follower.followPath(collectTwo);
+                    follower.followPath(collectTwo,true);
                     setPathState(6);
                 }
             case 6:
@@ -273,19 +280,18 @@ public class redSorted extends OpMode{
                     follower.setMaxPower(0.67);
                     waitM(500);
                     //robot.spindexer.setPoseThree();
-                    robot.intake.intakeUp();
                     robot.intake.startIntakingMax();
                     follower.followPath(scoreTwo);
                     setPathState(7);
                 }
             case 7:
                 if (!follower.isBusy()){
-                    while (llResult.isValid() && (llResult.getTx() > 1 || llResult.getTx() < -1)){
+                    while (llResult.isValid() && (llResult.getTx() > 2 || llResult.getTx() < -2)){
 //                            if (llResult.getTx() > 2){
 //                                robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 550);
 //                            }
 //                            else if (llResult.getTx() < -2){
-                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 650);
+                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
                         waitM(100);
                         llResult = robot.limelight.getLatestResult();
 //                            }
@@ -293,23 +299,54 @@ public class redSorted extends OpMode{
 //                                break;
 //                            }
                     }
-                    robot.spindexer.setPoseThree();
-                    //robot.turretServo.setPosition(RobotConstants.Drivetrain.turretMeowPose);
                     //waitM(500);
-                    //robot.spindexer.sorting();
+                    robot.spindexer.setPoseTwo();
+                    robot.turretServo.setPosition(RobotConstants.Drivetrain.turretRedAutoPose);
                     robot.intake.intakeUp();
-                    robot.intake.stopIntaking();
+                    waitM(250);
+                    robot.spindexer.sortingRedAuto();
+                    waitM(250);
+                    robot.spindexer.setPoseThree();
+                    robot.intake.intakeDown();
+                    robot.intake.startIntaking();
                     follower.setMaxPower(0.5);
-                    follower.followPath(park);
+                    follower.followPath(collectThree);
                     setPathState(8);
                 }
             case 8:
                 if (!follower.isBusy()){
-                    break;
+                    follower.setMaxPower(0.67);
+                    waitM(500);
+                    robot.intake.startIntakingMax();
+                    follower.followPath(scoreThree);
+                    setPathState(9);
                 }
             case 9:
                 if (!follower.isBusy()){
-                    //robot.spindexer.sorting();
+                    while (llResult.isValid() && (llResult.getTx() > 2 || llResult.getTx() < -2)){
+//                            if (llResult.getTx() > 2){
+//                                robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 550);
+//                            }
+//                            else if (llResult.getTx() < -2){
+                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
+                        waitM(100);
+                        llResult = robot.limelight.getLatestResult();
+//                            }
+//                            else {
+//                                break;
+//                            }
+                    }
+                    //waitM(500);
+                    robot.spindexer.setPoseOne();
+                    robot.turretServo.setPosition(RobotConstants.Drivetrain.turretRedAutoPose);
+                    waitM(250);
+                    robot.spindexer.noSortingRed();
+                    //robot.spindexer.sortingBlueAuto();
+                    waitM(250);
+                    robot.spindexer.setPoseOne();
+                    robot.intake.intakeUp();
+                    robot.intake.stopIntaking();
+                    follower.setMaxPower(0.67);
                     follower.followPath(park);
                     setPathState(10);
                 }
@@ -323,7 +360,62 @@ public class redSorted extends OpMode{
     /** These change the states of the paths and actions. It will also reset the timers of the individual switches **/
     public void setPathState(int pState) {
         pathState = pState;
-        pathTimer.reset();
+        //robot.pathTimer.reset();
+    }
+
+
+    public void waitM (double time){
+        robot.pathTimer.reset();
+        while (robot.pathTimer.milliseconds() < time){
+//            follower.update();
+//            autonomousPathUpdate();
+            orientation = robot.imu.getRobotYawPitchRollAngles();
+            robot.limelight.updateRobotOrientation(orientation.getYaw());
+            robot.intake.setShooterVelocity();
+            llResult = robot.limelight.getLatestResult();
+            if (robot.aprilID < 20){
+                robot.limelight.pipelineSwitch(0);
+                limelightTemp = false;
+            }
+            else if (robot.aprilID > 20){
+                robot.limelight.pipelineSwitch(2);
+                limelightTemp = true;
+            }
+            if (llResult != null && llResult.isValid()) {
+                Pose3D botPose = llResult.getBotpose();
+                List<LLResultTypes.FiducialResult> ID = llResult.getFiducialResults();
+                for (LLResultTypes.FiducialResult id : ID) {
+                    if (id.getFiducialId() == 21 || id.getFiducialId() == 22 || id.getFiducialId() == 23){
+                        robot.aprilID = id.getFiducialId();
+                    }
+                    else {
+                        break;
+                    }
+                    telemetry.addData("ID", robot.aprilID);
+                }
+                if (limelightTemp){
+                    if (llResult.getTx() > 2){
+                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
+                    }
+                    else if (llResult.getTx() < -2){
+                        robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
+                    }
+                    limelightLoopTemp = true;
+                }
+            }
+            else if (!llResult.isValid()){
+                if (limelightLoopTemp){
+                    robot.llResetTimer.resetTimer();
+                    limelightLoopTemp = false;
+                }
+                if (robot.llResetTimer.getElapsedTimeSeconds() > 1 && llResult.getTx() == 0){
+                    robot.turretServo.setPosition(RobotConstants.Drivetrain.turretRedAutoPose);
+                    limelightLoopTemp = true;
+                }
+
+
+            }
+        }
     }
 
 
@@ -334,6 +426,7 @@ public class redSorted extends OpMode{
         follower.update();
         autonomousPathUpdate();
         robot.limelight.start();
+        robot.intake.setShooterVelocity();
         orientation = robot.imu.getRobotYawPitchRollAngles();
         robot.limelight.updateRobotOrientation(orientation.getYaw());
         llResult = robot.limelight.getLatestResult();
@@ -363,11 +456,11 @@ public class redSorted extends OpMode{
                 telemetry.addData("ID", robot.aprilID);
             }
             if (limelightTemp){
-                if (llResult.getTx() > 1){
-                    robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 725);
+                if (llResult.getTx() > 2){
+                    robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 800);
                 }
-                else if (llResult.getTx() < -1){
-                    robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 725);
+                else if (llResult.getTx() < -2){
+                    robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 800);
                 }
                 limelightLoopTemp = true;
             }
@@ -378,7 +471,7 @@ public class redSorted extends OpMode{
                 limelightLoopTemp = false;
             }
             if (llResetTimer.getElapsedTimeSeconds() > 1 && llResult.getTx() == 0){
-                robot.turretServo.setPosition(RobotConstants.Drivetrain.turretPose);
+                robot.turretServo.setPosition(RobotConstants.Drivetrain.turretRedAutoPose);
                 limelightLoopTemp = true;
             }
 
@@ -386,7 +479,9 @@ public class redSorted extends OpMode{
         }
         telemetry.addData("Action Timer: ", actionTimer.getElapsedTime());
         telemetry.addData("Path Completion: ", follower.getPathCompletion());
+        telemetry.addData("Heading", follower.getHeading());;
         telemetry.addData("ID", robot.aprilID);
+
         telemetry.update();
 
     }
@@ -395,10 +490,11 @@ public class redSorted extends OpMode{
     public void init() {
         CommandScheduler.getInstance().run();
         robot.init(hardwareMap);
-        robot.turretServo.setPosition(RobotConstants.Drivetrain.turretRedAutoPose);
+        robot.turretServo.setPosition(0);
+        robot.spindexer.setPoseThree();
 
 
-        pathTimer = new ElapsedTime();
+        robot.pathTimer = new ElapsedTime();
         opmodeTimer = new Timer();
         actionTimer = new Timer();
         llResetTimer = new Timer();
@@ -447,6 +543,7 @@ public class redSorted extends OpMode{
 
     @Override
     public void start() {
+        robot.pathTimer.reset();
         opmodeTimer.resetTimer();
         actionTimer.resetTimer();
         llResetTimer.resetTimer();
@@ -456,3 +553,5 @@ public class redSorted extends OpMode{
         setPathState(0);
     }
 }
+
+

@@ -130,16 +130,16 @@ public class Spindexer implements Subsystem{
     }
 
 //    public void setSpindexerServo(){
-////        double error = getSpindexerTurns() - robot.target;
-////        robot.power = -robot.spindexerServoPID.calculate(error);
-////        robot.spindexerServo.setPower(robot.power);
-////        if (Math.abs(error) < 0.02){
-////            robot.spindexerServo.setPower(0);
-////        }
+//        double error = getSpindexerTurns() - robot.target;
+//        robot.power = -robot.spindexerServoPID.calculate(error);
+//        robot.spindexerServo.setPower(robot.power);
+//        if (Math.abs(error) < 0.02){
+//            robot.spindexerServo.setPower(0);
+//        }
 //
-////        if (Math.abs(robot.target + 1 - getSpindexerTurns()) < Math.abs(getSpindexerTurns() - robot.target)){
-////            robot.turns += 1;
-////        }
+//        if (Math.abs(robot.target + 1 - getSpindexerTurns()) < Math.abs(getSpindexerTurns() - robot.target)){
+//            robot.turns += 1;
+//        }
 //        robot.power = robot.spindexerServoPID.calculate(getRealSpindexerPosition() , getTargetPose());
 //        //robot.spindexerServo.setPower(robot.power);
 //    }
@@ -418,6 +418,49 @@ public class Spindexer implements Subsystem{
     }
 
 
+    public void noSorting (){
+        setPoseThree();
+        robot.blueSorted.waitM(200);
+        spindexerUp();
+        robot.blueSorted.waitM(350);
+        spindexerDown();
+        robot.blueSorted.waitM(200);
+        setPoseTwo();
+        robot.blueSorted.waitM(200);
+        spindexerUp();
+        robot.blueSorted.waitM(350);
+        spindexerDown();
+        robot.blueSorted.waitM(200);
+        setPoseOne();
+        robot.blueSorted.waitM(200);
+        spindexerUp();
+        robot.blueSorted.waitM(350);
+        spindexerDown();
+        robot.blueSorted.waitM(200);
+    }
+
+    public void noSortingRed (){
+        setPoseOne();
+        robot.redSorted.waitM(200);
+        spindexerUp();
+        robot.redSorted.waitM(350);
+        spindexerDown();
+        robot.redSorted.waitM(200);
+        setPoseTwo();
+        robot.redSorted.waitM(200);
+        spindexerUp();
+        robot.redSorted.waitM(350);
+        spindexerDown();
+        robot.redSorted.waitM(200);
+        setPoseThree();
+        robot.redSorted.waitM(200);
+        spindexerUp();
+        robot.redSorted.waitM(350);
+        spindexerDown();
+        robot.redSorted.waitM(200);
+    }
+
+
     public void sortingBlueAuto (){
 //        robot.pathTimer = new ElapsedTime();
         //robot.aprilID = 22;
@@ -426,81 +469,81 @@ public class Spindexer implements Subsystem{
         if (robot.aprilID == 21){
             // Slot 2 = Purple | Slot 1 = Purple
             if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
-                robot.blueSorted.waitM(250);
+                //robot.blueSorted.waitM(250);
                 setPoseThree();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseTwo();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseOne();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
             }
             // Slot 2 = Purple | Slot 1 = Green
             else if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() < robot.colorSensorOne_1.green()){
-                robot.blueSorted.waitM(250);
+                //robot.blueSorted.waitM(250);
                 setPoseOne();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseTwo();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseThree();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
             }
             // Slot 2 = Green | Slot 1 = Purple
             else if (robot.colorSensorTwo_1.blue() < robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
-                robot.blueSorted.waitM(500);
+                //robot.blueSorted.waitM(500);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseThree();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseOne();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
             }
             else {
-                robot.blueSorted.waitM(500);
+                //robot.blueSorted.waitM(500);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseOne();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseThree();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
             }
         }
@@ -508,79 +551,79 @@ public class Spindexer implements Subsystem{
         else if (robot.aprilID == 22){
             // Slot 2 = Purple | Slot 1 = Purple
             if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
-                robot.blueSorted.waitM(500);
+                //robot.blueSorted.waitM(500);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseThree();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseOne();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
             }
             // Slot 2 = Purple | Slot 1 = Green
             else if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() < robot.colorSensorOne_1.green()){
-                robot.blueSorted.waitM(500);
+                //robot.blueSorted.waitM(500);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseOne();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseThree();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
             }
             // Slot 2 = Green | Slot 1 = Purple
             else if (robot.colorSensorTwo_1.blue() < robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
-                robot.blueSorted.waitM(250);
+                //robot.blueSorted.waitM(250);
                 setPoseOne();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseTwo();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseThree();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
             }
             else {
-                robot.blueSorted.waitM(500);
+                //robot.blueSorted.waitM(500);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseOne();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseThree();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
             }
         }
@@ -588,79 +631,328 @@ public class Spindexer implements Subsystem{
         else if (robot.aprilID == 23){
             // Slot 2 = Purple | Slot 1 = Purple
             if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
-                robot.blueSorted.waitM(500);
+                //robot.blueSorted.waitM(500);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseOne();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseThree();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
             }
             // Slot 2 = Purple | Slot 1 = Green
             else if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() < robot.colorSensorOne_1.green()){
-                robot.blueSorted.waitM(500);
+                //robot.blueSorted.waitM(500);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseThree();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseOne();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
             }
             // Slot 2 = Green | Slot 1 = Purple
             else if (robot.colorSensorTwo_1.blue() < robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
-                robot.blueSorted.waitM(250);
+                //robot.blueSorted.waitM(250);
                 setPoseOne();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseThree();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseTwo();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
             }
             else {
-                robot.blueSorted.waitM(500);
+                //robot.blueSorted.waitM(500);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseOne();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
                 spindexerDown();
-                robot.blueSorted.waitM(250);
+                robot.blueSorted.waitM(150);
                 setPoseThree();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(450);
                 spindexerUp();
-                robot.blueSorted.waitM(500);
+                robot.blueSorted.waitM(200);
+                spindexerDown();
+            }
+        }
+    }
+
+
+    public void sortingRedAuto (){
+        //        robot.pathTimer = new ElapsedTime();
+        //robot.aprilID = 22;
+        setPoseTwo();
+        // Green Purple Purple
+        if (robot.aprilID == 21){
+            // Slot 2 = Purple | Slot 1 = Purple
+            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(250);
+                setPoseThree();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseTwo();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseOne();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+            }
+            // Slot 2 = Purple | Slot 1 = Green
+            else if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() < robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(250);
+                setPoseOne();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseTwo();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseThree();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+            }
+            // Slot 2 = Green | Slot 1 = Purple
+            else if (robot.colorSensorTwo_1.blue() < robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseThree();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseOne();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+            }
+            else {
+                //robot.blueSorted.waitM(500);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseOne();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseThree();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+            }
+        }
+        // Purple Green Purple
+        else if (robot.aprilID == 22){
+            // Slot 2 = Purple | Slot 1 = Purple
+            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseThree();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseOne();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+            }
+            // Slot 2 = Purple | Slot 1 = Green
+            else if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() < robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseOne();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseThree();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+            }
+            // Slot 2 = Green | Slot 1 = Purple
+            else if (robot.colorSensorTwo_1.blue() < robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(250);
+                setPoseOne();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseTwo();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseThree();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+            }
+            else {
+                //robot.blueSorted.waitM(500);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseOne();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseThree();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+            }
+        }
+        // Purple Purple Green
+        else if (robot.aprilID == 23){
+            // Slot 2 = Purple | Slot 1 = Purple
+            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseOne();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseThree();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+            }
+            // Slot 2 = Purple | Slot 1 = Green
+            else if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() < robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseThree();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseOne();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+            }
+            // Slot 2 = Green | Slot 1 = Purple
+            else if (robot.colorSensorTwo_1.blue() < robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(250);
+                setPoseOne();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseThree();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseTwo();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+            }
+            else {
+                //robot.blueSorted.waitM(500);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseOne();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
+                spindexerDown();
+                robot.redSorted.waitM(150);
+                setPoseThree();
+                robot.redSorted.waitM(450);
+                spindexerUp();
+                robot.redSorted.waitM(200);
                 spindexerDown();
             }
         }
