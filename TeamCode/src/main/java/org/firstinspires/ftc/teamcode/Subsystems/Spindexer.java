@@ -179,31 +179,59 @@ public class Spindexer implements Subsystem{
     spindexerState = state;
         switch (state){
             case moveLeft:
-                if (robot.atPoseOne){
-                    setPoseThree();
-                    break;
+                if (!robot.spindexer.getTouchSensorState()){
+                    if (robot.atPoseOne){
+                        setPoseThree();
+                        break;
+                    }
+                    if (robot.atPoseTwo){
+                        setPoseOne();
+                        break;
+                    }
+                    if (robot.atPoseThree){
+                        setPoseTwo();
+                        break;
+                    }
                 }
-                if (robot.atPoseTwo){
-                    setPoseOne();
-                    break;
-                }
-                if (robot.atPoseThree){
-                    setPoseTwo();
-                    break;
-                }
+//                if (robot.atPoseOne){
+//                    setPoseThree();
+//                    break;
+//                }
+//                if (robot.atPoseTwo){
+//                    setPoseOne();
+//                    break;
+//                }
+//                if (robot.atPoseThree){
+//                    setPoseTwo();
+//                    break;
+//                }
             case moveRight:
-                if (robot.atPoseOne){
-                    setPoseTwo();
-                    break;
+                if (!robot.spindexer.getTouchSensorState()){
+                    if (robot.atPoseOne){
+                        setPoseTwo();
+                        break;
+                    }
+                    if (robot.atPoseTwo){
+                        setPoseThree();
+                        break;
+                    }
+                    if (robot.atPoseThree){
+                        setPoseOne();
+                        break;
+                    }
                 }
-                if (robot.atPoseTwo){
-                    setPoseThree();
-                    break;
-                }
-                if (robot.atPoseThree){
-                    setPoseOne();
-                    break;
-                }
+//                if (robot.atPoseOne){
+//                    setPoseTwo();
+//                    break;
+//                }
+//                if (robot.atPoseTwo){
+//                    setPoseThree();
+//                    break;
+//                }
+//                if (robot.atPoseThree){
+//                    setPoseOne();
+//                    break;
+//                }
         }
     }
     public void setPoseOne(){

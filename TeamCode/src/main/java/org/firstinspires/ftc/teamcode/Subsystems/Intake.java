@@ -39,8 +39,16 @@ public class Intake implements Subsystem{
         robot.target = t;
     }
 
-    public void setShooterVelocity(){
-        robot.shooterMotors.set(robot.target);
+    public void setTargetAngle(double a){
+        robot.hoodAngle = a;
+    }
+
+    public void setTargetTurretPos(double p){
+        robot.turretPos = p;
+    }
+
+    public void setShooterVelocity(double t){
+        robot.shooterMotors.set(t);
 //        double velocityOne = robot.shooterOne.getVelocity();
 //        double velocityTwo = robot.shooterTwo.getVelocity();
 //
@@ -49,5 +57,13 @@ public class Intake implements Subsystem{
 //        double vel = robot.shooterPID.calculate(avgVelocity, robot.target);
 //        robot.shooterOne.setVelocity(vel);
 //        robot.shooterTwo.setVelocity(vel);
+    }
+
+    public void setHoodAngle(double a){
+        robot.adjustableHoodServo.setPosition(a);
+    }
+
+    public void setTurretPos(){
+        robot.turretServo.setPosition(robot.turretPos);
     }
 }

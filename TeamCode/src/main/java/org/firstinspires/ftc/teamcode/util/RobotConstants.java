@@ -37,7 +37,6 @@ public class RobotConstants {
         public static double hoodPoseFull = 1;
         public static double initX = 18.5;
         public static double initY = 114;
-        public static double target = 0.45;
         public static double targetFar = 0.537;
         public static double shootP = 0.4;
         public static double shootI = 0;
@@ -59,6 +58,9 @@ public class RobotConstants {
         public static double intakeMotorReverse = -1.0;
         public static double intakeServoDown = 1.0; //need to tune value
         public static double intakeServoUp = 0.25; //need to tune value
+        public static double target = 0.45;
+        public static double hoodAngle = 0.5;
+        public static double turretPos = 0.5;
     }
 
     @Config

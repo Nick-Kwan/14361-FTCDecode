@@ -85,6 +85,9 @@ public class RobotHardware {
     public Limelight3A limelight;
     public YawPitchRollAngles orientation;
     public LLResult llResult;
+    public double targetY;
+    public double hoodAngle;
+    public double turretPos;
     public boolean limelightTemp;
     public boolean limelightLoopTemp;
     public com.pedropathing.util.Timer llResetTimer;
@@ -108,6 +111,7 @@ public class RobotHardware {
     private HardwareMap hardwareMap;
     private static RobotHardware instance = null;
     public Mecanum mecanum;
+    public ShooterLUT ShooterLUT;
     private boolean enabled;
 
     public GamepadEx driver;
@@ -224,7 +228,9 @@ public class RobotHardware {
         this.shooterMotors = new MotorGroup(m_shooterTwo,m_shooterOne);
         this.shooterMotors.setRunMode(Motor.RunMode.VelocityControl);
         this.shooterMotors.setVeloCoefficients(RobotConstants.Drivetrain.shootP,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD);
-        target = 0;
+        target = RobotConstants.Intake.target;
+        hoodAngle = RobotConstants.Intake.hoodAngle;
+        targetY = 0;
 
         this.hubs = hardwareMap.getAll(LynxModule.class);
         this.hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
@@ -244,6 +250,7 @@ public class RobotHardware {
         mecanum = new Mecanum();
         intake = new Intake();
         spindexer = new Spindexer();
+        ShooterLUT = new ShooterLUT();
         timerTaskCommands = new timerTaskCommands();
         blueSorted = new blueSorted();
         redSorted = new redSorted();
@@ -362,6 +369,7 @@ public class RobotHardware {
         mecanum = new Mecanum();
         intake = new Intake();
         spindexer = new Spindexer();
+        ShooterLUT = new ShooterLUT();
         timerTaskCommands = new timerTaskCommands();
         blueSorted = new blueSorted();
         redSorted = new redSorted();

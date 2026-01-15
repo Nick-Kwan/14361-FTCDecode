@@ -115,7 +115,7 @@ public class TeleOpRed extends CommandOpMode {
 
         // Controls
 //        robot.spindexer.setSpindexerServo();
-        robot.intake.setShooterVelocity();
+        //robot.intake.setShooterVelocity();
         if(driver.gamepad.left_trigger > 0.1) {
             robot.mecanum.periodic(0.3);
         } else {

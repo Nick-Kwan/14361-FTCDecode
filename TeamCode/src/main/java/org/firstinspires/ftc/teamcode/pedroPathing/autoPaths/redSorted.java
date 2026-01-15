@@ -371,7 +371,7 @@ public class redSorted extends OpMode{
 //            autonomousPathUpdate();
             orientation = robot.imu.getRobotYawPitchRollAngles();
             robot.limelight.updateRobotOrientation(orientation.getYaw());
-            robot.intake.setShooterVelocity();
+            //robot.intake.setShooterVelocity();
             llResult = robot.limelight.getLatestResult();
             if (robot.aprilID < 20){
                 robot.limelight.pipelineSwitch(0);
@@ -426,7 +426,7 @@ public class redSorted extends OpMode{
         follower.update();
         autonomousPathUpdate();
         robot.limelight.start();
-        robot.intake.setShooterVelocity();
+        //robot.intake.setShooterVelocity();
         orientation = robot.imu.getRobotYawPitchRollAngles();
         robot.limelight.updateRobotOrientation(orientation.getYaw());
         llResult = robot.limelight.getLatestResult();
