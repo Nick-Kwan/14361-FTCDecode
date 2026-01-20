@@ -27,6 +27,7 @@ public class RobotConstants {
         public static double shooterReverse = 1;
         public static double turretPose = 0.5;
         public static double turretPoseAuto = 0.8;
+        public static double turretPoseAutoLong = 0.33;
         public static double turretMeowPose = 0.3;
         public static double turretBlueAutoPose = 1;
         public static double turretRedAutoPose = 0.2;
@@ -38,7 +39,7 @@ public class RobotConstants {
         public static double initX = 18.5;
         public static double initY = 114;
         public static double targetFar = 0.537;
-        public static double shootP = 0.4;
+        public static double shootP = 3;
         public static double shootI = 0;
         public static double shootD = 0;
         public static double shootF = 0;

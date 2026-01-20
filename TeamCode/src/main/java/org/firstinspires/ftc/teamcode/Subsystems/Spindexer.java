@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-import static org.firstinspires.ftc.teamcode.States.AutoIntakeStates.Checking;
-import static org.firstinspires.ftc.teamcode.States.AutoIntakeStates.Exit;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.States.AutoIntakeStates;
@@ -19,6 +17,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Spindexer implements Subsystem{
     private RobotHardware robot;
@@ -36,7 +35,7 @@ public class Spindexer implements Subsystem{
     public ElapsedTime secondShooterTimer = new ElapsedTime();
     public ElapsedTime thirdShooterTimer = new ElapsedTime();
     public ElapsedTime time = new ElapsedTime();
-    private ScheduledExecutorService s = Executors.newScheduledThreadPool(1);
+    //private ScheduledExecutorService s = Executors.newScheduledThreadPool(1);
     private double prevPose;
     public double currentPose;
     private double tempTarget;
@@ -129,51 +128,6 @@ public class Spindexer implements Subsystem{
         robot.spindexerLinkageServo.setPosition(RobotConstants.Spindexer.spindexerLinkageServoDown);
     }
 
-//    public void setSpindexerServo(){
-//        double error = getSpindexerTurns() - robot.target;
-//        robot.power = -robot.spindexerServoPID.calculate(error);
-//        robot.spindexerServo.setPower(robot.power);
-//        if (Math.abs(error) < 0.02){
-//            robot.spindexerServo.setPower(0);
-//        }
-//
-//        if (Math.abs(robot.target + 1 - getSpindexerTurns()) < Math.abs(getSpindexerTurns() - robot.target)){
-//            robot.turns += 1;
-//        }
-//        robot.power = robot.spindexerServoPID.calculate(getRealSpindexerPosition() , getTargetPose());
-//        //robot.spindexerServo.setPower(robot.power);
-//    }
-//
-//    public double getRealSpindexerPosition(){
-//        return (robot.spindexerServoInput.getVoltage() / 3.3) ;
-//    }
-//    public double getSpindexerTurns(){
-//        currentPose = getRealSpindexerPosition();
-//        if (currentPose - robot.target > 0.55){
-//            robot.turns++;
-//        }
-//        else if (currentPose - robot.target < -0.55){
-//            robot.turns--;
-//        }
-//        return robot.turns;
-//
-//    }
-//    public double getTargetPose(){
-//        return robot.target;
-//    }
-//
-//
-//    public void setSpindexerPosition(double t){
-////        if (Math.abs((t + 1) - getSpindexerTurns()) < Math.abs(getSpindexerTurns() - t)){
-////            robot.turns += 1;
-////        }
-//        robot.target = t;
-//    }
-//    public void setCurrentPose(){
-//        robot.currentPose = robot.currentPose + getSpindexerTurns();
-//    }
-//
-
 
     public void setPose(SpindexerStates state){
     spindexerState = state;
@@ -193,18 +147,6 @@ public class Spindexer implements Subsystem{
                         break;
                     }
                 }
-//                if (robot.atPoseOne){
-//                    setPoseThree();
-//                    break;
-//                }
-//                if (robot.atPoseTwo){
-//                    setPoseOne();
-//                    break;
-//                }
-//                if (robot.atPoseThree){
-//                    setPoseTwo();
-//                    break;
-//                }
             case moveRight:
                 if (!robot.spindexer.getTouchSensorState()){
                     if (robot.atPoseOne){
@@ -220,18 +162,6 @@ public class Spindexer implements Subsystem{
                         break;
                     }
                 }
-//                if (robot.atPoseOne){
-//                    setPoseTwo();
-//                    break;
-//                }
-//                if (robot.atPoseTwo){
-//                    setPoseThree();
-//                    break;
-//                }
-//                if (robot.atPoseThree){
-//                    setPoseOne();
-//                    break;
-//                }
         }
     }
     public void setPoseOne(){
@@ -297,151 +227,376 @@ public class Spindexer implements Subsystem{
         return allColor;
     }
 
+    public void teleOpShootPoseOne(){
+        robot.spindexer.spindexerUp();
+        robot.timer1.schedule(robot.spindexderDown1,200);
+        robot.timer1.schedule(robot.spindexderSetPoseTwo,350);
+        robot.timer1.schedule(robot.spindexderUp2,600);
+        robot.timer1.schedule(robot.spindexderDown2,800);
+        robot.timer1.schedule(robot.spindexderSetPoseThree,950);
+        robot.timer1.schedule(robot.spindexderUp3,1200);
+        robot.timer1.schedule(robot.spindexderDown3,1400);
+    }
 
+    public void teleOpShootPoseTwo(){
+        robot.spindexer.spindexerUp();
+        robot.timer1.schedule(robot.spindexderDown1,200);
+        robot.timer1.schedule(robot.spindexderSetPoseOne,350);
+        robot.timer1.schedule(robot.spindexderUp2,600);
+        robot.timer1.schedule(robot.spindexderDown2,800);
+        robot.timer1.schedule(robot.spindexderSetPoseThree,950);
+        robot.timer1.schedule(robot.spindexderUp3,1400);
+        robot.timer1.schedule(robot.spindexderDown3,1600);
+    }
+
+    public void teleOpShootPoseTwo_2(){
+        robot.spindexer.spindexerUp();
+        robot.timer1.schedule(robot.spindexderDown1,200);
+        robot.timer1.schedule(robot.spindexderSetPoseOne,350);
+        robot.timer1.schedule(robot.spindexderUp2,600);
+        robot.timer1.schedule(robot.spindexderDown2,800);
+        robot.timer1.schedule(robot.spindexderSetPoseThree,950);
+        robot.timer1.schedule(robot.spindexderUp3,1400);
+        robot.timer1.schedule(robot.spindexderDown3,1600);
+    }
+
+    public void teleOpShootPoseThree (){
+        robot.spindexer.spindexerUp();
+        robot.timer1.schedule(robot.spindexderDown1,200);
+        robot.timer1.schedule(robot.spindexderSetPoseTwo,350);
+        robot.timer1.schedule(robot.spindexderUp2,600);
+        robot.timer1.schedule(robot.spindexderDown2,800);
+        robot.timer1.schedule(robot.spindexderSetPoseOne,950);
+        robot.timer1.schedule(robot.spindexderUp3,1200);
+        robot.timer1.schedule(robot.spindexderDown3,1400);
+    }
+
+
+    public void autoShootPoseOne(){
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerUp();
+        }, robot.d+= 250 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 200 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.setPoseTwo();
+        }, robot.d+= 150 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerUp();
+        }, robot.d+= 250 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 200 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.setPoseThree();
+        }, robot.d+= 150 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerUp();
+        }, robot.d+= 250 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 200 , TimeUnit.MILLISECONDS);
+//        robot.timer1.schedule(robot.spindexderUp1,250);
+//        robot.timer1.schedule(robot.spindexderDown1,450);
+//        robot.timer1.schedule(robot.spindexderSetPoseTwo,600);
+//        robot.timer1.schedule(robot.spindexderUp2,850);
+//        robot.timer1.schedule(robot.spindexderDown2,1050);
+//        robot.timer1.schedule(robot.spindexderSetPoseThree,1200);
+//        robot.timer1.schedule(robot.spindexderUp3,1450);
+//        robot.timer1.schedule(robot.spindexderDown3,1650);
+    }
+
+    public void autoShootPoseTwo(){
+        robot.spindexer.spindexerUp();
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 250 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 200 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.setPoseOne();
+        }, robot.d+= 150 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerUp();
+        }, robot.d+= 250 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 200 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.setPoseThree();
+        }, robot.d+= 150 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerUp();
+        }, robot.d+= 450 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 200 , TimeUnit.MILLISECONDS);
+//        robot.timer1.schedule(robot.spindexderUp1,250);
+//        robot.timer1.schedule(robot.spindexderDown1,450);
+//        robot.timer1.schedule(robot.spindexderSetPoseOne,600);
+//        robot.timer1.schedule(robot.spindexderUp2,850);
+//        robot.timer1.schedule(robot.spindexderDown2,1050);
+//        robot.timer1.schedule(robot.spindexderSetPoseThree,1450);
+//        robot.timer1.schedule(robot.spindexderUp3,1700);
+//        robot.timer1.schedule(robot.spindexderDown3,1900);
+    }
+
+    public void autoShootPoseTwo_2 (){
+        robot.spindexer.spindexerUp();
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 250 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 200 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.setPoseThree();
+        }, robot.d+= 150 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerUp();
+        }, robot.d+= 250 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 200 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.setPoseOne();
+        }, robot.d+= 150 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerUp();
+        }, robot.d+= 450 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 200 , TimeUnit.MILLISECONDS);
+        //robot.spindexer.spindexerUp();
+//        robot.timer1.schedule(robot.spindexderUp1,250);
+//        robot.timer1.schedule(robot.spindexderDown1,450);
+//        robot.timer1.schedule(robot.spindexderSetPoseThree,600);
+//        robot.timer1.schedule(robot.spindexderUp2,850);
+//        robot.timer1.schedule(robot.spindexderDown2,1050);
+//        robot.timer1.schedule(robot.spindexderSetPoseOne,1450);
+//        robot.timer1.schedule(robot.spindexderUp3,1700);
+//        robot.timer1.schedule(robot.spindexderDown3,1900);
+    }
+
+    public void autoShootPoseThree(){
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerUp();
+        }, robot.d+= 250 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 200 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.setPoseTwo();
+        }, robot.d+= 150 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerUp();
+        }, robot.d+= 250 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 200 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.setPoseOne();
+        }, robot.d+= 150 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerUp();
+        }, robot.d+= 250 , TimeUnit.MILLISECONDS);
+        robot.s.schedule(() -> {
+            robot.spindexer.spindexerDown();
+        }, robot.d+= 200 , TimeUnit.MILLISECONDS);
+//        robot.timer1.schedule(robot.spindexderUp1,250);
+//        robot.timer1.schedule(robot.spindexderDown1,450);
+//        robot.timer1.schedule(robot.spindexderSetPoseTwo,600);
+//        robot.timer1.schedule(robot.spindexderUp2,850);
+//        robot.timer1.schedule(robot.spindexderDown2,1050);
+//        robot.timer1.schedule(robot.spindexderSetPoseOne,1200);
+//        robot.timer1.schedule(robot.spindexderUp3,1450);
+//        robot.timer1.schedule(robot.spindexderDown3,1650);
+    }
+
+
+    public void sortingAuto(){
+        setPoseTwo();
+        //robot.intake.timerTaskSetup();
+        robot.d = 0;
+        //robot.aprilID = 21;
+        // Green Purple Purple
+        if (robot.aprilID == 21){
+            // Slot 2 = Purple | Slot 1 = Purple
+            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(250);
+                setPoseThree();
+                autoShootPoseThree();
+            }
+            // Slot 2 = Purple | Slot 1 = Green
+            else if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() < robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(250);
+                setPoseOne();
+                autoShootPoseOne();
+            }
+            // Slot 2 = Green | Slot 1 = Purple
+            else if (robot.colorSensorTwo_1.blue() < robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                autoShootPoseTwo_2();
+            }
+            else {
+                //robot.blueSorted.waitM(500);
+                autoShootPoseTwo();
+            }
+        }
+        // Purple Green Purple
+        else if (robot.aprilID == 22) {
+            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                autoShootPoseTwo_2();
+            }
+            // Slot 2 = Purple | Slot 1 = Green
+            else if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() < robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                autoShootPoseTwo();
+            }
+            // Slot 2 = Green | Slot 1 = Purple
+            else if (robot.colorSensorTwo_1.blue() < robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(250);
+                setPoseOne();
+                autoShootPoseOne();
+            }
+            else {
+                //robot.blueSorted.waitM(500);
+                autoShootPoseTwo();
+            }
+        }
+        // Purple Purple Green
+        else if (robot.aprilID == 23){
+            // Slot 2 = Purple | Slot 1 = Purple
+            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                autoShootPoseTwo();
+            }
+            // Slot 2 = Purple | Slot 1 = Green
+            else if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() < robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                autoShootPoseTwo_2();
+            }
+            // Slot 2 = Green | Slot 1 = Purple
+            else if (robot.colorSensorTwo_1.blue() < robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(250);
+                setPoseOne();
+                autoShootPoseOne();
+            }
+            else {
+                //robot.blueSorted.waitM(500);
+                autoShootPoseTwo();
+            }
+        }
+    }
+
+
+    public void sorting(){
+        setPoseTwo();
+        robot.intake.timerTaskAutoSetup();
+        //robot.aprilID = 21;
+        // Green Purple Purple
+        if (robot.aprilID == 21){
+            // Slot 2 = Purple | Slot 1 = Purple
+            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(250);
+                setPoseThree();
+                teleOpShootPoseThree();
+            }
+            // Slot 2 = Purple | Slot 1 = Green
+            else if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() < robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(250);
+                setPoseOne();
+                teleOpShootPoseOne();
+            }
+            // Slot 2 = Green | Slot 1 = Purple
+            else if (robot.colorSensorTwo_1.blue() < robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                teleOpShootPoseTwo_2();
+            }
+            else {
+                //robot.blueSorted.waitM(500);
+                teleOpShootPoseTwo();
+            }
+        }
+        // Purple Green Purple
+        else if (robot.aprilID == 22) {
+            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                teleOpShootPoseTwo_2();
+            }
+            // Slot 2 = Purple | Slot 1 = Green
+            else if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() < robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                teleOpShootPoseTwo();
+            }
+            // Slot 2 = Green | Slot 1 = Purple
+            else if (robot.colorSensorTwo_1.blue() < robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(250);
+                setPoseOne();
+                teleOpShootPoseOne();
+            }
+            else {
+                //robot.blueSorted.waitM(500);
+                teleOpShootPoseTwo();
+            }
+        }
+        // Purple Purple Green
+        else if (robot.aprilID == 23){
+            // Slot 2 = Purple | Slot 1 = Purple
+            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                teleOpShootPoseTwo();
+            }
+            // Slot 2 = Purple | Slot 1 = Green
+            else if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() < robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(500);
+                teleOpShootPoseTwo_2();
+            }
+            // Slot 2 = Green | Slot 1 = Purple
+            else if (robot.colorSensorTwo_1.blue() < robot.colorSensorTwo_1.green() && robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green()){
+                //robot.blueSorted.waitM(250);
+                setPoseOne();
+                teleOpShootPoseOne();
+            }
+            else {
+                //robot.blueSorted.waitM(500);
+                teleOpShootPoseTwo();
+            }
+        }
+    }
 
     public void autoIntake(){
-        // At Pose One
+        // At Pose One or Pose Three
         if (robot.atPoseOne && !robot.atPoseTwo && !robot.atPoseThree) {
-            // All the slots have balls
-            if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
-                robot.spindexer.setPoseOne();
-            }
-            // The first slot or third slot is empty
-            if (robot.spindexer.detectColorOne_1() < 1000 || robot.spindexer.detectColorThree_1() < 1000){
-                robot.spindexer.setPoseOne();
-            }
-            // The first and third slots are taken
-            if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
+            if ((robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000) && (robot.spindexer.detectColorTwo_1() < 1500 || robot.spindexer.detectColorTwo_2() < 1500)){
                 robot.spindexer.setPoseTwo();
+            }
+            if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() < 1500 || robot.spindexer.detectColorTwo_2() < 1500)){
+                robot.spindexer.setPoseThree();
             }
         }
         // When the Spindexer is at Pose Two
         // Pose: Two Two Three One Three
         else if (!robot.atPoseOne && robot.atPoseTwo && !robot.atPoseThree) {
-            // All the slots have balls
-            if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
-                robot.spindexer.setPoseTwo();
-            }
-            // The first slot or third slot is empty
-            if (robot.spindexer.detectColorOne_1() < 1000 || robot.spindexer.detectColorThree_1() < 1000){
-                robot.spindexer.setPoseTwo();
-            }
-            // The first and third slots are taken
-            if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
-                robot.spindexer.setPoseThree();
-            }
-        }
-        // When the Spindexer is at Pose Three
-        // Pose: Three Three One Two One
-        else if (!robot.atPoseOne && !robot.atPoseTwo && robot.atPoseThree) {
-            // All the slots have balls
-            if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
-                robot.spindexer.setPoseThree();
-            }
-            // The first slot or third slot is empty
-            if (robot.spindexer.detectColorOne_1() < 1000 || robot.spindexer.detectColorThree_1() < 1000){
-                robot.spindexer.setPoseThree();
-            }
-            // The first and third slots are taken
-            if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
+            if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() < 1500 || robot.spindexer.detectColorTwo_2() < 1500)){
                 robot.spindexer.setPoseOne();
             }
+            else if ((robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000) && (robot.spindexer.detectColorTwo_1() < 1500 || robot.spindexer.detectColorTwo_2() < 1500)){
+                robot.spindexer.setPoseThree();
+            }
         }
-    }
-
-    public void autoIntakeOLD (){
-        setAutoIntakeState(Checking);
-        switch (intakeState){
-            case Checking:
-                // When the Spindexer is at Pose One
-                if (robot.atPoseOne && !robot.atPoseTwo && !robot.atPoseThree) {
-                    // All the slots have balls
-                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
-                        robot.spindexer.setPoseOne();
-                        setAutoIntakeState(Exit);
-                    }
-                    // The first slot is empty
-                    if (robot.spindexer.detectColorOne_1() > 1000){
-                        robot.spindexer.setPoseOne();
-                        setAutoIntakeState(Exit);
-                    }
-                    // The second slot is empty and the other two slots are taken
-                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
-                        robot.spindexer.setPoseTwo();
-                        setAutoIntakeState(Exit);
-                    }
-                    // The third slot is empty and the other two slots are taken
-                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && robot.spindexer.detectColorThree_1() < 1000){
-                        robot.spindexer.setPoseThree();
-                        setAutoIntakeState(Exit);
-                    }
-                    // The first slot is taken and the other two slots are empty
-                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && robot.spindexer.detectColorThree_1() < 1000){
-                        robot.spindexer.setPoseTwo();
-                        setAutoIntakeState(Exit);
-                    }
-                }
-                // When the Spindexer is at Pose Two
-                // Pose: Two Two Three One Three
-                else if (!robot.atPoseOne && robot.atPoseTwo && !robot.atPoseThree) {
-                    // All the slots have balls
-                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
-                        robot.spindexer.setPoseTwo();
-                        setAutoIntakeState(Exit);
-                    }
-                    // The first slot is empty
-                    if (robot.spindexer.detectColorOne_1() > 1000){
-                        robot.spindexer.setPoseTwo();
-                        setAutoIntakeState(Exit);
-                    }
-                    // The second slot is empty and the other two slots are taken
-                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
-                        robot.spindexer.setPoseThree();
-                        setAutoIntakeState(Exit);
-                    }
-                    // The third slot is empty and the other two slots are taken
-                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && robot.spindexer.detectColorThree_1() < 1000){
-                        robot.spindexer.setPoseOne();
-                        setAutoIntakeState(Exit);
-                    }
-                    // The first slot is taken and the other two slots are empty
-                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && robot.spindexer.detectColorThree_1() < 1000){
-                        robot.spindexer.setPoseThree();
-                        setAutoIntakeState(Exit);
-                    }
-                }
-                // When the Spindexer is at Pose Three
-                // Pose: Three Three One Two One
-                else if (!robot.atPoseOne && !robot.atPoseTwo && robot.atPoseThree) {
-                    // All the slots have balls
-                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
-                        robot.spindexer.setPoseThree();
-                        setAutoIntakeState(Exit);
-                    }
-                    // The first slot is empty
-                    if (robot.spindexer.detectColorOne_1() > 1000){
-                        robot.spindexer.setPoseThree();
-                        setAutoIntakeState(Exit);
-                    }
-                    // The second slot is empty and the other two slots are taken
-                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && (robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000)){
-                        robot.spindexer.setPoseOne();
-                        setAutoIntakeState(Exit);
-                    }
-                    // The third slot is empty and the other two slots are taken
-                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() > 2000 || robot.spindexer.detectColorTwo_2() > 2000) && robot.spindexer.detectColorThree_1() < 1000){
-                        robot.spindexer.setPoseTwo();
-                        setAutoIntakeState(Exit);
-                    }
-                    // The first slot is taken and the other two slots are empty
-                    if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && robot.spindexer.detectColorTwo_1() < 1000 && robot.spindexer.detectColorThree_1() < 1000){
-                        robot.spindexer.setPoseOne();
-                        setAutoIntakeState(Exit);
-                    }
-                }
-            case Exit:
-                break;
-
+//        // When the Spindexer is at Pose Three
+//        // Pose: Three Three One Two One
+        else if (!robot.atPoseOne && !robot.atPoseTwo && robot.atPoseThree) {
+            if ((robot.spindexer.detectColorThree_1() > 2000 || robot.spindexer.detectColorThree_2() > 2000) && (robot.spindexer.detectColorTwo_1() < 1500 || robot.spindexer.detectColorTwo_2() < 1500)){
+                robot.spindexer.setPoseOne();
+            }
+            else if ((robot.spindexer.detectColorOne_1() > 2000 || robot.spindexer.detectColorOne_2() > 2000) && (robot.spindexer.detectColorTwo_1() < 1500 || robot.spindexer.detectColorTwo_2() < 1500)){
+                robot.spindexer.setPoseTwo();
+            }
         }
     }
 
@@ -1176,493 +1331,6 @@ public class Spindexer implements Subsystem{
                 spindexerUp();
                 waitMTeleOp(500);
                 spindexerDown();
-            }
-        }
-    }
-    public void NOsorting (){
-        robot.aprilID = 21;
-        robot.spindexer.setPoseThree();
-        if (robot.aprilID == 21){
-            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseTwo(), 250);
-                waitM(750);
-                if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseOne(), 250);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseTwo(), 250);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                }
-                else if (robot.colorSensorTwo_1.green() > robot.colorSensorTwo_1.blue()){
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseThree(), 250);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseOne(), 250);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                }
-            }
-            else {
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseTwo(), 250);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseOne(), 250);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-            }
-        }
-        // Purple Green Purple
-        if (robot.aprilID == 22){
-            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseTwo(), 250);
-                waitM(750);
-                if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseOne(), 250);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseTwo(), 250);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                }
-                else if (robot.colorSensorTwo_1.green() > robot.colorSensorTwo_1.blue()){
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseOne(), 250);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                }
-            }
-            else {
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseTwo(), 250);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseThree(), 250);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseOne(), 250);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-            }
-        }
-        // Purple Purple Green
-        if (robot.aprilID == 23){
-            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseTwo(), 250);
-                waitM(750);
-                if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseOne(), 250);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                }
-                else if (robot.colorSensorTwo_1.green() > robot.colorSensorTwo_1.blue()){
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseOne(), 250);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseTwo(), 250);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                    robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                }
-            }
-            else {
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseTwo(), 250);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseOne(), 250);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.setPoseThree(), 250);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerUp(), 500);
-                robot.timerTeleOp.schedule(robot.timerTaskCommands.spindexerDown(), 500);
-            }
-        }
-    }
-
-
-    public void sortingOldAuto (){
-        // Remove this for actual gameplay
-        robot.aprilID = 21;
-        robot.spindexer.setPoseThree();
-        if (robot.aprilID == 21){
-            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                robot.blueSorted.waitM(250);
-                robot.spindexer.setPoseTwo();
-                robot.blueSorted.waitM(750);
-                if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                    robot.blueSorted.waitM(250);
-                    robot.spindexer.setPoseOne();
-                    robot.blueSorted.waitM(250);
-                    robot.spindexer.setPoseOne();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                    robot.blueSorted.waitM(250);
-                    robot.spindexer.setPoseTwo();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                }
-                else if (robot.colorSensorTwo_1.green() > robot.colorSensorTwo_1.blue()){
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                    robot.blueSorted.waitM(250);
-                    robot.spindexer.setPoseThree();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                    robot.blueSorted.waitM(250);
-                    robot.spindexer.setPoseOne();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                }
-            }
-            else {
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerUp();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerDown();
-                robot.blueSorted.waitM(250);
-                robot.spindexer.setPoseTwo();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerUp();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerDown();
-                robot.blueSorted.waitM(250);
-                robot.spindexer.setPoseOne();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerUp();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerDown();
-            }
-        }
-        // Purple Green Purple
-        if (robot.aprilID == 22){
-            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerUp();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerDown();
-                robot.blueSorted.waitM(250);
-                robot.spindexer.setPoseTwo();
-                waitM(750);
-                if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                    robot.blueSorted.waitM(250);
-                    robot.spindexer.setPoseOne();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                    robot.blueSorted.waitM(250);
-                    robot.spindexer.setPoseTwo();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                }
-                else if (robot.colorSensorTwo_1.green() > robot.colorSensorTwo_1.blue()){
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                    robot.blueSorted.waitM(250);
-                    robot.spindexer.setPoseOne();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                }
-            }
-            else {
-                robot.blueSorted.waitM(250);
-                robot.spindexer.setPoseTwo();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerUp();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerDown();
-                robot.blueSorted.waitM(250);
-                robot.spindexer.setPoseThree();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerUp();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerDown();
-                robot.blueSorted.waitM(250);
-                robot.spindexer.setPoseOne();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerUp();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerDown();
-            }
-        }
-        // Purple Purple Green
-        if (robot.aprilID == 23){
-            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerUp();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerDown();
-                robot.blueSorted.waitM(250);
-                robot.spindexer.setPoseTwo();
-                robot.blueSorted.waitM(750);
-                if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                    robot.blueSorted.waitM(250);
-                    robot.spindexer.setPoseOne();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                }
-                else if (robot.colorSensorTwo_1.green() > robot.colorSensorTwo_1.blue()){
-                    robot.blueSorted.waitM(250);
-                    robot.spindexer.setPoseOne();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                    robot.blueSorted.waitM(250);
-                    robot.spindexer.setPoseTwo();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerUp();
-                    robot.blueSorted.waitM(500);
-                    robot.spindexer.spindexerDown();
-                }
-            }
-            else {
-                robot.blueSorted.waitM(250);
-                robot.spindexer.setPoseTwo();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerUp();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerDown();
-                robot.blueSorted.waitM(250);
-                robot.spindexer.setPoseOne();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerUp();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerDown();
-                robot.blueSorted.waitM(250);
-                robot.spindexer.setPoseThree();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerUp();
-                robot.blueSorted.waitM(500);
-                robot.spindexer.spindexerDown();
-            }
-        }
-    }
-
-
-
-    public void sortingOldTeleOp (){
-        // Remove this for actual gameplay
-        robot.aprilID = 21;
-        robot.spindexer.setPoseThree();
-        if (robot.aprilID == 21){
-            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                waitMTeleOp(250);
-                robot.spindexer.setPoseTwo();
-                waitMTeleOp(750);
-                if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                    waitMTeleOp(250);
-                    robot.spindexer.setPoseOne();
-                    waitMTeleOp(250);
-                    robot.spindexer.setPoseOne();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                    waitMTeleOp(250);
-                    robot.spindexer.setPoseTwo();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                }
-                else if (robot.colorSensorTwo_1.green() > robot.colorSensorTwo_1.blue()){
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                    waitMTeleOp(250);
-                    robot.spindexer.setPoseThree();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                    waitMTeleOp(250);
-                    robot.spindexer.setPoseOne();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                }
-            }
-            else {
-                waitMTeleOp(500);
-                robot.spindexer.spindexerUp();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerDown();
-                waitMTeleOp(250);
-                robot.spindexer.setPoseTwo();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerUp();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerDown();
-                waitMTeleOp(250);
-                robot.spindexer.setPoseOne();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerUp();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerDown();
-            }
-        }
-        // Purple Green Purple
-        if (robot.aprilID == 22){
-            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                waitMTeleOp(500);
-                robot.spindexer.spindexerUp();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerDown();
-                waitMTeleOp(250);
-                robot.spindexer.setPoseTwo();
-                waitMTeleOp(750);
-                if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                    waitMTeleOp(250);
-                    robot.spindexer.setPoseOne();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                    waitMTeleOp(250);
-                    robot.spindexer.setPoseTwo();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                }
-                else if (robot.colorSensorTwo_1.green() > robot.colorSensorTwo_1.blue()){
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                    waitMTeleOp(250);
-                    robot.spindexer.setPoseOne();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                }
-            }
-            else {
-                waitMTeleOp(250);
-                robot.spindexer.setPoseTwo();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerUp();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerDown();
-                waitMTeleOp(250);
-                robot.spindexer.setPoseThree();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerUp();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerDown();
-                waitMTeleOp(250);
-                robot.spindexer.setPoseOne();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerUp();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerDown();
-            }
-        }
-        // Purple Purple Green
-        if (robot.aprilID == 23){
-            if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                waitMTeleOp(500);
-                robot.spindexer.spindexerUp();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerDown();
-                waitMTeleOp(250);
-                robot.spindexer.setPoseTwo();
-                waitMTeleOp(750);
-                if (robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green()){
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                    waitMTeleOp(250);
-                    robot.spindexer.setPoseOne();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                }
-                else if (robot.colorSensorTwo_1.green() > robot.colorSensorTwo_1.blue()){
-                    waitMTeleOp(250);
-                    robot.spindexer.setPoseOne();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                    waitMTeleOp(250);
-                    robot.spindexer.setPoseTwo();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerUp();
-                    waitMTeleOp(500);
-                    robot.spindexer.spindexerDown();
-                }
-            }
-            else {
-                waitMTeleOp(250);
-                robot.spindexer.setPoseTwo();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerUp();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerDown();
-                waitMTeleOp(250);
-                robot.spindexer.setPoseOne();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerUp();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerDown();
-                waitMTeleOp(250);
-                robot.spindexer.setPoseThree();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerUp();
-                waitMTeleOp(500);
-                robot.spindexer.spindexerDown();
             }
         }
     }

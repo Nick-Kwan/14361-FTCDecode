@@ -32,12 +32,16 @@ import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Mecanum;
 import org.firstinspires.ftc.teamcode.Subsystems.Spindexer;
 import org.firstinspires.ftc.teamcode.pedroPathing.autoPaths.blueSorted;
+import org.firstinspires.ftc.teamcode.pedroPathing.autoPaths.blueSortedLong;
 import org.firstinspires.ftc.teamcode.pedroPathing.autoPaths.redSorted;
 
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 @Config
 public class RobotHardware {
@@ -52,6 +56,11 @@ public class RobotHardware {
     public PIDFController spindexerServoPID;
     public double power;
     public double target;
+    public boolean autoIntakeIntermittenceBool;
+    public TimerTask spindexderUp1, spindexderUp2, spindexderUp3, spindexderDown1, spindexderDown2, spindexderDown3, spindexderSetPoseOne, spindexderSetPoseTwo, spindexderSetPoseThree, autoIntakeIntermittence, autoSortDelay;
+    public java.util.Timer timer1, timer2;
+    public ScheduledExecutorService s;
+    public int d;
 
 
 //    public AbsoluteAnalogEncoder spindexerEncoder;
@@ -122,6 +131,7 @@ public class RobotHardware {
     public Spindexer spindexer;
     public timerTaskCommands timerTaskCommands;
     public blueSorted blueSorted;
+    public blueSortedLong blueSortedLong;
     public redSorted redSorted;
     public static RobotHardware getInstance() {
         if (instance == null) {
@@ -228,9 +238,11 @@ public class RobotHardware {
         this.shooterMotors = new MotorGroup(m_shooterTwo,m_shooterOne);
         this.shooterMotors.setRunMode(Motor.RunMode.VelocityControl);
         this.shooterMotors.setVeloCoefficients(RobotConstants.Drivetrain.shootP,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD);
+        this.shooterMotors.setFeedforwardCoefficients(0,RobotConstants.Drivetrain.shootV);
         target = RobotConstants.Intake.target;
         hoodAngle = RobotConstants.Intake.hoodAngle;
         targetY = 0;
+        autoIntakeIntermittenceBool = true;
 
         this.hubs = hardwareMap.getAll(LynxModule.class);
         this.hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
@@ -246,6 +258,9 @@ public class RobotHardware {
 
         this.adjustableHoodServo = hardwareMap.servo.get(RobotConstants.Drivetrain.adjustableHoodServo);
         this.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseMid);
+
+        s = Executors.newScheduledThreadPool(2);
+        d = 0;
 
         mecanum = new Mecanum();
         intake = new Intake();
@@ -298,7 +313,7 @@ public class RobotHardware {
         this.spindexerLinkageServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerLinkageServo);
         this.spindexerLinkageServo.setPosition(RobotConstants.Spindexer.spindexerLinkageServoDown);
         this.spindexerServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerServo);
-        this.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseThree);
+        this.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
         //spindexer.setPoseThree();
 
         this.touchSensor = hardwareMap.get(DigitalChannel.class,RobotConstants.Spindexer.touchSensor);
@@ -357,8 +372,11 @@ public class RobotHardware {
 
         this.shooterMotors = new MotorGroup(m_shooterTwo,m_shooterOne);
         this.shooterMotors.setRunMode(Motor.RunMode.VelocityControl);
-        this.shooterMotors.setVeloCoefficients(RobotConstants.Drivetrain.shootP,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD);
-        target = 0;
+        this.shooterMotors.setVeloCoefficients(0.4,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD);
+        //this.shooterMotors.setFeedforwardCoefficients(0,RobotConstants.Drivetrain.shootV);
+        target = RobotConstants.Intake.target;
+        hoodAngle = RobotConstants.Intake.hoodAngle;
+        targetY = 0;
 
         this.hubs = hardwareMap.getAll(LynxModule.class);
         this.hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
@@ -366,11 +384,15 @@ public class RobotHardware {
         this.adjustableHoodServo = hardwareMap.servo.get(RobotConstants.Drivetrain.adjustableHoodServo);
         this.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseAuto);
 
+        s = Executors.newScheduledThreadPool(1);
+        d = 0;
+
         mecanum = new Mecanum();
         intake = new Intake();
         spindexer = new Spindexer();
         ShooterLUT = new ShooterLUT();
         timerTaskCommands = new timerTaskCommands();
+        blueSortedLong = new blueSortedLong();
         blueSorted = new blueSorted();
         redSorted = new redSorted();
     }

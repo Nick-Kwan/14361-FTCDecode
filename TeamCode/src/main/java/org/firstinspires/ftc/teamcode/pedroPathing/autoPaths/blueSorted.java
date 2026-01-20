@@ -31,7 +31,7 @@ public class blueSorted extends OpMode{
 
 
     private Follower follower;
-    private Timer  actionTimer, opmodeTimer;
+    private Timer opmodeTimer;
     //private ElapsedTime pathTimer;
     private Timer llResetTimer;
     private int pathState;
@@ -171,7 +171,7 @@ public class blueSorted extends OpMode{
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                robot.intake.setTargetVelocity(0.41);
+                //robot.intake.setTargetVelocity(0.41);
                 robot.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseAuto);
                 robot.spindexer.setPoseTwo();
                 follower.setMaxPower(0.67);
@@ -201,7 +201,6 @@ public class blueSorted extends OpMode{
                     //robot.spindexer.setPoseOne();
                     follower.setMaxPower(0.6);
                     follower.followPath(collectOne,true);
-                    actionTimer.resetTimer();
 //                    waitM(300);
 //                    robot.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
                     setPathState(3);
@@ -209,16 +208,6 @@ public class blueSorted extends OpMode{
                 break;
                 // IT SKIPS THIS RN
             case 2:
-//                if (tempAutoSpec) {
-//                    actionTimer.resetTimer();
-//                    tempAutoSpec = false;
-//                }
-//                if (actionTimer.getElapsedTimeSeconds() > 0.5){
-//                    robot.spindexer.setPoseTwo();
-//                }
-//                if (follower.getPathCompletion() > 0.4 || follower.getPathCompletion() < 0.9){
-//                    robot.spindexer.setPoseTwo();
-//                }
                 if (!follower.isBusy()){
                     //robot.spindexer.setPoseTwo();
                     //robot.spindexer.setPoseOne();
@@ -378,7 +367,7 @@ public class blueSorted extends OpMode{
 //            autonomousPathUpdate();
             orientation = robot.imu.getRobotYawPitchRollAngles();
             robot.limelight.updateRobotOrientation(orientation.getYaw());
-            //robot.intake.setShooterVelocity();
+            //robot.intake.setShooterVelocity(0.41);
             llResult = robot.limelight.getLatestResult();
             if (robot.aprilID < 20){
                 robot.limelight.pipelineSwitch(0);
@@ -484,7 +473,6 @@ public class blueSorted extends OpMode{
 
 
             }
-        telemetry.addData("Action Timer: ", actionTimer.getElapsedTime());
         telemetry.addData("Path Completion: ", follower.getPathCompletion());
         telemetry.addData("Heading", follower.getHeading());;
         telemetry.addData("ID", robot.aprilID);
@@ -502,9 +490,7 @@ public class blueSorted extends OpMode{
 
         robot.pathTimer = new ElapsedTime();
         opmodeTimer = new Timer();
-        actionTimer = new Timer();
         llResetTimer = new Timer();
-        robot.spindexer.shooterTimer = new ElapsedTime();
         opmodeTimer.resetTimer();
 
         follower = Constants.createFollower(hardwareMap);
@@ -551,11 +537,7 @@ public class blueSorted extends OpMode{
     public void start() {
         robot.pathTimer.reset();
         opmodeTimer.resetTimer();
-        actionTimer.resetTimer();
         llResetTimer.resetTimer();
-        robot.spindexer.shooterTimer.reset();
-        robot.spindexer.secondShooterTimer.reset();
-        robot.spindexer.thirdShooterTimer.reset();
         setPathState(0);
     }
 }

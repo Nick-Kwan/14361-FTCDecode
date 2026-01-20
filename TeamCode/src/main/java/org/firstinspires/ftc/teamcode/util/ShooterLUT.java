@@ -14,8 +14,8 @@ public class ShooterLUT {
         this.robot = RobotHardware.getInstance();
         table.put(15.0, new shotConfig(0.55, 0.6, 0.0));
         table.put(5.0, new shotConfig(0.6, 0.45, 0.0));
-        table.put(0.0, new shotConfig(0.7, 0.35, 0.0));
-        table.put(-2.7, new shotConfig(0.8, 0.2, 0.0));
+        table.put(0.0, new shotConfig(0.74, 0.27, 0.0));
+        table.put(-2.7, new shotConfig(0.82, 0.2, 0.0));
         //table.put(27.0, new shotConfig(900, 0.1, 0.0));
     }
 

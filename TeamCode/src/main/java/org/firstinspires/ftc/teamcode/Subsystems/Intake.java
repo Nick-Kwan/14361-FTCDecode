@@ -5,6 +5,8 @@ import org.firstinspires.ftc.teamcode.util.RobotConstants;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.arcrobotics.ftclib.command.Subsystem;
 
+import java.util.TimerTask;
+
 public class Intake implements Subsystem{
     private RobotHardware robot;
     public Intake() {
@@ -59,11 +61,160 @@ public class Intake implements Subsystem{
 //        robot.shooterTwo.setVelocity(vel);
     }
 
+    public void setAutoShooterVelocity(){
+        robot.shooterMotors.set(robot.target);
+    }
+
     public void setHoodAngle(double a){
         robot.adjustableHoodServo.setPosition(a);
     }
 
     public void setTurretPos(){
         robot.turretServo.setPosition(robot.turretPos);
+    }
+
+    public void timerTaskSetup(){
+        // TimerTask commands
+        robot.timer1 = new java.util.Timer();
+        robot.timer2 = new java.util.Timer();
+        robot.spindexderUp1 = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.spindexerUp();
+            }
+        };
+        robot.spindexderUp2 = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.spindexerUp();
+            }
+        };
+        robot.spindexderUp3 = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.spindexerUp();
+            }
+        };
+        robot.spindexderDown1 = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.spindexerDown();
+            }
+        };
+        robot.spindexderDown2 = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.spindexerDown();
+            }
+        };
+        robot.spindexderDown3 = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.spindexerDown();
+            }
+        };
+        robot.spindexderSetPoseOne = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.setPoseOne();
+            }
+        };
+        robot.spindexderSetPoseTwo = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.setPoseTwo();
+            }
+        };
+        robot.spindexderSetPoseThree = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.setPoseThree();
+            }
+        };
+        robot.autoIntakeIntermittence = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.autoIntake();
+                robot.autoIntakeIntermittenceBool = true;
+            }
+        };
+        robot.autoSortDelay = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.sorting();
+            }
+        };
+    }
+    public void timerTaskAutoSetup(){
+        // TimerTask commands
+        robot.timer1 = new java.util.Timer();
+        robot.timer2 = new java.util.Timer();
+        robot.spindexderUp1 = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.spindexerUp();
+            }
+        };
+        robot.spindexderUp2 = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.spindexerUp();
+            }
+        };
+        robot.spindexderUp3 = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.spindexerUp();
+            }
+        };
+        robot.spindexderDown1 = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.spindexerDown();
+            }
+        };
+        robot.spindexderDown2 = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.spindexerDown();
+            }
+        };
+        robot.spindexderDown3 = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.spindexerDown();
+            }
+        };
+        robot.spindexderSetPoseOne = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.setPoseOne();
+            }
+        };
+        robot.spindexderSetPoseTwo = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.setPoseTwo();
+            }
+        };
+        robot.spindexderSetPoseThree = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.setPoseThree();
+            }
+        };
+        robot.autoIntakeIntermittence = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.autoIntake();
+                robot.autoIntakeIntermittenceBool = true;
+            }
+        };
+        robot.autoSortDelay = new TimerTask() {
+            @Override
+            public void run() {
+                robot.spindexer.sorting();
+            }
+        };
     }
 }
