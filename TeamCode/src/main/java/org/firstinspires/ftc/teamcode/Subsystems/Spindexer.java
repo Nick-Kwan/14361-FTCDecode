@@ -381,6 +381,7 @@ public class Spindexer implements Subsystem{
     }
 
     public void autoShootPoseThree(){
+        // Total = 1650
         robot.s.schedule(() -> {
             robot.spindexer.spindexerUp();
         }, robot.d+= 250 , TimeUnit.MILLISECONDS);

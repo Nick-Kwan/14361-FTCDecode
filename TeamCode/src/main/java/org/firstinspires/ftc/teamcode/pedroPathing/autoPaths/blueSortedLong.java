@@ -65,9 +65,6 @@ public class blueSortedLong extends OpMode{
     }
 
     private RobotHardware robot = RobotHardware.getInstance();
-    private Runnable setPoseOne = () -> {
-        robot.spindexer.setPoseOne();
-    };
 
     private static double initX = 63.5;
     private static double initY = 8.5;
@@ -87,32 +84,35 @@ public class blueSortedLong extends OpMode{
 
     // Setting up the poses for the paths
     private final Pose startPose = new Pose(initX, initY, Math.toRadians(90));
-    private final Pose collectOnePose = new Pose(17,8.5, Math.toRadians(180));
-    private final Pose collectControlOnePose = new Pose(34.5,15,Math.toRadians(172));
+    private final Pose collectOnePose = new Pose(16,10, Math.toRadians(180));
+    private final Pose collectControlOnePose = new Pose(34.5,20,Math.toRadians(180));
     private final Pose shootOnePose = new Pose(56, 14, Math.toRadians(110));
-    private final Pose collectTwoPose = new Pose(27,26,Math.toRadians(90));
-    private final Pose collectControlTwoPose = new Pose(25,8,Math.toRadians(90));
+    private final Pose collectTwoPose = new Pose(19,38,Math.toRadians(90));
+    private final Pose collectControlTwoPose = new Pose(65,38);
     private final Pose shootTwoPose = new Pose(56, 14, Math.toRadians(110));
-    private final Pose collectThreePose = new Pose(27,50,Math.toRadians(90));
-    private final Pose collectControlThreePose = new Pose(25,28,Math.toRadians(135.8));
+    private final Pose shootControlTwoPose = new Pose(56,38);
+    private final Pose collectThreePose = new Pose(25,62,Math.toRadians(90));
+    private final Pose collectControlThreePose = new Pose(65,62);
     private final Pose shootThreePose = new Pose(56, 14, Math.toRadians(110));
-    private final Pose collectFourPose = new Pose(27,74,Math.toRadians(90));
-    private final Pose collectControlFourPose = new Pose(25,50,Math.toRadians(151.5));
-    private final Pose shootFourPose = new Pose(56, 14, Math.toRadians(110));
-    private final Pose parkPose = new Pose(36,14,Math.toRadians(180));
+    private final Pose shootControlThreePose = new Pose(55,62);
+    private final Pose collectFourPose = new Pose(25,86,Math.toRadians(90));
+    private final Pose collectControlFourPose = new Pose(65,86);
+    private final Pose shootFourPose = new Pose(50, 86, Math.toRadians(110));
+    //private final Pose shootControlFourPose = new Pose(55,86);
+    private final Pose parkPose = new Pose(25,86,Math.toRadians(180));
 
     // Creating the paths from the poses
     private Path collectOne;
     private PathChain scoreOne, collectTwo, scoreTwo, collectThree, scoreThree, collectFour, scoreFour, park;
-//    private Runnable setPoseOne = () -> {
-//        robot.spindexer.setPoseOne();
-//    };
-//    private Runnable setPoseTwo = () -> {
-//        robot.spindexer.setPoseTwo();
-//    };
-//    private Runnable setPoseThree = () -> {
-//        robot.spindexer.setPoseThree();
-//    };
+    private Runnable setPoseOne = () -> {
+        robot.spindexer.setPoseOne();
+    };
+    private Runnable setPoseTwo = () -> {
+        robot.spindexer.setPoseTwo();
+    };
+    private Runnable setPoseThree = () -> {
+        robot.spindexer.setPoseThree();
+    };
 
 
     public void buildPaths() {
@@ -127,37 +127,49 @@ public class blueSortedLong extends OpMode{
 
         collectTwo = follower.pathBuilder()
                 .addPath(new BezierCurve(shootOnePose,collectControlTwoPose,collectTwoPose))
-                .setLinearHeadingInterpolation(shootOnePose.getHeading(), collectTwoPose.getHeading())
+                .addParametricCallback(0.2,setPoseThree)
+                .addParametricCallback(0.79,setPoseTwo)
+//                .addParametricCallback(0.93,setPoseOne)
+                .setTangentHeadingInterpolation()
                 .build();
 
         scoreTwo = follower.pathBuilder()
-                .addPath(new BezierLine(collectTwoPose,shootTwoPose))
-                .setLinearHeadingInterpolation(collectTwoPose.getHeading(),shootTwoPose.getHeading())
+                .addPath(new BezierCurve(collectTwoPose,shootControlTwoPose,shootTwoPose))
+                .setTangentHeadingInterpolation()
+                .setReversed()
                 .build();
 
         collectThree = follower.pathBuilder()
                 .addPath(new BezierCurve(shootTwoPose,collectControlThreePose,collectThreePose))
+                .addParametricCallback(0.2,setPoseThree)
+                .addParametricCallback(0.74,setPoseTwo)
+                .addParametricCallback(0.85,setPoseOne)
                 .setTangentHeadingInterpolation()
                 .build();
 
         scoreThree = follower.pathBuilder()
-                .addPath(new BezierLine(collectThreePose,shootThreePose))
-                .setLinearHeadingInterpolation(collectThreePose.getHeading(),shootThreePose.getHeading())
+                .addPath(new BezierCurve(collectThreePose,shootControlThreePose,shootThreePose))
+                .setTangentHeadingInterpolation()
+                .setReversed()
                 .build();
 
         collectFour = follower.pathBuilder()
                 .addPath(new BezierCurve(shootThreePose,collectControlFourPose,collectFourPose))
+                .addParametricCallback(0.2,setPoseThree)
+                .addParametricCallback(0.79,setPoseTwo)
+                .addParametricCallback(0.89,setPoseOne)
                 .setTangentHeadingInterpolation()
                 .build();
 
         scoreFour = follower.pathBuilder()
-                .addPath(new BezierLine(collectFourPose,shootFourPose))
-                .setLinearHeadingInterpolation(collectFourPose.getHeading(),shootFourPose.getHeading())
+                .addPath(new BezierCurve(collectFourPose,shootFourPose))
+                .setTangentHeadingInterpolation()
+                .setReversed()
                 .build();
 
         park = follower.pathBuilder()
                 .addPath(new BezierLine(shootFourPose,parkPose))
-                .setLinearHeadingInterpolation(shootFourPose.getHeading(), parkPose.getHeading())
+                .setTangentHeadingInterpolation()
                 .build();
 
     }
@@ -178,14 +190,13 @@ public class blueSortedLong extends OpMode{
                     }, t += 1000 , TimeUnit.MILLISECONDS);
                     autoSchedule.schedule(() -> {
                         robot.spindexer.setPoseOne();
-                    }, t += 1700 , TimeUnit.MILLISECONDS);
+                    }, t += 1900 , TimeUnit.MILLISECONDS);
                     autoSchedule.schedule(() -> {
                         robot.intake.intakeDown();
                         robot.intake.startIntaking();
-                        //robot.spindexer.setPoseOne();
                         follower.followPath(collectOne);
                         setPathState(1);
-                    }, t += 1850 , TimeUnit.MILLISECONDS);
+                    }, t += 450 , TimeUnit.MILLISECONDS);
                 }
                 break;
             case 1:
@@ -207,18 +218,14 @@ public class blueSortedLong extends OpMode{
                 if (!follower.isBusy() && !ranCase2){
                     ranCase2 = true;
                     t = 0;
-//                    autoSchedule.schedule(() -> {
-//                        robot.spindexer.sortingAuto();
-//                    }, t += 500 , TimeUnit.MILLISECONDS);
-                    robot.spindexer.sortingAuto();
                     autoSchedule.schedule(() -> {
-                        robot.spindexer.setPoseOne();
-                    }, t += 1700 , TimeUnit.MILLISECONDS);
+                        robot.spindexer.sortingAuto();
+                    }, t += 500 , TimeUnit.MILLISECONDS);
                     autoSchedule.schedule(() -> {
                         //robot.spindexer.setPoseOne();
                         follower.followPath(collectTwo);
                         setPathState(3);
-                    }, t += 1850 , TimeUnit.MILLISECONDS);
+                    }, t += 1900 , TimeUnit.MILLISECONDS);
                     break;
                 }
                 break;
@@ -227,11 +234,8 @@ public class blueSortedLong extends OpMode{
                     ranCase3 = true;
                     t = 0;
                     autoSchedule.schedule(() -> {
-                        robot.spindexer.setPoseTwo();
-                    }, t += 200 , TimeUnit.MILLISECONDS);
-                    autoSchedule.schedule(() -> {
                         //.turretServo.setPosition(RobotConstants.Drivetrain.turretPoseAutoLong);
-                        //robot.spindexer.setPoseTwo();
+                        robot.spindexer.setPoseTwo();
                         follower.followPath(scoreTwo,true);
                         setPathState(4);
                     }, t += 1000 , TimeUnit.MILLISECONDS);
@@ -246,13 +250,10 @@ public class blueSortedLong extends OpMode{
 //                    }, t += 500 , TimeUnit.MILLISECONDS);
                     robot.spindexer.sortingAuto();
                     autoSchedule.schedule(() -> {
-                        robot.spindexer.setPoseOne();
-                    }, t += 1700 , TimeUnit.MILLISECONDS);
-                    autoSchedule.schedule(() -> {
                         //robot.spindexer.setPoseOne();
                         follower.followPath(collectThree);
                         setPathState(5);
-                    }, t += 1850 , TimeUnit.MILLISECONDS);
+                    }, t += 1700 , TimeUnit.MILLISECONDS);
                 }
                 break;
             case 5:
@@ -260,11 +261,8 @@ public class blueSortedLong extends OpMode{
                     ranCase5 = true;
                     t = 0;
                     autoSchedule.schedule(() -> {
-                        robot.spindexer.setPoseTwo();
-                    }, t += 200 , TimeUnit.MILLISECONDS);
-                    autoSchedule.schedule(() -> {
                         //robot.turretServo.setPosition(RobotConstants.Drivetrain.turretPoseAutoLong);
-                        //robot.spindexer.setPoseTwo();
+                        robot.spindexer.setPoseTwo();
                         follower.followPath(scoreThree,true);
                         setPathState(6);
                     }, t += 1000 , TimeUnit.MILLISECONDS);
@@ -279,13 +277,10 @@ public class blueSortedLong extends OpMode{
 //                    }, t += 500 , TimeUnit.MILLISECONDS);
                     robot.spindexer.sortingAuto();
                     autoSchedule.schedule(() -> {
-                        robot.spindexer.setPoseOne();
-                    }, t += 1700 , TimeUnit.MILLISECONDS);
-                    autoSchedule.schedule(() -> {
                         //robot.spindexer.setPoseOne();
                         follower.followPath(collectFour);
                         setPathState(7);
-                    }, t += 1850 , TimeUnit.MILLISECONDS);
+                    }, t += 1700 , TimeUnit.MILLISECONDS);
                 }
                 break;
             case 7:
@@ -293,10 +288,9 @@ public class blueSortedLong extends OpMode{
                     ranCase7 = true;
                     t = 0;
                     autoSchedule.schedule(() -> {
+                        robot.adjustableHoodServo.setPosition(0.4);
                         robot.spindexer.setPoseTwo();
-                    }, t += 200 , TimeUnit.MILLISECONDS);
-                    autoSchedule.schedule(() -> {
-                       // robot.turretServo.setPosition(RobotConstants.Drivetrain.turretPoseAutoLong);
+                        follower.setMaxPower(1.0);
                         follower.followPath(scoreFour,true);
                         setPathState(8);
                     }, t += 1000 , TimeUnit.MILLISECONDS);
@@ -306,14 +300,15 @@ public class blueSortedLong extends OpMode{
                 if (!follower.isBusy() && !ranCase8) {
                     ranCase8 = true;
                     t = 0;
-//                    autoSchedule.schedule(() -> {
-//                        robot.spindexer.sortingAuto();
-//                    }, t += 500 , TimeUnit.MILLISECONDS);
-                    robot.spindexer.sortingAuto();
+
+                    robot.turretServo.setPosition(0.8);
+                    autoSchedule.schedule(() -> {
+                        robot.spindexer.sortingAuto();
+                    }, t += 200 , TimeUnit.MILLISECONDS);
                     autoSchedule.schedule(() -> {
                         follower.followPath(park);
                         setPathState(9);
-                    }, t += 1600, TimeUnit.MILLISECONDS);
+                    }, t += 1700, TimeUnit.MILLISECONDS);
                 }
                 break;
             case 9:
@@ -372,10 +367,10 @@ public class blueSortedLong extends OpMode{
             }
             if (limelightTemp){
                 if (llResult.getTx() > 2){
-                    robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
+                    robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 700);
                 }
                 else if (llResult.getTx() < -2){
-                    robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 1000);
+                    robot.turretServo.setPosition(robot.turretServo.getPosition() + llResult.getTx() / 700);
                 }
                 limelightLoopTemp = true;
             }
