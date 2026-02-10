@@ -7,7 +7,6 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import Constants.EnumConstants;
 import Constants.LimelightConstants;
 import Constants.ShooterConstants;
 import Constants.TurretConstants;

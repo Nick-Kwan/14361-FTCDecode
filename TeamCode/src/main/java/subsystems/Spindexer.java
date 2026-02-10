@@ -200,11 +200,9 @@ public class Spindexer extends SubsystemBase {
     public void autoIntake() {
         switch (currentPosition) {
             case PoseOne:
-                // Two independent checks — matches old code (not else-if)
                 if (isBallPresentAtThree() && isSlotEmptyAtTwo()) {
                     setPoseTwo();
-                }
-                if (isBallPresentAtOne() && isSlotEmptyAtTwo()) {
+                } else if (isBallPresentAtOne() && isSlotEmptyAtTwo()) {
                     setPoseThree();
                 }
                 break;

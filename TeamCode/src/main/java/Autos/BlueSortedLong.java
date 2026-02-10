@@ -125,7 +125,7 @@ public class BlueSortedLong extends AutonTemplate {
             // Shoot preload
             .setShooterVelocity(ShooterConstants.SHOOTER_AUTO)
             .delay(1.0)
-            .sortedShoot(EnumConstants.AllianceColor.Blue)
+            .sortedShoot()
 
             // Collect 1
             .rotateTo(EnumConstants.SpindexerPosition.PoseOne)
@@ -141,7 +141,7 @@ public class BlueSortedLong extends AutonTemplate {
 
             // Shoot + collect 2
             .delay(0.5)
-            .sortedShoot(EnumConstants.AllianceColor.Blue)
+            .sortedShoot()
             .delay(0.4)
             .moveTo(toCollect2)
 
@@ -151,7 +151,7 @@ public class BlueSortedLong extends AutonTemplate {
             .moveTo(toScore2)
 
             // Shoot + collect 3
-            .sortedShoot(EnumConstants.AllianceColor.Blue)
+            .sortedShoot()
             .delay(0.2)
             .moveTo(toCollect3)
 
@@ -161,7 +161,7 @@ public class BlueSortedLong extends AutonTemplate {
             .moveTo(toScore3)
 
             // Shoot + collect 4
-            .sortedShoot(EnumConstants.AllianceColor.Blue)
+            .sortedShoot()
             .delay(0.2)
             .moveTo(toCollect4)
 
@@ -174,7 +174,7 @@ public class BlueSortedLong extends AutonTemplate {
             // Final shoot + park
             .setTurretPosition(0.8)
             .delay(0.2)
-            .sortedShoot(EnumConstants.AllianceColor.Blue)
+            .sortedShoot()
             .delay(0.2)
             .moveTo(toPark)
 

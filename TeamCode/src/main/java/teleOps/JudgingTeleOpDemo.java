@@ -57,7 +57,7 @@ public class JudgingTeleOpDemo extends CommandOpMode {
 
     // Limelight tracking state
     private boolean wasTrackingValid = false;
-    private com.pedropathing.util.Timer llResetTimer;
+    private ElapsedTime llResetTimer;
 
     // Auto-intake distribution timing
     private boolean autoIntakeReady = true;
@@ -96,7 +96,7 @@ public class JudgingTeleOpDemo extends CommandOpMode {
         shooter.setHoodAngle(ShooterConstants.HOOD_POSE_MID);
 
         // Timers
-        llResetTimer = new com.pedropathing.util.Timer();
+        llResetTimer = new ElapsedTime();
         autoIntakeTimer = new ElapsedTime();
 
         // Register subsystems with the command scheduler
@@ -231,11 +231,11 @@ public class JudgingTeleOpDemo extends CommandOpMode {
             wasTrackingValid = true;
         } else {
             if (wasTrackingValid) {
-                llResetTimer.resetTimer();
+                llResetTimer.reset();
                 wasTrackingValid = false;
             }
             // Auto-center turret after timeout with no valid target
-            if (llResetTimer.getElapsedTimeSeconds() > TurretConstants.RESET_TIMEOUT_SEC
+            if (llResetTimer.seconds() > TurretConstants.RESET_TIMEOUT_SEC
                     && limelight.getTx() == 0) {
                 turret.center();
                 wasTrackingValid = true;

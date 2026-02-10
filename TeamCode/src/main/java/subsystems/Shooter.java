@@ -105,7 +105,7 @@ public class Shooter extends SubsystemBase {
         robot.shooterMotors.setFeedforwardCoefficients(0, ShooterConstants.SHOOT_V);
     }
 
-    /** Configure PID for autonomous mode (P=0.4) */
+    /** Configure PID for autonomous mode */
     public void configureForAuto() {
         robot.shooterMotors.setVeloCoefficients(
             ShooterConstants.AUTO_VELO_P,

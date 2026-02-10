@@ -3,7 +3,6 @@ package commands;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import Constants.EnumConstants.AllianceColor;
 import Constants.EnumConstants.SpindexerPosition;
 import subsystems.Limelight;
 import subsystems.Spindexer;
@@ -11,38 +10,34 @@ import subsystems.Spindexer;
 /**
  * Sorted shooting command based on AprilTag ID and color sensor readings.
  *
+ * Reads the AprilTag pattern (21/22/23) and ball colors (green vs purple)
+ * to determine the correct firing order that matches balls to goal slots.
+ *
+ * Color detection: blue > green = purple ball, green > blue = green ball.
+ *
  * Two usage modes:
- * - Constructor (for auto): new SortedShootCommand(spindexer, limelight, alliance)
+ * - Constructor (for auto): new SortedShootCommand(spindexer, limelight)
  *   Reads sensors at EXECUTION time (in initialize()), suitable for command sequences
  *   built during init() but executed later.
  *
  * - Static factory (for teleop): SortedShootCommand.build(spindexer, limelight)
  *   Reads sensors at CALL time, suitable for commands built and scheduled immediately.
  *
- * Decision tree matches old Spindexer.sortingAllianceAuto() for blue
- * and sortingRedAuto() for red (mirrored PoseOne/PoseThree, inverted color checks).
- *
  * Must be called when spindexer is at PoseTwo.
  */
 public class SortedShootCommand extends CommandBase {
     private final Spindexer spindexer;
     private final Limelight limelight;
-    private final AllianceColor alliance;
     private Command delegate;
 
-    public SortedShootCommand(Spindexer spindexer, Limelight limelight, AllianceColor alliance) {
+    public SortedShootCommand(Spindexer spindexer, Limelight limelight) {
         this.spindexer = spindexer;
         this.limelight = limelight;
-        this.alliance = alliance;
     }
 
     @Override
     public void initialize() {
-        if (alliance == AllianceColor.Blue) {
-            delegate = buildBlueFromSensors(spindexer, limelight);
-        } else {
-            delegate = buildRedFromSensors(spindexer, limelight);
-        }
+        delegate = buildFromSensors(spindexer, limelight);
         delegate.initialize();
     }
 
@@ -63,30 +58,37 @@ public class SortedShootCommand extends CommandBase {
 
     // ==================== Static Factory (reads sensors NOW — for TeleOp) ====================
 
-    /**
-     * Build a blue sorted shooting command. Reads sensors at call time.
-     * The spindexer should already be at PoseTwo before calling this.
-     */
     public static Command build(Spindexer spindexer, Limelight limelight) {
-        return buildBlueFromSensors(spindexer, limelight);
+        return buildFromSensors(spindexer, limelight);
     }
 
-    // ==================== Blue Decision Tree ====================
+    // ==================== Decision Tree ====================
 
-    private static Command buildBlueFromSensors(Spindexer spindexer, Limelight limelight) {
+    /**
+     * Determines firing order based on AprilTag pattern and ball colors.
+     *
+     * AprilTag patterns (which slot is green):
+     *   Tag 21: Green, Purple, Purple
+     *   Tag 22: Purple, Green, Purple
+     *   Tag 23: Purple, Purple, Green
+     *
+     * Color sensor: blue > green = purple ball, green > blue = green ball.
+     * "twoBlue" = ball at PoseTwo is purple, "oneBlue" = ball at PoseOne is purple.
+     */
+    private static Command buildFromSensors(Spindexer spindexer, Limelight limelight) {
         int aprilID = limelight.getAprilID();
-        boolean twoBlue = spindexer.isBlueGreaterThanGreenAtTwo();
-        boolean oneBlue = spindexer.isBlueGreaterThanGreenAtOne();
+        boolean twoIsPurple = spindexer.isBlueGreaterThanGreenAtTwo();
+        boolean oneIsPurple = spindexer.isBlueGreaterThanGreenAtOne();
 
         // Tag 21: Green, Purple, Purple
         if (aprilID == 21) {
-            if (twoBlue && oneBlue) {
+            if (twoIsPurple && oneIsPurple) {
                 return ShootingCommands.shootAtThreePoses(spindexer,
                     SpindexerPosition.PoseThree, SpindexerPosition.PoseTwo, SpindexerPosition.PoseOne);
-            } else if (twoBlue && !oneBlue) {
+            } else if (twoIsPurple && !oneIsPurple) {
                 return ShootingCommands.shootAtThreePoses(spindexer,
                     SpindexerPosition.PoseOne, SpindexerPosition.PoseTwo, SpindexerPosition.PoseThree);
-            } else if (!twoBlue && oneBlue) {
+            } else if (!twoIsPurple && oneIsPurple) {
                 return ShootingCommands.shootFromCurrent(spindexer,
                     SpindexerPosition.PoseThree, SpindexerPosition.PoseOne);
             } else {
@@ -96,13 +98,13 @@ public class SortedShootCommand extends CommandBase {
         }
         // Tag 22: Purple, Green, Purple
         else if (aprilID == 22) {
-            if (twoBlue && oneBlue) {
+            if (twoIsPurple && oneIsPurple) {
                 return ShootingCommands.shootFromCurrent(spindexer,
                     SpindexerPosition.PoseThree, SpindexerPosition.PoseOne);
-            } else if (twoBlue && !oneBlue) {
+            } else if (twoIsPurple && !oneIsPurple) {
                 return ShootingCommands.shootFromCurrent(spindexer,
                     SpindexerPosition.PoseOne, SpindexerPosition.PoseThree);
-            } else if (!twoBlue && oneBlue) {
+            } else if (!twoIsPurple && oneIsPurple) {
                 return ShootingCommands.shootAtThreePoses(spindexer,
                     SpindexerPosition.PoseOne, SpindexerPosition.PoseTwo, SpindexerPosition.PoseThree);
             } else {
@@ -112,80 +114,18 @@ public class SortedShootCommand extends CommandBase {
         }
         // Tag 23: Purple, Purple, Green
         else if (aprilID == 23) {
-            if (twoBlue && oneBlue) {
+            if (twoIsPurple && oneIsPurple) {
                 return ShootingCommands.shootFromCurrent(spindexer,
                     SpindexerPosition.PoseOne, SpindexerPosition.PoseThree);
-            } else if (twoBlue && !oneBlue) {
+            } else if (twoIsPurple && !oneIsPurple) {
                 return ShootingCommands.shootFromCurrent(spindexer,
                     SpindexerPosition.PoseThree, SpindexerPosition.PoseOne);
-            } else if (!twoBlue && oneBlue) {
+            } else if (!twoIsPurple && oneIsPurple) {
                 return ShootingCommands.shootAtThreePoses(spindexer,
                     SpindexerPosition.PoseOne, SpindexerPosition.PoseThree, SpindexerPosition.PoseTwo);
             } else {
                 return ShootingCommands.shootFromCurrent(spindexer,
                     SpindexerPosition.PoseOne, SpindexerPosition.PoseThree);
-            }
-        }
-
-        // Fallback: no valid tag, shoot all unsorted
-        return ShootingCommands.shootAll(spindexer);
-    }
-
-    // ==================== Red Decision Tree ====================
-    // Mirrors blue with inverted color checks and PoseOne<->PoseThree swapped
-
-    private static Command buildRedFromSensors(Spindexer spindexer, Limelight limelight) {
-        int aprilID = limelight.getAprilID();
-        boolean twoBlue = spindexer.isBlueGreaterThanGreenAtTwo();
-        boolean oneBlue = spindexer.isBlueGreaterThanGreenAtOne();
-        // For red: "our ball" = NOT blue (red has green > blue)
-
-        // Tag 21: Green, Purple, Purple
-        if (aprilID == 21) {
-            if (!twoBlue && !oneBlue) {
-                return ShootingCommands.shootAtThreePoses(spindexer,
-                    SpindexerPosition.PoseOne, SpindexerPosition.PoseTwo, SpindexerPosition.PoseThree);
-            } else if (!twoBlue && oneBlue) {
-                return ShootingCommands.shootAtThreePoses(spindexer,
-                    SpindexerPosition.PoseThree, SpindexerPosition.PoseTwo, SpindexerPosition.PoseOne);
-            } else if (twoBlue && !oneBlue) {
-                return ShootingCommands.shootFromCurrent(spindexer,
-                    SpindexerPosition.PoseOne, SpindexerPosition.PoseThree);
-            } else {
-                return ShootingCommands.shootFromCurrent(spindexer,
-                    SpindexerPosition.PoseThree, SpindexerPosition.PoseOne);
-            }
-        }
-        // Tag 22: Purple, Green, Purple
-        else if (aprilID == 22) {
-            if (!twoBlue && !oneBlue) {
-                return ShootingCommands.shootFromCurrent(spindexer,
-                    SpindexerPosition.PoseOne, SpindexerPosition.PoseThree);
-            } else if (!twoBlue && oneBlue) {
-                return ShootingCommands.shootFromCurrent(spindexer,
-                    SpindexerPosition.PoseThree, SpindexerPosition.PoseOne);
-            } else if (twoBlue && !oneBlue) {
-                return ShootingCommands.shootAtThreePoses(spindexer,
-                    SpindexerPosition.PoseThree, SpindexerPosition.PoseTwo, SpindexerPosition.PoseOne);
-            } else {
-                return ShootingCommands.shootFromCurrent(spindexer,
-                    SpindexerPosition.PoseThree, SpindexerPosition.PoseOne);
-            }
-        }
-        // Tag 23: Purple, Purple, Green
-        else if (aprilID == 23) {
-            if (!twoBlue && !oneBlue) {
-                return ShootingCommands.shootFromCurrent(spindexer,
-                    SpindexerPosition.PoseThree, SpindexerPosition.PoseOne);
-            } else if (!twoBlue && oneBlue) {
-                return ShootingCommands.shootFromCurrent(spindexer,
-                    SpindexerPosition.PoseOne, SpindexerPosition.PoseThree);
-            } else if (twoBlue && !oneBlue) {
-                return ShootingCommands.shootAtThreePoses(spindexer,
-                    SpindexerPosition.PoseThree, SpindexerPosition.PoseOne, SpindexerPosition.PoseTwo);
-            } else {
-                return ShootingCommands.shootFromCurrent(spindexer,
-                    SpindexerPosition.PoseThree, SpindexerPosition.PoseOne);
             }
         }
 

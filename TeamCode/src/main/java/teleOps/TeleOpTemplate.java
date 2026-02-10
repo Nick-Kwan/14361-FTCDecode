@@ -56,11 +56,14 @@ abstract public class TeleOpTemplate extends CommandOpMode {
 
     // Limelight tracking state
     private boolean wasTrackingValid = false;
-    private com.pedropathing.util.Timer llResetTimer;
+    private ElapsedTime llResetTimer;
 
     // Auto-intake distribution timing
     private boolean autoIntakeReady = true;
     private ElapsedTime autoIntakeTimer;
+
+    // Cached IMU heading (read once per loop, shared by drive + limelight)
+    private double cachedHeadingRad = 0;
 
     /** Subclass returns the goal-tracking pipeline (3=Blue, 2=Red) */
     protected abstract int getGoalPipeline();
@@ -102,7 +105,7 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         shooter.setHoodAngle(ShooterConstants.HOOD_POSE_MID);
 
         // Timers
-        llResetTimer = new com.pedropathing.util.Timer();
+        llResetTimer = new ElapsedTime();
         autoIntakeTimer = new ElapsedTime();
 
         // Register subsystems with the command scheduler
@@ -125,7 +128,7 @@ abstract public class TeleOpTemplate extends CommandOpMode {
                 double rx = driverGamepad.getRightX();
                 double speed = (gamepad1.left_trigger > DriveConstants.TRIGGER_THRESHOLD)
                     ? DriveConstants.SLOW_MODE_FACTOR : 1.0;
-                mecanumDrive.drive(ly, lx, rx, speed);
+                mecanumDrive.drive(ly, lx, rx, speed, cachedHeadingRad);
             }, mecanumDrive)
         );
 
@@ -212,20 +215,23 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         // 1. Clear bulk cache (must happen before any hardware reads)
         robot.clearBulkCache();
 
-        // 2. Run command scheduler + subsystem periodic() methods
+        // 2. Cache IMU heading once per loop (used by drive + limelight)
+        cachedHeadingRad = robot.imu.getRobotYawPitchRollAngles().getYaw(
+                org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS);
+
+        // 3. Run command scheduler + subsystem periodic() methods
         super.run();
 
-        // 3. Update limelight orientation and pipeline
-        double yaw = robot.imu.getRobotYawPitchRollAngles().getYaw();
-        limelight.updateOrientation(yaw);
+        // 4. Update limelight orientation
+        limelight.updateOrientation(Math.toDegrees(cachedHeadingRad));
 
-        // 4. Turret tracking via Limelight Tx
+        // 5. Turret tracking via Limelight Tx
         updateLimelightTracking();
 
-        // 5. Auto-aim shooter from LUT based on Ty
+        // 6. Auto-aim shooter from LUT based on Ty
         shooter.prepareForShot(limelight.getTy());
 
-        // 6. Telemetry
+        // 7. Telemetry
         telemetryHelper.update(telemetry, shooter, turret, spindexer, limelight);
     }
 
@@ -239,11 +245,11 @@ abstract public class TeleOpTemplate extends CommandOpMode {
             wasTrackingValid = true;
         } else {
             if (wasTrackingValid) {
-                llResetTimer.resetTimer();
+                llResetTimer.reset();
                 wasTrackingValid = false;
             }
             // Auto-center turret after timeout with no valid target
-            if (llResetTimer.getElapsedTimeSeconds() > TurretConstants.RESET_TIMEOUT_SEC
+            if (llResetTimer.seconds() > TurretConstants.RESET_TIMEOUT_SEC
                     && limelight.getTx() == 0) {
                 turret.center();
                 wasTrackingValid = true;

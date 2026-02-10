@@ -100,7 +100,7 @@ public class BlueJoint extends AutonTemplate {
 
             // Sorted shoot cycle 1
             .delay(1.0)
-            .sortedShoot(EnumConstants.AllianceColor.Blue)
+            .sortedShoot()
             .delay(1.9)
             .rotateTo(EnumConstants.SpindexerPosition.PoseOne)
             .intakeStart()
@@ -119,7 +119,7 @@ public class BlueJoint extends AutonTemplate {
             .delay(1.0)
             .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
             .delay(0.25)
-            .sortedShoot(EnumConstants.AllianceColor.Blue)
+            .sortedShoot()
             .delay(2.2)
             .rotateTo(EnumConstants.SpindexerPosition.PoseThree)
             .intakeStart()
@@ -134,7 +134,7 @@ public class BlueJoint extends AutonTemplate {
             .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
             .intakeStop()
             .delay(1.0)
-            .sortedShoot(EnumConstants.AllianceColor.Blue)
+            .sortedShoot()
             .delay(1.9)
             .rotateTo(EnumConstants.SpindexerPosition.PoseOne)
             .intakeStop()

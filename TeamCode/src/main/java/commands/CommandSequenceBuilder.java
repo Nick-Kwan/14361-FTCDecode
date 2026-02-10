@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import Constants.EnumConstants;
 import Constants.EnumConstants.SpindexerPosition;
 import subsystems.Intake;
 import subsystems.Limelight;
@@ -108,14 +107,8 @@ public class CommandSequenceBuilder {
     }
 
     /** Sorted shooting based on AprilTag + color sensors (reads sensors at execution time) */
-    public CommandSequenceBuilder sortedShoot(EnumConstants.AllianceColor alliance) {
-        commands.add(new SortedShootCommand(spindexer, limelight, alliance));
-        return this;
-    }
-
-    /** Sorted shooting — blue alliance (reads sensors at execution time) */
     public CommandSequenceBuilder sortedShoot() {
-        commands.add(new SortedShootCommand(spindexer, limelight, EnumConstants.AllianceColor.Blue));
+        commands.add(new SortedShootCommand(spindexer, limelight));
         return this;
     }
 

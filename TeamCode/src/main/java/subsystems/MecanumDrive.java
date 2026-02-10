@@ -1,7 +1,6 @@
 package subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import utility.RobotHardware;
 import Constants.DriveConstants;
@@ -21,12 +20,11 @@ public class MecanumDrive extends SubsystemBase {
      * @param lx strafe input (-1 to 1)
      * @param rx rotation input (-1 to 1)
      * @param speedMultiplier overall speed factor (1.0 = full, SLOW_MODE_FACTOR = slow)
+     * @param heading current robot yaw in radians (cached from loop start)
      */
-    public void drive(double ly, double lx, double rx, double speedMultiplier) {
+    public void drive(double ly, double lx, double rx, double speedMultiplier, double heading) {
         double x = lx * DriveConstants.DRIVE_COMP;
         double rotation = rx * DriveConstants.DRIVE_COMP;
-
-        double heading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
         double rotX = x * Math.cos(-heading) - ly * Math.sin(-heading);
         double rotY = x * Math.sin(-heading) + ly * Math.cos(-heading);

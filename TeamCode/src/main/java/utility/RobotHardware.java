@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.List;
 
+import Constants.IntakeConstants;
 import Constants.NamingConstants;
 import Constants.OdometryConstants;
 import Constants.SpindexerConstants;
@@ -107,7 +108,7 @@ public class RobotHardware {
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMotor.setPower(0);
         intakeServo = hardwareMap.servo.get(NamingConstants.INTAKE_SERVO);
-        intakeServo.setPosition(0.25);
+        intakeServo.setPosition(IntakeConstants.SERVO_UP);
 
         // Shooter motors (FTCLib)
         m_shooterOne = new Motor(hardwareMap, NamingConstants.SHOOTER_ONE, Motor.GoBILDA.BARE);
