@@ -10,7 +10,7 @@ public final class TurretConstants {
     public static final double TURRET_POSE_AUTO = 0.8;
     public static final double TURRET_POSE_AUTO_LONG = 0.33;
     public static final double TURRET_BLUE_AUTO_POSE = 1;
-    public static final double TURRET_RED_AUTO_POSE = 0.2;
+    public static final double TURRET_RED_AUTO_POSE = 0.0;
     public static final double TURRET_MEOW_POSE = 0.3;
 
     // Proportional tracking gains

@@ -2,6 +2,7 @@ package pedroPathing;
 
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
+import com.pedropathing.control.PredictiveBrakingCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -29,6 +30,7 @@ public class Constants {
             .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.2,0,0.012,0.015))
             .headingPIDFCoefficients(new PIDFCoefficients(0.9,0,0.025,0.01))
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(0.9,0,0.01,0.009))
+            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(.05,0.1,0.001))
             .centripetalScaling(0.0008);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1)

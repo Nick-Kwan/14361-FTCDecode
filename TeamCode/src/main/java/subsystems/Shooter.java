@@ -83,6 +83,13 @@ public class Shooter extends SubsystemBase {
         setHoodAngle(config.hoodPos);
     }
 
+    /** Demo LUT shoot - only adjusts hood angle (for judging demo, no velocity change) */
+    public void prepareForShotHoodOnly(double targetY) {
+        ShotConfig config = getConfigForTargetY(targetY);
+        setHoodAngle(config.hoodPos);
+        // No velocity change - for demo purposes
+    }
+
     /** Get current flywheel velocities (list of [motor2, motor1] speeds) */
     public List<Double> getVelocities() {
         return robot.shooterMotors.getVelocities();

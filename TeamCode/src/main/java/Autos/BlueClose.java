@@ -11,7 +11,7 @@ import Constants.LimelightConstants;
 import Constants.ShooterConstants;
 import commands.CommandSequenceBuilder;
 
-@Autonomous(name = "Blue Close", group = "Auto")
+@Autonomous(name = "Blue Close", group = "oldAuto")
 public class BlueClose extends AutonTemplate {
 
     // ===== POSES =====

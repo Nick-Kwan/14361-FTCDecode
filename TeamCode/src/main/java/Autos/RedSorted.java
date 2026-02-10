@@ -17,79 +17,79 @@ import commands.CommandSequenceBuilder;
 public class RedSorted extends AutonTemplate {
 
     // ===== POSES =====
+    // Updated from Kwan hkhk commit (d32cdda) - mirrored for red alliance
     private final Pose startPose = new Pose(125.5, 114, Math.toRadians(90));
-    private final Pose shootPose1 = new Pose(90.5, 90, Math.toRadians(0));
-    private final Pose collectControlPoint1 = new Pose(75, 76);
-    private final Pose collectPose1 = new Pose(117, 81, Math.toRadians(0));
-    private final Pose shootPose2 = new Pose(90, 89, Math.toRadians(5));
-    private final Pose collectControlPoint2 = new Pose(72, 51);
-    private final Pose collectPose2 = new Pose(118.5, 56, Math.toRadians(5));
-    private final Pose shootPose3 = new Pose(87, 86.5, Math.toRadians(10));
-    private final Pose collectControlPoint3 = new Pose(80, 24);
-    private final Pose collectPose3 = new Pose(122, 30, Math.toRadians(10));
-    private final Pose shootPose4 = new Pose(90, 88, Math.toRadians(10));
+    private final Pose shootOnePose = new Pose(90.5, 90, Math.toRadians(0));
+    private final Pose collectControlOnePose = new Pose(88, 85);
+    private final Pose collectOnePose = new Pose(117, 85, Math.toRadians(0));
+    private final Pose shootControlTwoPose = new Pose(95, 89);
+    private final Pose shootTwoPose = new Pose(90, 89, Math.toRadians(0));
+    private final Pose collectControlTwoPose = new Pose(72, 56.5);
+    private final Pose collectTwoPose = new Pose(118.5, 56.5, Math.toRadians(0));
+    private final Pose shootControlThreePose = new Pose(95, 56.5);
+    private final Pose shootControl2ThreePose = new Pose(103.5, 86.5);
+    private final Pose shootThreePose = new Pose(87, 86.5, Math.toRadians(0));
+    private final Pose collectControlThreePose = new Pose(60, 34);
+    private final Pose collectThreePose = new Pose(122, 34, Math.toRadians(0));
+    private final Pose shootControlFourPose = new Pose(105, 34);
+    private final Pose shootControl2FourPose = new Pose(110, 88);
+    private final Pose shootFourPose = new Pose(90, 88, Math.toRadians(0));
     private final Pose parkPose = new Pose(120, 88, Math.toRadians(10));
 
     // ===== PATHS =====
     private Path scorePreload;
-    private PathChain toCollect1, toScore1, toCollect2, toScore2, toCollect3, toScore3, toPark;
+    private PathChain collectOne, scoreOne, collectTwo, scoreTwo;
+    private PathChain collectThree, scoreThree, park;
 
     @Override
     protected void buildPaths() {
         follower.setStartingPose(startPose);
 
-        scorePreload = new Path(new BezierLine(startPose, shootPose1));
-        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), shootPose1.getHeading());
+        scorePreload = new Path(new BezierLine(startPose, shootOnePose));
+        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), shootOnePose.getHeading());
 
-        toCollect1 = follower.pathBuilder()
-            .addPath(new BezierCurve(shootPose1, collectControlPoint1, collectPose1))
-            .setLinearHeadingInterpolation(shootPose1.getHeading(), collectPose1.getHeading())
+        collectOne = follower.pathBuilder()
+            .addPath(new BezierCurve(shootOnePose, collectControlOnePose, collectOnePose))
+            .setConstantHeadingInterpolation(Math.toRadians(0))
             .addParametricCallback(0.2, () -> spindexer.setPoseThree())
-            .addParametricCallback(0.84, () -> spindexer.setPoseTwo())
+            .addParametricCallback(0.74, () -> spindexer.setPoseTwo())
+            .addParametricCallback(0.89, () -> spindexer.setPoseOne())
+            .build();
+
+        scoreOne = follower.pathBuilder()
+            .addPath(new BezierCurve(collectOnePose, shootControlTwoPose, shootTwoPose))
+            .setConstantHeadingInterpolation(Math.toRadians(0))
+            .build();
+
+        collectTwo = follower.pathBuilder()
+            .addPath(new BezierCurve(shootTwoPose, collectControlTwoPose, collectTwoPose))
+            .setConstantHeadingInterpolation(Math.toRadians(0))
+            .addParametricCallback(0.2, () -> spindexer.setPoseThree())
+            .addParametricCallback(0.78, () -> spindexer.setPoseTwo())
             .addParametricCallback(0.93, () -> spindexer.setPoseOne())
-            .setGlobalDeceleration()
             .build();
 
-        toScore1 = follower.pathBuilder()
-            .addPath(new BezierCurve(collectPose1, shootPose2))
-            .setLinearHeadingInterpolation(collectPose1.getHeading(), shootPose2.getHeading())
-            .setGlobalDeceleration()
+        scoreTwo = follower.pathBuilder()
+            .addPath(new BezierCurve(collectTwoPose, shootControlThreePose, shootControl2ThreePose, shootThreePose))
+            .setConstantHeadingInterpolation(Math.toRadians(0))
             .build();
 
-        toCollect2 = follower.pathBuilder()
-            .addPath(new BezierCurve(shootPose2, collectControlPoint2, collectPose2))
-            .setLinearHeadingInterpolation(shootPose2.getHeading(), collectPose2.getHeading())
+        collectThree = follower.pathBuilder()
+            .addPath(new BezierCurve(shootThreePose, collectControlThreePose, collectThreePose))
+            .setConstantHeadingInterpolation(Math.toRadians(0))
             .addParametricCallback(0.2, () -> spindexer.setPoseThree())
             .addParametricCallback(0.83, () -> spindexer.setPoseTwo())
             .addParametricCallback(0.92, () -> spindexer.setPoseOne())
-            .setGlobalDeceleration()
             .build();
 
-        toScore2 = follower.pathBuilder()
-            .addPath(new BezierCurve(collectPose2, shootPose3))
-            .setLinearHeadingInterpolation(collectPose2.getHeading(), shootPose3.getHeading())
-            .setGlobalDeceleration()
+        scoreThree = follower.pathBuilder()
+            .addPath(new BezierCurve(collectThreePose, shootControlFourPose, shootControl2FourPose, shootFourPose))
+            .setConstantHeadingInterpolation(Math.toRadians(0))
             .build();
 
-        toCollect3 = follower.pathBuilder()
-            .addPath(new BezierCurve(shootPose3, collectControlPoint3, collectPose3))
-            .setLinearHeadingInterpolation(shootPose3.getHeading(), collectPose3.getHeading())
-            .addParametricCallback(0.2, () -> spindexer.setPoseThree())
-            .addParametricCallback(0.79, () -> spindexer.setPoseTwo())
-            .addParametricCallback(0.89, () -> spindexer.setPoseOne())
-            .setGlobalDeceleration()
-            .build();
-
-        toScore3 = follower.pathBuilder()
-            .addPath(new BezierCurve(collectPose3, shootPose4))
-            .setLinearHeadingInterpolation(collectPose3.getHeading(), shootPose4.getHeading())
-            .setGlobalDeceleration()
-            .build();
-
-        toPark = follower.pathBuilder()
-            .addPath(new BezierCurve(shootPose3, parkPose))
-            .setLinearHeadingInterpolation(shootPose3.getHeading(), parkPose.getHeading())
-            .setGlobalDeceleration()
+        park = follower.pathBuilder()
+            .addPath(new BezierLine(shootFourPose, parkPose))
+            .setLinearHeadingInterpolation(shootFourPose.getHeading(), parkPose.getHeading())
             .build();
     }
 
@@ -97,77 +97,72 @@ public class RedSorted extends AutonTemplate {
     public void init() {
         super.init();
 
-        // Configure auto tracking — red uses different gain
+        // Configure auto tracking for red alliance
         goalPipeline = LimelightConstants.PIPELINE_GOAL_RED;
-        autoTrackingGain = TurretConstants.AUTO_LOOP_GAIN_RED;
-        autoTurretResetPosition = TurretConstants.TURRET_RED_AUTO_POSE;
+        autoTrackingGain = TurretConstants.AUTO_ALIGN_GAIN;
+        autoTurretResetPosition = TurretConstants.TURRET_POSE_AUTO;
 
-        // Initial positions
-        turret.setPosition(0);
-        spindexer.setPoseThree();
+        // Initial turret position
+        turret.setPosition(TurretConstants.TURRET_RED_AUTO_POSE);
 
         autonomousCommand = new CommandSequenceBuilder(follower, intake, spindexer, limelight, shooter, turret)
             // Score preload
-            .setHoodAngle(ShooterConstants.HOOD_POSE_AUTO)
+            .setShooterVelocity(0.46)
             .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
-            .moveTo(scorePreload, 0.67)
+            .moveTo(scorePreload, 1.0)
 
             // Sorted shoot cycle 1
-            .setTurretPosition(TurretConstants.TURRET_RED_AUTO_POSE)
-            .delay(0.1)
+            .delay(1.0)
             .sortedShoot(EnumConstants.AllianceColor.Red)
-            .delay(0.25)
+            .delay(2.5)
             .rotateTo(EnumConstants.SpindexerPosition.PoseThree)
             .intakeStart()
-            .moveTo(toCollect1, 0.6)
+            .moveTo(collectOne, 1.0)
 
             // Return to score 1
-            .addAction(() -> intake.startIntakingMax())
             .delay(0.5)
-            .moveTo(toScore1, 0.67)
+            .addAction(() -> intake.startIntakingMax())
+            .moveTo(scoreOne, 1.0)
 
             // Sorted shoot cycle 2
-            .intakeStop()
-            .setTurretPosition(TurretConstants.TURRET_RED_AUTO_POSE)
-            .delay(0.25)
             .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
-            .delay(0.25)
+            .intakeStop()
+            .delay(1.0)
             .sortedShoot(EnumConstants.AllianceColor.Red)
-            .delay(0.25)
-            .intakeStart()
+            .delay(2.5)
             .rotateTo(EnumConstants.SpindexerPosition.PoseThree)
-            .moveTo(toCollect2, 0.6)
+            .intakeStart()
+            .moveTo(collectTwo, 1.0)
 
             // Return to score 2
             .delay(0.5)
             .addAction(() -> intake.startIntakingMax())
-            .moveTo(toScore2, 0.67)
+            .moveTo(scoreTwo, 1.0)
 
             // Sorted shoot cycle 3
             .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
-            .setTurretPosition(TurretConstants.TURRET_RED_AUTO_POSE)
             .intakeStop()
-            .delay(0.25)
+            .delay(1.0)
             .sortedShoot(EnumConstants.AllianceColor.Red)
-            .delay(0.25)
+            .delay(2.5)
             .rotateTo(EnumConstants.SpindexerPosition.PoseThree)
             .intakeStart()
-            .moveTo(toCollect3, 0.5)
+            .moveTo(collectThree, 1.0)
 
             // Return to score 3
             .delay(0.5)
             .addAction(() -> intake.startIntakingMax())
-            .moveTo(toScore3, 0.67)
+            .moveTo(scoreThree, 1.0)
 
-            // Final no-sorting cycle + park
-            .rotateTo(EnumConstants.SpindexerPosition.PoseOne)
-            .setTurretPosition(TurretConstants.TURRET_RED_AUTO_POSE)
-            .delay(0.25)
-            .noSortingRed()
-            .delay(0.25)
+            // Final shoot cycle + park
+            .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
+            .intakeStop()
+            .delay(1.0)
+            .sortedShoot(EnumConstants.AllianceColor.Red)
+            .delay(1.9)
             .rotateTo(EnumConstants.SpindexerPosition.PoseOne)
             .intakeStop()
-            .moveTo(toPark, 0.67)
+            .moveTo(park, 1.0)
 
             .build();
     }
