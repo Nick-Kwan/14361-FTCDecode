@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.arcrobotics.ftclib.command.Subsystem;
 
 import java.util.TimerTask;
@@ -51,14 +50,6 @@ public class Intake implements Subsystem{
 
     public void setShooterVelocity(double t){
         robot.shooterMotors.set(t);
-//        double velocityOne = robot.shooterOne.getVelocity();
-//        double velocityTwo = robot.shooterTwo.getVelocity();
-//
-//        double avgVelocity = (velocityOne + velocityTwo) / 2;
-//
-//        double vel = robot.shooterPID.calculate(avgVelocity, robot.target);
-//        robot.shooterOne.setVelocity(vel);
-//        robot.shooterTwo.setVelocity(vel);
     }
 
     public void setAutoShooterVelocity(){
@@ -74,79 +65,6 @@ public class Intake implements Subsystem{
     }
 
     public void timerTaskSetup(){
-        // TimerTask commands
-        robot.timer1 = new java.util.Timer();
-        robot.timer2 = new java.util.Timer();
-        robot.spindexderUp1 = new TimerTask() {
-            @Override
-            public void run() {
-                robot.spindexer.spindexerUp();
-            }
-        };
-        robot.spindexderUp2 = new TimerTask() {
-            @Override
-            public void run() {
-                robot.spindexer.spindexerUp();
-            }
-        };
-        robot.spindexderUp3 = new TimerTask() {
-            @Override
-            public void run() {
-                robot.spindexer.spindexerUp();
-            }
-        };
-        robot.spindexderDown1 = new TimerTask() {
-            @Override
-            public void run() {
-                robot.spindexer.spindexerDown();
-            }
-        };
-        robot.spindexderDown2 = new TimerTask() {
-            @Override
-            public void run() {
-                robot.spindexer.spindexerDown();
-            }
-        };
-        robot.spindexderDown3 = new TimerTask() {
-            @Override
-            public void run() {
-                robot.spindexer.spindexerDown();
-            }
-        };
-        robot.spindexderSetPoseOne = new TimerTask() {
-            @Override
-            public void run() {
-                robot.spindexer.setPoseOne();
-            }
-        };
-        robot.spindexderSetPoseTwo = new TimerTask() {
-            @Override
-            public void run() {
-                robot.spindexer.setPoseTwo();
-            }
-        };
-        robot.spindexderSetPoseThree = new TimerTask() {
-            @Override
-            public void run() {
-                robot.spindexer.setPoseThree();
-            }
-        };
-        robot.autoIntakeIntermittence = new TimerTask() {
-            @Override
-            public void run() {
-                robot.spindexer.autoIntake();
-                robot.autoIntakeIntermittenceBool = true;
-            }
-        };
-        robot.autoSortDelay = new TimerTask() {
-            @Override
-            public void run() {
-                robot.spindexer.sorting();
-            }
-        };
-    }
-    public void timerTaskAutoSetup(){
-        // TimerTask commands
         robot.timer1 = new java.util.Timer();
         robot.timer2 = new java.util.Timer();
         robot.spindexderUp1 = new TimerTask() {

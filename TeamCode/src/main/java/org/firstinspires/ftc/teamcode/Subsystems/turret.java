@@ -5,9 +5,7 @@ import org.firstinspires.ftc.teamcode.util.RobotConstants;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.pedropathing.control.PIDFController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
@@ -22,9 +20,7 @@ public class turret extends OpMode {
 
     public static PIDController controller;
     public static double p =0.03, i = 0.00005, d = 0.00001;
-    public static double f = 0;
     public static int target = 0;
-    public final double ticks_in_degree = (double) 28 /360;
     private DcMotorEx shooterMotor;
     @Override
     public void init() {

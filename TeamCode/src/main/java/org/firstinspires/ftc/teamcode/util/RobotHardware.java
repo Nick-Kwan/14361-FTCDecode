@@ -24,8 +24,6 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
-//import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
-//import com.seattlesolvers.solverslib.hardware.motors.CRServoEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
@@ -62,9 +60,6 @@ public class RobotHardware {
     public ScheduledExecutorService s;
     public int d;
 
-
-//    public AbsoluteAnalogEncoder spindexerEncoder;
-//    public CRServoEx spindexerServo;
     public boolean isShootingOne;
     public boolean isShootingTwo;
     public boolean isShootingThree;
@@ -141,9 +136,8 @@ public class RobotHardware {
         return instance;
     }
 
-    public void init(final HardwareMap hardwareMap, GamepadEx driver) {
+    private void initCommon(final HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
-        this.driver = driver;
 
         //Intake setup
         this.intakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Intake.intakeMotor);
@@ -151,8 +145,6 @@ public class RobotHardware {
         this.intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         this.intakeMotor.setPower(RobotConstants.Intake.intakeMotorOff);
         this.intakeServo.setPosition(RobotConstants.Intake.intakeServoUp);
-
-
 
         // Drivetrain setup
         leftFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.leftFront);
@@ -165,238 +157,112 @@ public class RobotHardware {
 
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT, //
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP
         ));
         imu.initialize(parameters);
         imu.resetYaw();
-        this.timerTeleOp = new Timer();
 
-
-
-        // Spindexer setup
+        // Spindexer sensors setup
         this.spindexerLinkageServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerLinkageServo);
         this.spindexerLinkageServo.setPosition(RobotConstants.Spindexer.spindexerLinkageServoDown);
         this.spindexerServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerServo);
+
+        this.touchSensor = hardwareMap.get(DigitalChannel.class,RobotConstants.Spindexer.touchSensor);
+        this.touchSensor.setMode(DigitalChannel.Mode.INPUT);
+
+        this.magneticLimitSensor = hardwareMap.get(DigitalChannel.class, RobotConstants.Spindexer.magneticLimitSensor);
+        this.magneticLimitSensor.setMode(DigitalChannel.Mode.INPUT);
+
+        this.colorSensorOne_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne_1);
+        this.colorSensorTwo_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo_1);
+        this.colorSensorThree_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree_1);
+        this.colorSensorOne_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne_2);
+        this.colorSensorTwo_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo_2);
+        this.colorSensorThree_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree_2);
+
+        // Limelight and turret setup
+        limelight = hardwareMap.get(Limelight3A.class,RobotConstants.Drivetrain.limelight);
+        pathTimer = new ElapsedTime();
+        shootTimer = new com.pedropathing.util.Timer();
+        orientation = imu.getRobotYawPitchRollAngles();
+        llResult = limelight.getLatestResult();
+        llResetTimer = new com.pedropathing.util.Timer();
+
+        this.turretServo = hardwareMap.servo.get(RobotConstants.Drivetrain.turret);
+
+        // Shooter motors setup
+        this.m_shooterOne = new Motor(hardwareMap, "shooterOne", Motor.GoBILDA.BARE);
+        this.m_shooterOne.setInverted(true);
+        this.m_shooterOne.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+
+        this.m_shooterTwo = new Motor(hardwareMap, "shooterTwo", Motor.GoBILDA.BARE);
+        this.m_shooterTwo.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+
+        this.shooterMotors = new MotorGroup(m_shooterTwo,m_shooterOne);
+        this.shooterMotors.setRunMode(Motor.RunMode.VelocityControl);
+
+        target = RobotConstants.Intake.target;
+        hoodAngle = RobotConstants.Intake.hoodAngle;
+        targetY = 0;
+
+        this.hubs = hardwareMap.getAll(LynxModule.class);
+        this.hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
+
+        this.adjustableHoodServo = hardwareMap.servo.get(RobotConstants.Drivetrain.adjustableHoodServo);
+
+        d = 0;
+
+        // Subsystem construction
+        mecanum = new Mecanum();
+        intake = new Intake();
+        spindexer = new Spindexer();
+        ShooterLUT = new ShooterLUT();
+        timerTaskCommands = new timerTaskCommands();
+        blueSorted = new blueSorted();
+        redSorted = new redSorted();
+    }
+
+    public void init(final HardwareMap hardwareMap, GamepadEx driver) {
+        initCommon(hardwareMap);
+        this.driver = driver;
+
+        this.timerTeleOp = new Timer();
         this.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
         this.atPoseOne = true;
         this.atPoseTwo = false;
         this.atPoseThree = false;
 
-//        this.spindexerServoInput = hardwareMap.get(AnalogInput.class, RobotConstants.Spindexer.spindexerServoInput);
-//        this.spindexerServo = hardwareMap.crservo.get(RobotConstants.Spindexer.spindexerServo);
-//        this.spindexerServoPID = new PIDFController(RobotConstants.Spindexer.spinP,RobotConstants.Spindexer.spinI,RobotConstants.Spindexer.spinD,RobotConstants.Spindexer.spinF);
-//        this.prevPose = RobotConstants.Spindexer.spindexerServoPoseTwo;
-//        this.currentPose = RobotConstants.Spindexer.spindexerServoPoseTwo;
-//        this.target = RobotConstants.Spindexer.spindexerServoPoseTwo;
-//        this.turns = 0;
-
-
-        this.touchSensor = hardwareMap.get(DigitalChannel.class,RobotConstants.Spindexer.touchSensor);
-        this.touchSensor.setMode(DigitalChannel.Mode.INPUT);
-
-        this.magneticLimitSensor = hardwareMap.get(DigitalChannel.class, RobotConstants.Spindexer.magneticLimitSensor);
-        this.magneticLimitSensor.setMode(DigitalChannel.Mode.INPUT);
-
-        this.colorSensorOne_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne_1);
-        this.colorSensorTwo_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo_1);
-        this.colorSensorThree_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree_1);
-        this.colorSensorOne_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne_2);
-        this.colorSensorTwo_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo_2);
-        this.colorSensorThree_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree_2);
-
-
-        // Limelight and turret setup
-        limelight = hardwareMap.get(Limelight3A.class,RobotConstants.Drivetrain.limelight);
         limelight.pipelineSwitch(3);
-        pathTimer = new ElapsedTime();
-        shootTimer = new com.pedropathing.util.Timer();
-        imu = hardwareMap.get(IMU.class, "imu");
-    RevHubOrientationOnRobot revOrientation = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP);
-        imu.initialize(new IMU.Parameters(revOrientation));
-        orientation = imu.getRobotYawPitchRollAngles();
-        llResult = limelight.getLatestResult();
-        llResetTimer = new com.pedropathing.util.Timer();
-
-        this.turretServo = hardwareMap.servo.get(RobotConstants.Drivetrain.turret);
         this.turretServo.setPosition(RobotConstants.Drivetrain.turretPose);
-
-//        this.shooterOne = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterOne);
-////        this.shooterOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-////        this.shooterOne.setDirection(DcMotor.Direction.REVERSE);
-//        this.shooterTwo = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterTwo);
-//        this.shooterTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        this.m_shooterOne = new Motor(hardwareMap, "shooterOne", Motor.GoBILDA.BARE);
-        this.m_shooterOne.setInverted(true);
-        this.m_shooterOne.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
-
-        this.m_shooterTwo = new Motor(hardwareMap, "shooterTwo", Motor.GoBILDA.BARE);
-        this.m_shooterTwo.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
-
-        this.shooterMotors = new MotorGroup(m_shooterTwo,m_shooterOne);
-        this.shooterMotors.setRunMode(Motor.RunMode.VelocityControl);
-        this.shooterMotors.setVeloCoefficients(RobotConstants.Drivetrain.shootP,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD);
-        this.shooterMotors.setFeedforwardCoefficients(0,RobotConstants.Drivetrain.shootV);
-        target = RobotConstants.Intake.target;
-        hoodAngle = RobotConstants.Intake.hoodAngle;
-        targetY = 0;
-        autoIntakeIntermittenceBool = true;
-
-        this.hubs = hardwareMap.getAll(LynxModule.class);
-        this.hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
-
-//        this.shooterOne = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooterOne);
-//        this.shooterOne.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-//        this.shooterOne.setDirection(DcMotorEx.Direction.REVERSE);
-//        this.shooterTwo = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.shooterTwo);
-//        this.shooterTwo.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-//
-//        this.shooterPID = new PIDFController(RobotConstants.Drivetrain.shootP,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD,RobotConstants.Drivetrain.shootF);
-//        this.target = RobotConstants.Drivetrain.target;
-
-        this.adjustableHoodServo = hardwareMap.servo.get(RobotConstants.Drivetrain.adjustableHoodServo);
         this.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseMid);
 
+        this.shooterMotors.setVeloCoefficients(RobotConstants.Drivetrain.shootP,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD);
+        this.shooterMotors.setFeedforwardCoefficients(0,RobotConstants.Drivetrain.shootV);
+
+        autoIntakeIntermittenceBool = true;
+
         s = Executors.newScheduledThreadPool(2);
-        d = 0;
-
-        mecanum = new Mecanum();
-        intake = new Intake();
-        spindexer = new Spindexer();
-        ShooterLUT = new ShooterLUT();
-        timerTaskCommands = new timerTaskCommands();
-        blueSorted = new blueSorted();
-        redSorted = new redSorted();
-
     }
 
     public void init(final HardwareMap hardwareMap) {
-        this.hardwareMap = hardwareMap;
+        initCommon(hardwareMap);
 
-
-
-        //Intake setup
-        this.intakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Intake.intakeMotor);
-        this.intakeMotor.setPower(RobotConstants.Intake.intakeMotorOff);
-        this.intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        this.intakeServo = hardwareMap.servo.get(RobotConstants.Intake.intakeServo);
-        this.intakeServo.setPosition(RobotConstants.Intake.intakeServoUp);
-
-
-
-        // Drivetrain setup
-        leftFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.leftFront);
-        leftRear = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.leftRear);
-        rightRear = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightRear);
-        rightFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightFront);
-
-        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        imu = hardwareMap.get(IMU.class, "imu");
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT, //
-                RevHubOrientationOnRobot.UsbFacingDirection.UP
-        ));
-        imu.initialize(parameters);
-        imu.resetYaw();
+        this.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
         isShootingOne = true;
         isShootingTwo = true;
         isShootingThree = true;
         shotCounter = 0;
 
-
-
-        // Spindexer setup
-        this.spindexerLinkageServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerLinkageServo);
-        this.spindexerLinkageServo.setPosition(RobotConstants.Spindexer.spindexerLinkageServoDown);
-        this.spindexerServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerServo);
-        this.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseTwo);
-        //spindexer.setPoseThree();
-
-        this.touchSensor = hardwareMap.get(DigitalChannel.class,RobotConstants.Spindexer.touchSensor);
-        this.touchSensor.setMode(DigitalChannel.Mode.INPUT);
-
-        this.magneticLimitSensor = hardwareMap.get(DigitalChannel.class, RobotConstants.Spindexer.magneticLimitSensor);
-        this.magneticLimitSensor.setMode(DigitalChannel.Mode.INPUT);
-
-        this.colorSensorOne_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne_1);
-        this.colorSensorTwo_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo_1);
-        this.colorSensorThree_1 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree_1);
-        this.colorSensorOne_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorOne_2);
-        this.colorSensorTwo_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorTwo_2);
-        this.colorSensorThree_2 = hardwareMap.get(ColorSensor.class, RobotConstants.Spindexer.colorSensorThree_2);
-
-
-        // Limelight and turret setup
-        limelight = hardwareMap.get(Limelight3A.class,RobotConstants.Drivetrain.limelight);
         limelight.pipelineSwitch(0);
         aprilID = 0;
-        this.pathTimer = new ElapsedTime();
-        shootTimer = new com.pedropathing.util.Timer();
-        imu = hardwareMap.get(IMU.class, "imu");
-        RevHubOrientationOnRobot revOrientation = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP);
-        imu.initialize(new IMU.Parameters(revOrientation));
-        orientation = imu.getRobotYawPitchRollAngles();
-        llResult = limelight.getLatestResult();
-        llResetTimer = new com.pedropathing.util.Timer();
-
-        this.turretServo = hardwareMap.servo.get(RobotConstants.Drivetrain.turret);
-        //this.turretServo.setPosition(RobotConstants.Drivetrain.turretAutoPose);
-
-//        this.shooterOne = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterOne);
-//        this.shooterOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        this.shooterOne.setDirection(DcMotor.Direction.REVERSE);
-//        this.shooterTwo = hardwareMap.get(DcMotor.class, RobotConstants.Drivetrain.shooterTwo);
-//        this.shooterTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//
-//        this.m_shooterOne = new Motor(hardwareMap, "shooterOne", Motor.GoBILDA.BARE);
-//        this.shooterOne = m_shooterOne.motor;
-//        this.m_shooterTwo = new Motor(hardwareMap, "shooterTwo", Motor.GoBILDA.BARE);
-//        this.shooterTwo = m_shooterTwo.motor;
-//        this.shooterMotors = new MotorGroup(this.m_shooterOne,this.m_shooterTwo);
-//
-//        this.shooterMotors.setRunMode(Motor.RunMode.RawPower);
-//        this.hubs = hardwareMap.getAll(LynxModule.class);
-//        this.hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
-
-        this.m_shooterOne = new Motor(hardwareMap, "shooterOne", Motor.GoBILDA.BARE);
-        this.m_shooterOne.setInverted(true);
-        this.m_shooterOne.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
-
-        this.m_shooterTwo = new Motor(hardwareMap, "shooterTwo", Motor.GoBILDA.BARE);
-        this.m_shooterTwo.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
-
-        this.shooterMotors = new MotorGroup(m_shooterTwo,m_shooterOne);
-        this.shooterMotors.setRunMode(Motor.RunMode.VelocityControl);
-        this.shooterMotors.setVeloCoefficients(0.4,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD);
-        //this.shooterMotors.setFeedforwardCoefficients(0,RobotConstants.Drivetrain.shootV);
-        target = RobotConstants.Intake.target;
-        hoodAngle = RobotConstants.Intake.hoodAngle;
-        targetY = 0;
-
-        this.hubs = hardwareMap.getAll(LynxModule.class);
-        this.hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
-
-        this.adjustableHoodServo = hardwareMap.servo.get(RobotConstants.Drivetrain.adjustableHoodServo);
         this.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseAuto);
 
+        this.shooterMotors.setVeloCoefficients(0.4,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD);
+
         s = Executors.newScheduledThreadPool(1);
-        d = 0;
 
-        mecanum = new Mecanum();
-        intake = new Intake();
-        spindexer = new Spindexer();
-        ShooterLUT = new ShooterLUT();
-        timerTaskCommands = new timerTaskCommands();
         blueSortedLong = new blueSortedLong();
-        blueSorted = new blueSorted();
-        redSorted = new redSorted();
     }
-
-
 
 }

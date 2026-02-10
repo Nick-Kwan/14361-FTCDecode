@@ -1,10 +1,5 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import org.firstinspires.ftc.teamcode.util.RobotHardware;
-import org.firstinspires.ftc.teamcode.util.RobotConstants;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.arcrobotics.ftclib.command.Subsystem;
-
 import java.util.TimerTask;
 
 public class timerTaskCommands{
@@ -12,7 +7,7 @@ public class timerTaskCommands{
     public timerTaskCommands() {
         this.robot = RobotHardware.getInstance();
     }
-    
+
     public TimerTask spindexerUp(){
         TimerTask spindexerUp = new TimerTask() {
             public void run() {
@@ -53,13 +48,4 @@ public class timerTaskCommands{
         };
         return  setPoseThree;
     }
-    public TimerTask shoot(){
-        TimerTask shoot = new TimerTask() {
-            public void run() {
-                robot.spindexer.shoot();
-            }
-        };
-        return  shoot;
-    }
-
 }

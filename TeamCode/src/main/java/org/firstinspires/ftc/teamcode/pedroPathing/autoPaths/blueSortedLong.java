@@ -335,7 +335,7 @@ public class blueSortedLong extends OpMode{
         follower.update();
         autonomousPathUpdate();
         robot.intake.setAutoShooterVelocity();
-        //robot.intake.timerTaskAutoSetup();
+
         robot.limelight.start();
         orientation = robot.imu.getRobotYawPitchRollAngles();
         robot.limelight.updateRobotOrientation(orientation.getYaw());
