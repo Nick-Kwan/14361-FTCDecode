@@ -18,9 +18,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.List;
 
-@TeleOp(name = "TeleOpBlue", group = "TeleOp")
+@TeleOp(name = "JudgingTeleOpDemo", group = "Tuning")
 
-public class TeleOpBlue extends CommandOpMode {
+public class JudgingTeleOpDemo extends CommandOpMode {
     private final RobotHardware robot = RobotHardware.getInstance();
     private GamepadEx driver;
     boolean temp = true;
@@ -91,13 +91,13 @@ public class TeleOpBlue extends CommandOpMode {
 
 
         // Controls
-        robot.ShooterLUT.getReadyToShoot();
+        robot.ShooterLUT.demoLUTShoot();
 
-        if(driver.gamepad.left_trigger > 0.1) {
-            robot.mecanum.periodic(1 - (driver.gamepad.left_trigger/1.5));
-        } else {
-            robot.mecanum.periodic(1);
-        }
+//        if(driver.gamepad.left_trigger > 0.1) {
+//            robot.mecanum.periodic(1 - (driver.gamepad.left_trigger/1.5));
+//        } else {
+//            robot.mecanum.periodic(1);
+//        }
 
         if (driver.gamepad.ps) {
             robot.imu.resetYaw();
@@ -145,7 +145,7 @@ public class TeleOpBlue extends CommandOpMode {
                 robot.spindexer.setPoseTwo();
             }
             if (driver.gamepad.dpadRightWasPressed()) {
-                  robot.spindexer.setPose(Spindexer.SpindexerStates.moveRight);
+                robot.spindexer.setPose(Spindexer.SpindexerStates.moveRight);
             }
 
         }

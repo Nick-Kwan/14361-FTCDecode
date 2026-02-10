@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
-@Autonomous (name = "Red Close", group = "Auto")
+@Autonomous (name = "Red Close", group = "oldAuto")
 public class redClose  extends OpMode{
 
     private Follower follower;

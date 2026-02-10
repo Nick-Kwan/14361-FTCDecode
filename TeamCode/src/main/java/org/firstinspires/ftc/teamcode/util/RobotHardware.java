@@ -178,7 +178,7 @@ public class RobotHardware {
         this.spindexerLinkageServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerLinkageServo);
         this.spindexerLinkageServo.setPosition(RobotConstants.Spindexer.spindexerLinkageServoDown);
         this.spindexerServo = hardwareMap.servo.get(RobotConstants.Spindexer.spindexerServo);
-        this.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
+        //this.spindexerServo.setPosition(RobotConstants.Spindexer.spindexerServoPoseOne);
         this.atPoseOne = true;
         this.atPoseTwo = false;
         this.atPoseThree = false;
@@ -372,8 +372,9 @@ public class RobotHardware {
 
         this.shooterMotors = new MotorGroup(m_shooterTwo,m_shooterOne);
         this.shooterMotors.setRunMode(Motor.RunMode.VelocityControl);
-        this.shooterMotors.setVeloCoefficients(0.4,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD);
-        //this.shooterMotors.setFeedforwardCoefficients(0,RobotConstants.Drivetrain.shootV);
+        // old 0.63
+        this.shooterMotors.setVeloCoefficients(0.63,RobotConstants.Drivetrain.shootI,RobotConstants.Drivetrain.shootD);
+        this.shooterMotors.setFeedforwardCoefficients(0,RobotConstants.Drivetrain.shootV);
         target = RobotConstants.Intake.target;
         hoodAngle = RobotConstants.Intake.hoodAngle;
         targetY = 0;

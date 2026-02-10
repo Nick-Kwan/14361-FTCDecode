@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
 import java.util.List;
 
-@Autonomous (name = "Blue Close", group = "Auto")
+@Autonomous (name = "Blue Close", group = "oldAuto")
 public class blueClose  extends OpMode{
 
     private Follower follower;

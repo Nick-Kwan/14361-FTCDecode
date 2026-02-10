@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.util.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.RobotHardware;
 
 @Config
-@TeleOp (name = "PID Tuning")
+@TeleOp (name = "PID Tuning", group = "Tuning")
 public class PIDTuning extends OpMode{
     public PIDFCoefficients pid;
     public static double p =0.03, i = 0.00005, d = 0.00001;

@@ -30,8 +30,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Autonomous (name = "Blue Sorted Long", group = "Auto")
-public class blueSortedLong extends OpMode{
+@Autonomous (name = "Red Sorted Long", group = "Auto")
+public class redSortedLong extends OpMode{
 
 
     private Follower follower;
@@ -66,7 +66,7 @@ public class blueSortedLong extends OpMode{
 
     private RobotHardware robot = RobotHardware.getInstance();
 
-    private static double initX = 63.5;
+    private static double initX = 80.5;
     private static double initY = 8.5;
     private boolean pathTemp = false;
     private boolean actionTempOne, actionTempTwo,actionTempThree,actionTempFour,actionTempFive, actionTempSix = false;
@@ -77,29 +77,29 @@ public class blueSortedLong extends OpMode{
         return initY;
     }
 
-    public blueSortedLong(){
+    public redSortedLong(){
         this.robot = RobotHardware.getInstance();
     }
 
 
     // Setting up the poses for the paths
     private final Pose startPose = new Pose(initX, initY, Math.toRadians(90));
-    private final Pose collectOnePose = new Pose(16,10, Math.toRadians(180));
-    private final Pose collectControlOnePose = new Pose(63.5,16);
-    private final Pose shootOnePose = new Pose(56, 14, Math.toRadians(110));
-    private final Pose collectTwoPose = new Pose(19,38,Math.toRadians(90));
-    private final Pose collectControlTwoPose = new Pose(65,38);
-    private final Pose shootTwoPose = new Pose(56, 14, Math.toRadians(110));
-    private final Pose shootControlTwoPose = new Pose(56,38);
-    private final Pose collectThreePose = new Pose(25,64,Math.toRadians(90));
-    private final Pose collectControlThreePose = new Pose(80,64);
-    private final Pose shootThreePose = new Pose(56, 14, Math.toRadians(110));
-    private final Pose shootControlThreePose = new Pose(55,62);
-    private final Pose collectFourPose = new Pose(27,86,Math.toRadians(90));
-    private final Pose collectControlFourPose = new Pose(80,86);
-    private final Pose shootFourPose = new Pose(50, 86, Math.toRadians(110));
+    private final Pose collectOnePose = new Pose(128,11, Math.toRadians(0));
+    private final Pose collectControlOnePose = new Pose(80.5,25);
+    private final Pose shootOnePose = new Pose(88, 14, Math.toRadians(70));
+    private final Pose collectTwoPose = new Pose(125,34,Math.toRadians(90));
+    private final Pose collectControlTwoPose = new Pose(79,34);
+    private final Pose shootTwoPose = new Pose(88, 14, Math.toRadians(70));
+    private final Pose shootControlTwoPose = new Pose(88,38);
+    private final Pose collectThreePose = new Pose(122,58,Math.toRadians(90));
+    private final Pose collectControlThreePose = new Pose(64,58);
+    private final Pose shootThreePose = new Pose(88, 14, Math.toRadians(70));
+    private final Pose shootControlThreePose = new Pose(89,62);
+    private final Pose collectFourPose = new Pose(117,81,Math.toRadians(90));
+    private final Pose collectControlFourPose = new Pose(64,81);
+    private final Pose shootFourPose = new Pose(94, 81, Math.toRadians(70));
     //private final Pose shootControlFourPose = new Pose(55,86);
-    private final Pose parkPose = new Pose(25,86,Math.toRadians(180));
+    private final Pose parkPose = new Pose(119,81,Math.toRadians(0));
 
     // Creating the paths from the poses
     private Path collectOne;
@@ -132,8 +132,8 @@ public class blueSortedLong extends OpMode{
                 .addPath(new BezierCurve(shootOnePose,collectControlTwoPose,collectTwoPose))
                 .setTangentHeadingInterpolation()
                 .addParametricCallback(0.2,setPoseThree)
-                .addParametricCallback(0.73,setPoseTwo)
-                .addParametricCallback(0.86,setPoseOne)
+                .addParametricCallback(0.79,setPoseTwo)
+                .addParametricCallback(0.93,setPoseOne)
                 .build();
 
         scoreTwo = follower.pathBuilder()
@@ -147,8 +147,8 @@ public class blueSortedLong extends OpMode{
                 .addPath(new BezierCurve(shootTwoPose,collectControlThreePose,collectThreePose))
                 .setTangentHeadingInterpolation()
                 .addParametricCallback(0.2,setPoseThree)
-                .addParametricCallback(0.74,setPoseTwo)
-                .addParametricCallback(0.85,setPoseOne)
+                .addParametricCallback(0.87,setPoseTwo)
+                .addParametricCallback(0.96,setPoseOne)
                 .build();
 
         scoreThree = follower.pathBuilder()
@@ -194,14 +194,16 @@ public class blueSortedLong extends OpMode{
                     robot.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseLong);
                     autoSchedule.schedule(() -> {
                         robot.spindexer.sortingAuto();
-                    }, t += 1000 , TimeUnit.MILLISECONDS);
+                    }, t += 1500 , TimeUnit.MILLISECONDS);
                     autoSchedule.schedule(() -> {
-                        robot.spindexer.setPoseOne();
+                        robot.spindexer.setPoseThree();
+                    }, t += 2100 , TimeUnit.MILLISECONDS);
+                    autoSchedule.schedule(() -> {
                         robot.intake.intakeDown();
                         robot.intake.startIntakingMax();
                         follower.followPath(collectOne);
                         setPathState(1);
-                    }, t += 2300 , TimeUnit.MILLISECONDS);
+                    }, t += 450 , TimeUnit.MILLISECONDS);
                 }
                 break;
             case 1:
@@ -235,7 +237,7 @@ public class blueSortedLong extends OpMode{
                         //robot.spindexer.setPoseOne();
                         follower.followPath(collectTwo);
                         setPathState(3);
-                    }, t += 2200 , TimeUnit.MILLISECONDS);
+                    }, t += 2100 , TimeUnit.MILLISECONDS);
                     break;
                 }
                 break;
@@ -243,7 +245,6 @@ public class blueSortedLong extends OpMode{
                 if (!follower.isBusy() && !ranCase3){
                     ranCase3 = true;
                     t = 0;
-                    follower.setMaxPower(1.0);
                     autoSchedule.schedule(() -> {
                         //.turretServo.setPosition(RobotConstants.Drivetrain.turretPoseAutoLong);
                         //robot.intake.reverseIntaking();
@@ -261,12 +262,12 @@ public class blueSortedLong extends OpMode{
                     robot.intake.startIntakingMax();
                     autoSchedule.schedule(() -> {
                         robot.spindexer.sortingAuto();
-                    }, t += 1200 , TimeUnit.MILLISECONDS);
+                    }, t += 1200, TimeUnit.MILLISECONDS);
                     autoSchedule.schedule(() -> {
                         //robot.spindexer.setPoseOne();
                         follower.followPath(collectThree);
                         setPathState(5);
-                    }, t += 2200 , TimeUnit.MILLISECONDS);
+                    }, t += 1900 , TimeUnit.MILLISECONDS);
                 }
                 break;
             case 5:
@@ -291,12 +292,12 @@ public class blueSortedLong extends OpMode{
                     robot.intake.startIntakingMax();
                     autoSchedule.schedule(() -> {
                         robot.spindexer.sortingAuto();
-                    }, t += 1200 , TimeUnit.MILLISECONDS);
+                    }, t += 1200, TimeUnit.MILLISECONDS);
                     autoSchedule.schedule(() -> {
                         //robot.spindexer.setPoseOne();
                         follower.followPath(collectFour);
                         setPathState(7);
-                    }, t += 2200, TimeUnit.MILLISECONDS);
+                    }, t += 1900 , TimeUnit.MILLISECONDS);
                 }
                 break;
             case 7:
@@ -347,14 +348,10 @@ public class blueSortedLong extends OpMode{
 
     @Override
     public void loop() {
-//        robot.intake.timerTaskSetup();
-//        autoTimer = new java.util.Timer();
-
         CommandScheduler.getInstance().run();
         follower.update();
         autonomousPathUpdate();
         robot.intake.setAutoShooterVelocity();
-        //robot.intake.timerTaskAutoSetup();
         robot.limelight.start();
         orientation = robot.imu.getRobotYawPitchRollAngles();
         robot.limelight.updateRobotOrientation(orientation.getYaw());
@@ -364,7 +361,7 @@ public class blueSortedLong extends OpMode{
             limelightTemp = false;
         }
         else if (robot.aprilID > 20){
-            robot.limelight.pipelineSwitch(3);
+            robot.limelight.pipelineSwitch(2);
             limelightTemp = true;
         }
         if (llResult != null && llResult.isValid()) {
@@ -374,7 +371,6 @@ public class blueSortedLong extends OpMode{
             telemetry.addData("Target Area", llResult.getTa());
             telemetry.addData("BotPose", botPose.toString());
             telemetry.addData("Yaw", botPose.getOrientation().getYaw());
-            robot.intake.setAutoShooterVelocity();
             List<LLResultTypes.FiducialResult> ID = llResult.getFiducialResults();
             for (LLResultTypes.FiducialResult id : ID) {
                 if (id.getFiducialId() == 21 || id.getFiducialId() == 22 || id.getFiducialId() == 23){
@@ -401,7 +397,7 @@ public class blueSortedLong extends OpMode{
                 limelightLoopTemp = false;
             }
             if (llResetTimer.getElapsedTimeSeconds() > 1 && llResult.getTx() == 0){
-                robot.turretServo.setPosition(0.38);
+                robot.turretServo.setPosition(0.62);
                 limelightLoopTemp = true;
             }
 
@@ -415,8 +411,6 @@ public class blueSortedLong extends OpMode{
         telemetry.addData("Right Flywheel Velocity", velocities.get(1));
 
         telemetry.update();
-        robot.intake.setAutoShooterVelocity();
-
 
     }
 
@@ -425,7 +419,7 @@ public class blueSortedLong extends OpMode{
         CommandScheduler.getInstance().run();
         robot.init(hardwareMap);
         robot.turretServo.setPosition(RobotConstants.Drivetrain.turretPose);
-        robot.adjustableHoodServo.setPosition(0.12);
+        robot.adjustableHoodServo.setPosition(RobotConstants.Drivetrain.hoodPoseLong);
         robot.spindexer.setPoseTwo();
 
 

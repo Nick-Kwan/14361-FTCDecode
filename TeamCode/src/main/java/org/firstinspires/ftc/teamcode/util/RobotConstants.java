@@ -30,7 +30,7 @@ public class RobotConstants {
         public static double turretPoseAutoLong = 0.33;
         public static double turretMeowPose = 0.3;
         public static double turretBlueAutoPose = 1;
-        public static double turretRedAutoPose = 0.2;
+        public static double turretRedAutoPose = 0;
         public static double hoodPoseMid = 0.5;
         public static double hoodPoseAuto = 0.5;
         public static double hoodPoseLong = 0.21;
@@ -43,6 +43,7 @@ public class RobotConstants {
         public static double shootI = 0;
         public static double shootD = 0;
         public static double shootF = 0;
+        // old 0.000325
         public static double shootV = 0.7;
     }
 
@@ -54,7 +55,7 @@ public class RobotConstants {
 
         // Values
         public static double intakeMotorON = 0.85;
-        public static double intakeMotorFull = 0.85;
+        public static double intakeMotorFull = 1;
         public static int intakeMotorOff = 0;
         public static double intakeMotorReverse = -1.0;
         public static double intakeServoDown = 1.0; //need to tune value
