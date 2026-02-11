@@ -123,7 +123,7 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         // Default command for driving (field-relative mecanum with slow mode on left trigger)
         mecanumDrive.setDefaultCommand(
             new RunCommand(() -> {
-                double ly = -driverGamepad.getLeftY();
+                double ly = driverGamepad.getLeftY();
                 double lx = driverGamepad.getLeftX();
                 double rx = driverGamepad.getRightX();
                 double speed = (gamepad1.left_trigger > DriveConstants.TRIGGER_THRESHOLD)
@@ -142,14 +142,8 @@ abstract public class TeleOpTemplate extends CommandOpMode {
                 intake.startIntaking();
                 intake.deploy();
                 // Auto-intake distribution on a 300ms interval
-                if (autoIntakeReady) {
-                    autoIntakeReady = false;
-                    autoIntakeTimer.reset();
-                    spindexer.autoIntake();
-                }
-                if (autoIntakeTimer.milliseconds() >= SpindexerConstants.AUTO_INTAKE_INTERVAL_MS) {
-                    autoIntakeReady = true;
-                }
+                spindexer.autoIntake();
+
             })
             .whenInactive(() -> {
                 intake.stopIntaking();
