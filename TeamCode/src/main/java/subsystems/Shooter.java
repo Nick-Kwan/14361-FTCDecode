@@ -4,6 +4,8 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 
 import utility.RobotHardware;
 import Constants.ShooterConstants;
+import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,17 @@ public class Shooter extends SubsystemBase {
 
         return ShotConfig.lerp(floor.getValue(), ceil.getValue(), t);
     }
+
+//    public double findDistanceToGoal() {
+//        Pose goalPos = new Pose(0, 0, Math.toRadians(0));
+//        goalPos = new Pose(goalPos.getX(), goalPos.getY(), goalPos.getHeading());
+//        Pose robotPose = robot.robotLocalization.getRobotPose();
+//
+//        double dx = goalPos.getX() - robotPose.getX();
+//        double dy = goalPos.getY() - robotPose.getY();
+//
+//        return Math.hypot(dx, dy);
+//    }
 
     /** Set flywheel velocity via MotorGroup (VelocityControl mode) */
     public void setVelocity(double velocity) {

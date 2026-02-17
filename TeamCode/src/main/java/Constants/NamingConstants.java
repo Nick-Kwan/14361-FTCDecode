@@ -37,4 +37,7 @@ public final class NamingConstants {
 
     // Vision
     public static final String LIMELIGHT = "limelight";
+    public static final String PINPOINT = "pinpoint";
+    // LED
+    public static final String LEDLIGHT = "LEDlight";
 }

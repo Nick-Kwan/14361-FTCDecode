@@ -188,7 +188,10 @@ abstract public class TeleOpTemplate extends CommandOpMode {
 
         // Dpad Up: Go to pose 2
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_UP)
-            .whenPressed(new InstantCommand(spindexer::setPoseTwo));
+            .whenPressed(() -> {
+                new InstantCommand(spindexer::setPoseTwo);
+                new InstantCommand(turret::center);
+            });
 
         // Left bumper: Sorted shooting
         new GamepadButton(driverGamepad, GamepadKeys.Button.LEFT_BUMPER)

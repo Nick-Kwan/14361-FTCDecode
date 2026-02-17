@@ -3,6 +3,7 @@ package utility;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorGroup;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -12,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.List;
@@ -26,10 +28,12 @@ public class RobotHardware {
     // Drivetrain
     public DcMotorEx leftFront, leftRear, rightFront, rightRear;
     public IMU imu;
+//    public GoBildaPinpointDriver pinpointDrive;
 
     // Intake
     public DcMotorEx intakeMotor;
     public Servo intakeServo;
+    public Servo LEDlight;
 
     // Shooter (FTCLib motors)
     public Motor m_shooterOne, m_shooterTwo;
@@ -142,8 +146,15 @@ public class RobotHardware {
         colorSensorThree_1 = hardwareMap.get(ColorSensor.class, NamingConstants.COLOR_SENSOR_THREE_1);
         colorSensorThree_2 = hardwareMap.get(ColorSensor.class, NamingConstants.COLOR_SENSOR_THREE_2);
 
-        // Limelight
+        // Limelight and Pinpoint
         limelight = hardwareMap.get(Limelight3A.class, NamingConstants.LIMELIGHT);
+
+//        pinpointDrive = hardwareMap.get(GoBildaPinpointDriver.class, NamingConstants.PINPOINT);
+
+        // LED
+
+        LEDlight = hardwareMap.servo.get(NamingConstants.LEDLIGHT);
+        LEDlight.setPosition(0.722);
     }
 
     public void clearBulkCache() {

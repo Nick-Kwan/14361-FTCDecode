@@ -20,12 +20,12 @@ public class BlueSorted extends AutonTemplate {
     // Updated from Kwan hkhk commit (d32cdda) for improved path following
     private final Pose startPose = new Pose(18.5, 114, Math.toRadians(90));
     private final Pose shootOnePose = new Pose(53.5, 90, Math.toRadians(180));
-    private final Pose collectControlOnePose = new Pose(54, 84);
-    private final Pose collectOnePose = new Pose(24, 84, Math.toRadians(180));
+    private final Pose collectControlOnePose = new Pose(54, 83);
+    private final Pose collectOnePose = new Pose(24, 83, Math.toRadians(180));
     private final Pose shootControlTwoPose = new Pose(49, 89);
     private final Pose shootTwoPose = new Pose(54, 89, Math.toRadians(180));
-    private final Pose collectTwoPose = new Pose(44, 61, Math.toRadians(180));
-    private final Pose goCollectTwoPose = new Pose(25, 61, Math.toRadians(180));
+    private final Pose collectTwoPose = new Pose(44, 59, Math.toRadians(180));
+    private final Pose goCollectTwoPose = new Pose(25, 59, Math.toRadians(180));
     private final Pose collectControlTwoPose = new Pose(72, 61);
     private final Pose shootControlThreePose = new Pose(49, 61);
     private final Pose shootControl2ThreePose = new Pose(40.5, 86.5);
@@ -54,8 +54,8 @@ public class BlueSorted extends AutonTemplate {
             .addPath(new BezierCurve(shootOnePose, collectControlOnePose, collectOnePose))
             .setConstantHeadingInterpolation(Math.toRadians(180))
             .addParametricCallback(0.2, () -> spindexer.setPoseThree())
-            .addParametricCallback(0.74, () -> spindexer.setPoseTwo())
-            .addParametricCallback(0.89, () -> spindexer.setPoseOne())
+            .addParametricCallback(0.4, () -> spindexer.setPoseTwo())
+            .addParametricCallback(0.5, () -> spindexer.setPoseOne())
             .build();
 
         scoreOne = follower.pathBuilder()
@@ -66,16 +66,16 @@ public class BlueSorted extends AutonTemplate {
         collectTwo = follower.pathBuilder()
             .addPath(new BezierCurve(shootTwoPose, collectControlTwoPose, collectTwoPose))
             .setConstantHeadingInterpolation(Math.toRadians(180))
-            .addParametricCallback(0.2, () -> spindexer.setPoseThree())
-            .addParametricCallback(0.78, () -> spindexer.setPoseTwo())
-            .addParametricCallback(0.93, () -> spindexer.setPoseOne())
+//            .addParametricCallback(0.2, () -> spindexer.setPoseThree())
+//            .addParametricCallback(0.5, () -> spindexer.setPoseTwo())
+//            .addParametricCallback(0.93, () -> spindexer.setPoseOne())
             .build();
 
         goCollectTwo = follower.pathBuilder()
             .addPath(new BezierLine(collectTwoPose, goCollectTwoPose))
             .setConstantHeadingInterpolation(Math.toRadians(180))
-            .addParametricCallback(0.2, () -> spindexer.setPoseThree())
-            .addParametricCallback(0.3, () -> spindexer.setPoseOne())
+            .addParametricCallback(0.35, () -> spindexer.setPoseThree())
+            .addParametricCallback(0.45, () -> spindexer.setPoseOne())
             .build();
 
         scoreTwo = follower.pathBuilder()
@@ -91,8 +91,8 @@ public class BlueSorted extends AutonTemplate {
         goCollectThree = follower.pathBuilder()
             .addPath(new BezierLine(collectThreePose, goCollectThreePose))
             .setConstantHeadingInterpolation(Math.toRadians(180))
-            .addParametricCallback(0.2, () -> spindexer.setPoseThree())
-            .addParametricCallback(0.3, () -> spindexer.setPoseOne())
+            .addParametricCallback(0.35, () -> spindexer.setPoseThree())
+            .addParametricCallback(0.45, () -> spindexer.setPoseOne())
             .build();
 
         scoreThree = follower.pathBuilder()
@@ -120,63 +120,63 @@ public class BlueSorted extends AutonTemplate {
 
         autonomousCommand = new CommandSequenceBuilder(follower, intake, spindexer, limelight, shooter, turret)
             // Score preload
-            .setShooterVelocity(0.46)
+            .setShooterVelocity(0.37)
             .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
             .moveTo(scorePreload, 1.0)
 
             // Sorted shoot cycle 1
-            .delay(1.0)
+            .delay(0.5)
             .sortedShoot()
-            .delay(2.5)
+//            .delay(0.8)
             .rotateTo(EnumConstants.SpindexerPosition.PoseThree)
             .intakeStart()
-            .moveTo(collectOne, 1.0)
+            .moveTo(collectOne, 0.35)
 
             // Return to score 1
-            .delay(0.5)
+//            .delay(0.5)
             .addAction(() -> intake.startIntakingMax())
             .moveTo(scoreOne, 1.0)
 
             // Sorted shoot cycle 2
             .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
-            .intakeStop()
-            .delay(1.0)
+//            .intakeStop()
+            .delay(0.3)
             .sortedShoot()
-            .delay(2.5)
+//            .delay(0.8)
             .rotateTo(EnumConstants.SpindexerPosition.PoseThree)
             .intakeStart()
             .moveTo(collectTwo, 1.0)
 
             // Extended collection 2
-            .delay(0.5)
-            .moveTo(goCollectTwo, 1.0)
-            .delay(0.5)
+//            .delay(0.5)
+            .moveTo(goCollectTwo, 0.35)
+//            .delay(0.5)
             .addAction(() -> intake.startIntakingMax())
             .moveTo(scoreTwo, 1.0)
 
             // Sorted shoot cycle 3
             .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
-            .intakeStop()
-            .delay(1.0)
+//            .intakeStop()
+            .delay(0.3)
             .sortedShoot()
-            .delay(2.5)
+//            .delay(0.8)
             .rotateTo(EnumConstants.SpindexerPosition.PoseThree)
             .intakeStart()
             .moveTo(collectThree, 1.0)
 
             // Extended collection 3
-            .delay(0.5)
-            .moveTo(goCollectThree, 1.0)
-            .delay(0.5)
+//            .delay(0.5)
+            .moveTo(goCollectThree, 0.35)
+//            .delay(0.5)
             .addAction(() -> intake.startIntakingMax())
             .moveTo(scoreThree, 1.0)
 
             // Final shoot cycle + park
             .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
-            .intakeStop()
-            .delay(1.0)
+//            .intakeStop()
+            .delay(0.3)
             .sortedShoot()
-            .delay(1.9)
+//            .delay(0.8)
             .rotateTo(EnumConstants.SpindexerPosition.PoseOne)
             .intakeStop()
             .moveTo(park, 1.0)

@@ -16,6 +16,7 @@ public final class SpindexerConstants {
     public static final long FIRE_TIME_MS = 200;
     public static final long RETRACT_TIME_MS = 150;
     public static final long ROTATION_SETTLE_MS = 250;
+    public static final long ROTATION_LONG_SETTLE_MS = 400;
 
     // Color sensor thresholds (RGB sum)
     public static final double BALL_PRESENT = 2000;

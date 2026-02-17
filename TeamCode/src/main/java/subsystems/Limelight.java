@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 
+import Constants.IntakeConstants;
 import utility.RobotHardware;
 import Constants.LimelightConstants;
 
@@ -41,6 +42,7 @@ public class Limelight extends SubsystemBase {
         latestResult = robot.limelight.getLatestResult();
         if (latestResult != null && latestResult.isValid()) {
             valid = true;
+            LEDgreen();
             tx = latestResult.getTx();
             ty = latestResult.getTy();
             // Scan for valid AprilTag IDs (21, 22, 23)
@@ -53,10 +55,19 @@ public class Limelight extends SubsystemBase {
                 }
             }
         } else {
+            LEDred();
             valid = false;
         }
     }
-
+    public void LEDgreen() {
+        robot.LEDlight.setPosition(0.5);
+    }
+    public void LEDred() {
+        robot.LEDlight.setPosition(0.277);
+    }
+    public void LEDpurple() {
+        robot.LEDlight.setPosition(0.722);
+    }
     public boolean isValid() { return valid; }
     public double getTx() { return tx; }
     public double getTy() { return ty; }
