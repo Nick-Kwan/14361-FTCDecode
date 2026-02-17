@@ -246,10 +246,8 @@ abstract public class TeleOpTemplate extends CommandOpMode {
                 wasTrackingValid = false;
             }
             // Auto-center turret after timeout with no valid target
-            if (llResetTimer.seconds() > TurretConstants.RESET_TIMEOUT_SEC
-                    && limelight.getTx() == 0) {
+            if (llResetTimer.seconds() > TurretConstants.RESET_TIMEOUT_SEC) {
                 turret.center();
-                wasTrackingValid = true;
             }
         }
     }

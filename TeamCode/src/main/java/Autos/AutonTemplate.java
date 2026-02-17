@@ -189,10 +189,8 @@ public abstract class AutonTemplate extends OpMode {
                 llResetTimer.resetTimer();
                 wasTrackingValid = false;
             }
-            if (llResetTimer.getElapsedTimeSeconds() > TurretConstants.RESET_TIMEOUT_SEC
-                    && limelight.getTx() == 0) {
+            if (llResetTimer.getElapsedTimeSeconds() > TurretConstants.RESET_TIMEOUT_SEC) {
                 turret.setPosition(autoTurretResetPosition);
-                wasTrackingValid = true;
             }
         }
     }

@@ -13,10 +13,10 @@ public class Turret extends SubsystemBase {
         this.robot = RobotHardware.getInstance();
     }
 
-    /** Set turret servo position directly (0-1 range) */
+    /** Set turret servo position directly, clamped to 0-1 range */
     public void setPosition(double position) {
-        this.currentPosition = position;
-        robot.turretServo.setPosition(position);
+        this.currentPosition = Math.max(0.0, Math.min(1.0, position));
+        robot.turretServo.setPosition(currentPosition);
     }
 
     /** Get the last commanded turret position */
