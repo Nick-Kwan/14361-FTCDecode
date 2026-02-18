@@ -32,7 +32,20 @@ public class ShootingCommands {
                                              SpindexerPosition poseA,
                                              SpindexerPosition poseB,
                                              SpindexerPosition poseC) {
-        if (poseA == SpindexerPosition.PoseOne){
+        if (poseA == SpindexerPosition.PoseOne && poseB == SpindexerPosition.PoseThree){
+            return new SequentialCommandGroup(
+                    new RotateToCommand(spindexer, poseA),
+                    new WaitCommand(SpindexerConstants.ROTATION_SETTLE_MS),
+                    new FireCommand(spindexer),
+                    new RotateToCommand(spindexer, poseB),
+                    new WaitCommand(SpindexerConstants.ROTATION_LONG_SETTLE_MS),
+                    new FireCommand(spindexer),
+                    new RotateToCommand(spindexer, poseC),
+                    new WaitCommand(SpindexerConstants.ROTATION_SETTLE_MS),
+                    new FireCommand(spindexer)
+            );
+        }
+        else{
             return new SequentialCommandGroup(
                     new RotateToCommand(spindexer, poseA),
                     new WaitCommand(SpindexerConstants.ROTATION_SETTLE_MS),
@@ -45,17 +58,6 @@ public class ShootingCommands {
                     new FireCommand(spindexer)
             );
         }
-        return new SequentialCommandGroup(
-            new RotateToCommand(spindexer, poseA),
-            new WaitCommand(SpindexerConstants.ROTATION_SETTLE_MS),
-            new FireCommand(spindexer),
-            new RotateToCommand(spindexer, poseB),
-            new WaitCommand(SpindexerConstants.ROTATION_SETTLE_MS),
-            new FireCommand(spindexer),
-            new RotateToCommand(spindexer, poseC),
-            new WaitCommand(SpindexerConstants.ROTATION_SETTLE_MS),
-            new FireCommand(spindexer)
-        );
     }
 
     /**

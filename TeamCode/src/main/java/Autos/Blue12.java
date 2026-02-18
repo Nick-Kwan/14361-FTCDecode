@@ -9,12 +9,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import Constants.EnumConstants;
 import Constants.LimelightConstants;
-import Constants.ShooterConstants;
 import Constants.TurretConstants;
 import commands.CommandSequenceBuilder;
 
-@Autonomous(name = "Blue Sorted", group = "Auto")
-public class BlueSorted extends AutonTemplate {
+@Autonomous(name = "Blue 12 ball", group = "Auto")
+public class Blue12 extends AutonTemplate {
 
     // ===== POSES =====
     // Updated from Kwan hkhk commit (d32cdda) for improved path following
@@ -54,8 +53,8 @@ public class BlueSorted extends AutonTemplate {
             .addPath(new BezierCurve(shootOnePose, collectControlOnePose, collectOnePose))
             .setConstantHeadingInterpolation(Math.toRadians(180))
             .addParametricCallback(0.2, () -> spindexer.setPoseThree())
-            .addParametricCallback(0.4, () -> spindexer.setPoseTwo())
-            .addParametricCallback(0.5, () -> spindexer.setPoseOne())
+            .addParametricCallback(0.3, () -> spindexer.setPoseTwo())
+            .addParametricCallback(0.4, () -> spindexer.setPoseOne())
             .build();
 
         scoreOne = follower.pathBuilder()
@@ -134,11 +133,12 @@ public class BlueSorted extends AutonTemplate {
 
             // Return to score 1
 //            .delay(0.5)
+            .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
             .addAction(() -> intake.startIntakingMax())
             .moveTo(scoreOne, 1.0)
 
             // Sorted shoot cycle 2
-            .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
+//            .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
 //            .intakeStop()
             .delay(0.3)
             .sortedShoot()
@@ -150,12 +150,13 @@ public class BlueSorted extends AutonTemplate {
             // Extended collection 2
 //            .delay(0.5)
             .moveTo(goCollectTwo, 0.35)
-//            .delay(0.5)
+//            .delay(0.5
+            .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
             .addAction(() -> intake.startIntakingMax())
             .moveTo(scoreTwo, 1.0)
 
             // Sorted shoot cycle 3
-            .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
+//            .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
 //            .intakeStop()
             .delay(0.3)
             .sortedShoot()
