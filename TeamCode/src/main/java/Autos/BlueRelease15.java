@@ -23,7 +23,7 @@ public class BlueRelease15 extends AutonTemplate {
     private final Pose goCollectOnePose = new Pose(25, 62,Math.toRadians(180));
     private final Pose shootControlTwoPose = new Pose(46.8, 64.8);
     private final Pose shootTwoPose = new Pose(54.7, 77.9, Math.toRadians(180));
-    private final Pose releasePose = new Pose(12, 57, Math.toRadians(150));
+    private final Pose releasePose = new Pose(13, 59, Math.toRadians(150));
     private final Pose releaseControlPose = new Pose(40, 61.3, Math.toRadians(180));
     private final Pose shootThreePose = new Pose(54.7, 77.9, Math.toRadians(180));
     private final Pose shootControlThreePose = new Pose(40, 61.3, Math.toRadians(180));
@@ -76,7 +76,7 @@ public class BlueRelease15 extends AutonTemplate {
 
         scoreTwo = follower.pathBuilder()
                 .addPath(new BezierCurve(releasePose,shootControlThreePose,shootThreePose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setLinearHeadingInterpolation(releasePose.getHeading(), shootThreePose.getHeading())
                 .addParametricCallback(0.05, () -> intake.reverseIntaking())
                 .addParametricCallback(0.35, () -> intake.startIntaking())
                 .addParametricCallback(0.9, () -> spindexer.setPoseTwo())
@@ -175,7 +175,6 @@ public class BlueRelease15 extends AutonTemplate {
 
                 // Collect 2
                 .moveTo(collectTwo, 0.35,false)
-                .addAction(() -> intake.startIntakingMax())
 
                 // Sorted shoot cycle 3
 //                .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
@@ -189,7 +188,6 @@ public class BlueRelease15 extends AutonTemplate {
                 // Collect 3
                 .moveTo(collectThree, 1.0,false)
                 .moveTo(goCollectThree, 0.35,false)
-                .addAction(() -> intake.startIntakingMax())
 
                 // Sorted shoot cycle 4
                 .moveTo(scoreFour, 1.0,false)
