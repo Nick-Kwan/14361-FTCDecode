@@ -87,12 +87,12 @@ public class CommandSequenceBuilder {
     }
 
     public CommandSequenceBuilder moveTo(PathChain pathChain, double maxPower, boolean holdEnd) {
-        commands.add(new FollowPathCommand(follower, pathChain, maxPower, true));
+        commands.add(new FollowPathCommand(follower, pathChain, maxPower, holdEnd));
         return this;
     }
 
     public CommandSequenceBuilder moveTo(Path path, double maxPower, boolean holdEnd) {
-        commands.add(new FollowPathCommand(follower, path, maxPower, true));
+        commands.add(new FollowPathCommand(follower, path, maxPower, holdEnd));
         return this;
     }
 
