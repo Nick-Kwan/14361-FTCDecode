@@ -86,6 +86,16 @@ public class CommandSequenceBuilder {
         return this;
     }
 
+    public CommandSequenceBuilder moveTo(PathChain pathChain, double maxPower, boolean holdEnd) {
+        commands.add(new FollowPathCommand(follower, pathChain, maxPower, true));
+        return this;
+    }
+
+    public CommandSequenceBuilder moveTo(Path path, double maxPower, boolean holdEnd) {
+        commands.add(new FollowPathCommand(follower, path, maxPower, true));
+        return this;
+    }
+
     // ==================== Shooting Methods ====================
 
     /** Shoot all 3 balls based on current spindexer position */
