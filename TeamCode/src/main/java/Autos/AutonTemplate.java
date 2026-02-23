@@ -3,6 +3,7 @@ package Autos;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -107,6 +108,9 @@ public abstract class AutonTemplate extends OpMode {
 
         // Subclass builds paths (and sets starting pose)
         buildPaths();
+
+        // Connect turret to shooter for distance-based auto-aim
+        shooter.setTurret(turret);
     }
 
     @Override
@@ -122,10 +126,16 @@ public abstract class AutonTemplate extends OpMode {
         FieldMap.allianceColor = (goalPipeline == LimelightConstants.PIPELINE_GOAL_RED)
                 ? EnumConstants.AllianceColor.Red : EnumConstants.AllianceColor.Blue;
 
+        // Pre-aim turret at goal from starting position
+        turret.setTurretAngle(computeInitialTurretAngle(follower.getPose()));
+
         // Enable odometry-based turret tracking with Limelight Tx correction
         turret.setLimelight(limelight);
         turret.setTrackingEnabled(true);
         turret.setTxCorrectionEnabled(true);
+
+        // Enable distance-based auto-aim (velocity + hood from LUT)
+        shooter.setAutoAimEnabled(true);
 
         // Schedule the autonomous command
         if (autonomousCommand != null) {
@@ -175,8 +185,36 @@ public abstract class AutonTemplate extends OpMode {
         telemetry.addData("Flick State", spindexer.getFlickState());
         telemetry.addData("LL Valid", limelight.isValid());
         telemetry.addData("Tx", "%.2f", limelight.getTx());
+        telemetry.addData("Distance", "%.1f in", shooter.getLastDistance());
+        telemetry.addData("Turret Deg", "%.1f", turret.getCurrentTargetDegrees());
         telemetry.addData("Loop", "%.1f ms", loopMs);
         telemetry.update();
+    }
+
+    /**
+     * Compute the turret angle needed to aim at the goal from a given pose.
+     * Used to pre-aim the turret before odometry tracking takes over.
+     */
+    private double computeInitialTurretAngle(Pose startPose) {
+        Pose goalPosition = FieldMap.getGoalPosition();
+
+        double deltaX = goalPosition.getX() - startPose.getX();
+        double deltaY = goalPosition.getY() - startPose.getY();
+
+        double fieldAngleRad = Math.atan2(deltaY, deltaX);
+        double turretAngleRad = fieldAngleRad - startPose.getHeading();
+
+        double turretAngleDeg = Math.toDegrees(turretAngleRad);
+        turretAngleDeg = turretAngleDeg % 360;
+        if (turretAngleDeg > 180) turretAngleDeg -= 360;
+        if (turretAngleDeg < -180) turretAngleDeg += 360;
+
+        turretAngleDeg += (FieldMap.allianceColor == EnumConstants.AllianceColor.Blue)
+                ? TurretConstants.BLUE_TURRET_TRACKING_OFFSET
+                : TurretConstants.RED_TURRET_TRACKING_OFFSET;
+
+        return Math.max(TurretConstants.HARD_STOP_CCW,
+                        Math.min(TurretConstants.HARD_STOP_CW, turretAngleDeg));
     }
 
     /**
