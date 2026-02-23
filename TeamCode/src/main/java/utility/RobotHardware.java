@@ -14,7 +14,13 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.LED;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 
 import java.util.List;
 
@@ -28,7 +34,17 @@ public class RobotHardware {
     // Drivetrain
     public DcMotorEx leftFront, leftRear, rightFront, rightRear;
     public IMU imu;
-//    public GoBildaPinpointDriver pinpointDrive;
+
+    // Pinpoint odometry
+    public GoBildaPinpointDriver pinpoint;
+
+    // Cached pose fields (updated each loop via updateCachedPose)
+    public double cachedPoseX = 0;
+    public double cachedPoseY = 0;
+    public double cachedHeading = 0;
+    public double cachedVelX = 0;
+    public double cachedVelY = 0;
+    public double cachedHeadingVel = 0;
 
     // Intake
     public DcMotorEx intakeMotor;
@@ -41,7 +57,7 @@ public class RobotHardware {
     public Servo adjustableHoodServo;
 
     // Turret
-    public Servo turretServo;
+    public ServoImplEx turretServo;
 
     // Spindexer
     public Servo spindexerServo;
@@ -125,7 +141,8 @@ public class RobotHardware {
 
         // Hood and turret servos
         adjustableHoodServo = hardwareMap.servo.get(NamingConstants.ADJUSTABLE_HOOD_SERVO);
-        turretServo = hardwareMap.servo.get(NamingConstants.TURRET);
+        turretServo = hardwareMap.get(ServoImplEx.class, NamingConstants.TURRET);
+        turretServo.setPwmRange(new PwmControl.PwmRange(500, 2500)); // Full range for Axon servo
 
         // Spindexer
         spindexerServo = hardwareMap.servo.get(NamingConstants.SPINDEXER_SERVO);
@@ -146,15 +163,36 @@ public class RobotHardware {
         colorSensorThree_1 = hardwareMap.get(ColorSensor.class, NamingConstants.COLOR_SENSOR_THREE_1);
         colorSensorThree_2 = hardwareMap.get(ColorSensor.class, NamingConstants.COLOR_SENSOR_THREE_2);
 
-        // Limelight and Pinpoint
+        // Limelight
         limelight = hardwareMap.get(Limelight3A.class, NamingConstants.LIMELIGHT);
 
-//        pinpointDrive = hardwareMap.get(GoBildaPinpointDriver.class, NamingConstants.PINPOINT);
+        // Pinpoint odometry
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, NamingConstants.PINPOINT);
+        pinpoint.setEncoderDirections(
+                GoBildaPinpointDriver.EncoderDirection.FORWARD,
+                GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        pinpoint.setOffsets(1.91661417, 7.13570866, DistanceUnit.INCH); // From PedroPathing Constants
+        pinpoint.resetPosAndIMU();
+        try {
+            Thread.sleep(300); // Wait for IMU calibration
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        pinpoint.setYawScalar(OdometryConstants.yawScalar);
 
         // LED
-
         LEDlight = hardwareMap.servo.get(NamingConstants.LEDLIGHT);
         LEDlight.setPosition(0.722);
+    }
+
+    /** Read current pose from pinpoint and cache all values for this loop iteration */
+    public void updateCachedPose() {
+        cachedPoseX = pinpoint.getPosX(DistanceUnit.INCH);
+        cachedPoseY = pinpoint.getPosY(DistanceUnit.INCH);
+        cachedHeading = pinpoint.getHeading(AngleUnit.RADIANS);
+        cachedVelX = pinpoint.getVelX(DistanceUnit.INCH);
+        cachedVelY = pinpoint.getVelY(DistanceUnit.INCH);
+        cachedHeadingVel = pinpoint.getHeadingVelocity(UnnormalizedAngleUnit.RADIANS);
     }
 
     public void clearBulkCache() {

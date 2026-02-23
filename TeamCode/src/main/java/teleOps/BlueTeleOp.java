@@ -17,4 +17,9 @@ public class BlueTeleOp extends TeleOpTemplate {
     protected EnumConstants.AllianceColor getAllianceColor() {
         return EnumConstants.AllianceColor.Blue;
     }
+
+    @Override
+    protected double getDriveDirectionMultiplier() {
+        return -1.0;
+    }
 }

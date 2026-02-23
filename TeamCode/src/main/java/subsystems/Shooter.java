@@ -1,78 +1,93 @@
 package subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-
-import utility.RobotHardware;
-import Constants.ShooterConstants;
+import com.arcrobotics.ftclib.util.InterpLUT;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+
+import Constants.FieldMap;
+import Constants.ShooterConstants;
+import utility.RobotHardware;
 
 public class Shooter extends SubsystemBase {
     private final RobotHardware robot;
-    private final TreeMap<Double, ShotConfig> lut = new TreeMap<>();
+    private InterpLUT velocityLUT;
+    private InterpLUT hoodLUT;
+
+    // Reference to turret for distance calculation
+    private Turret turret;
+
+    // Whether distance-based auto-aim is active
+    private boolean autoAimEnabled = false;
+
+    // Cached distance for telemetry
+    private double lastDistance = 0;
 
     public Shooter() {
         this.robot = RobotHardware.getInstance();
-        initLUT();
+        initializeLUTs();
     }
 
-    /** Shot configuration with lerp interpolation (replaces old shotConfig.java) */
-    public static class ShotConfig {
-        public final double rpm;
-        public final double hoodPos;
-        public final double turretOffset;
+    /** Set turret reference for distance calculations */
+    public void setTurret(Turret turret) {
+        this.turret = turret;
+    }
 
-        public ShotConfig(double rpm, double hoodPos, double turretOffset) {
-            this.rpm = rpm;
-            this.hoodPos = hoodPos;
-            this.turretOffset = turretOffset;
+    // ==================== LUT Initialization ====================
+
+    private void initializeLUTs() {
+        velocityLUT = new InterpLUT();
+        for (double[] entry : ShooterConstants.VELOCITY_DATA) {
+            velocityLUT.add(entry[0], entry[1]);
+        }
+        velocityLUT.createLUT();
+
+        hoodLUT = new InterpLUT();
+        for (double[] entry : ShooterConstants.HOOD_DATA) {
+            hoodLUT.add(entry[0], entry[1]);
+        }
+        hoodLUT.createLUT();
+    }
+
+    // ==================== Distance Calculation ====================
+
+    /** Calculate Euclidean distance from turret field position to goal */
+    public double getDistanceToTarget() {
+        if (turret == null) {
+            return ShooterConstants.DEFAULT_DISTANCE;
         }
 
-        public static ShotConfig lerp(ShotConfig a, ShotConfig b, double t) {
-            return new ShotConfig(
-                a.rpm + (b.rpm - a.rpm) * t,
-                a.hoodPos + (b.hoodPos - a.hoodPos) * t,
-                a.turretOffset + (b.turretOffset - a.turretOffset) * t
-            );
-        }
+        double[] turretPos = turret.getTurretFieldPosition();
+        Pose goalPosition = FieldMap.getGoalPosition();
+
+        double deltaX = goalPosition.getX() - turretPos[0];
+        double deltaY = goalPosition.getY() - turretPos[1];
+
+        return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     }
 
-    private void initLUT() {
-        for (double[] entry : ShooterConstants.LUT_DATA) {
-            lut.put(entry[0], new ShotConfig(entry[1], entry[2], entry[3]));
-        }
+    // ==================== Distance-Based Auto-Aim ====================
+
+    /** Enable/disable distance-based auto-aim in periodic() */
+    public void setAutoAimEnabled(boolean enabled) {
+        this.autoAimEnabled = enabled;
     }
 
-    /** Look up shot configuration for a given Ty value with lerp interpolation */
-    public ShotConfig getConfigForTargetY(double y) {
-        Map.Entry<Double, ShotConfig> floor = lut.floorEntry(y);
-        Map.Entry<Double, ShotConfig> ceil = lut.ceilingEntry(y);
-
-        if (floor == null) return ceil.getValue();
-        if (ceil == null) return floor.getValue();
-        if (floor.getKey().equals(ceil.getKey())) return floor.getValue();
-
-        double d0 = floor.getKey();
-        double d1 = ceil.getKey();
-        double t = (y - d0) / (d1 - d0);
-
-        return ShotConfig.lerp(floor.getValue(), ceil.getValue(), t);
+    /** Update velocity and hood from distance-based LUT */
+    public void updateFromDistance() {
+        double distance = Math.min(getDistanceToTarget(), ShooterConstants.MAX_LUT_DISTANCE);
+        lastDistance = distance;
+        setVelocity(velocityLUT.get(distance));
+        setHoodAngle(hoodLUT.get(distance));
     }
 
-//    public double findDistanceToGoal() {
-//        Pose goalPos = new Pose(0, 0, Math.toRadians(0));
-//        goalPos = new Pose(goalPos.getX(), goalPos.getY(), goalPos.getHeading());
-//        Pose robotPose = robot.robotLocalization.getRobotPose();
-//
-//        double dx = goalPos.getX() - robotPose.getX();
-//        double dy = goalPos.getY() - robotPose.getY();
-//
-//        return Math.hypot(dx, dy);
-//    }
+    /** Get last calculated distance (for telemetry) */
+    public double getLastDistance() {
+        return lastDistance;
+    }
+
+    // ==================== Direct Control ====================
 
     /** Set flywheel velocity via MotorGroup (VelocityControl mode) */
     public void setVelocity(double velocity) {
@@ -89,24 +104,12 @@ public class Shooter extends SubsystemBase {
         robot.adjustableHoodServo.setPosition(position);
     }
 
-    /** Configure shooter from LUT based on Limelight Ty, then apply velocity + hood */
-    public void prepareForShot(double targetY) {
-        ShotConfig config = getConfigForTargetY(targetY);
-        setVelocity(config.rpm);
-        setHoodAngle(config.hoodPos);
-    }
-
-    /** Demo LUT shoot - only adjusts hood angle (for judging demo, no velocity change) */
-    public void prepareForShotHoodOnly(double targetY) {
-        ShotConfig config = getConfigForTargetY(targetY);
-        setHoodAngle(config.hoodPos);
-        // No velocity change - for demo purposes
-    }
-
-    /** Get current flywheel velocities (list of [motor2, motor1] speeds) */
+    /** Get current flywheel velocities */
     public List<Double> getVelocities() {
         return robot.shooterMotors.getVelocities();
     }
+
+    // ==================== PID Configuration ====================
 
     /** Configure PID for teleop mode (P=3, V=0.7 feedforward) */
     public void configureForTeleOp() {
@@ -127,7 +130,12 @@ public class Shooter extends SubsystemBase {
         );
     }
 
+    // ==================== Periodic ====================
+
     @Override
     public void periodic() {
+        if (autoAimEnabled) {
+            updateFromDistance();
+        }
     }
 }

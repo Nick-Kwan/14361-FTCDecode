@@ -7,7 +7,10 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import Constants.EnumConstants;
+import Constants.FieldMap;
 import Constants.LimelightConstants;
+import Constants.OdometryConstants;
 import Constants.ShooterConstants;
 import Constants.TurretConstants;
 import pedroPathing.Constants;
@@ -58,8 +61,6 @@ public abstract class AutonTemplate extends OpMode {
     protected int goalPipeline = LimelightConstants.PIPELINE_GOAL_BLUE;
 
     // Tracking state (managed by updateAutoTracking)
-    private boolean limelightOnGoalPipeline = false;
-    private boolean wasTrackingValid = false;
     private Timer llResetTimer;
 
     /**
@@ -117,6 +118,15 @@ public abstract class AutonTemplate extends OpMode {
         opmodeTimer.resetTimer();
         llResetTimer.resetTimer();
 
+        // Set alliance color based on goal pipeline
+        FieldMap.allianceColor = (goalPipeline == LimelightConstants.PIPELINE_GOAL_RED)
+                ? EnumConstants.AllianceColor.Red : EnumConstants.AllianceColor.Blue;
+
+        // Enable odometry-based turret tracking with Limelight Tx correction
+        turret.setLimelight(limelight);
+        turret.setTrackingEnabled(true);
+        turret.setTxCorrectionEnabled(true);
+
         // Schedule the autonomous command
         if (autonomousCommand != null) {
             CommandScheduler.getInstance().schedule(autonomousCommand);
@@ -135,6 +145,10 @@ public abstract class AutonTemplate extends OpMode {
 
         // Clear bulk cache
         robotHardware.clearBulkCache();
+
+        // Update pinpoint odometry and cache pose for turret tracking
+        robotHardware.pinpoint.update();
+        robotHardware.updateCachedPose();
 
         // Update limelight orientation BEFORE scheduler runs periodic()
         double yaw = robotHardware.imu.getRobotYawPitchRollAngles().getYaw();
@@ -166,37 +180,26 @@ public abstract class AutonTemplate extends OpMode {
     }
 
     /**
-     * Continuous limelight tracking: pipeline switching + turret alignment.
+     * Continuous limelight tracking: pipeline switching + Tx correction control.
+     * Odometry-based tracking runs in turret.periodic(); this just manages pipelines
+     * and enables/disables Tx correction based on whether we're on the goal pipeline.
      */
     private void updateAutoTracking() {
         int aprilID = limelight.getAprilID();
 
-        // Pipeline switching based on detected AprilTag
         if (aprilID < 20) {
             limelight.switchPipeline(aprilTagPipeline);
-            limelightOnGoalPipeline = false;
+            turret.setTxCorrectionEnabled(false);  // Not on goal pipeline
         } else if (aprilID > 20) {
             limelight.switchPipeline(goalPipeline);
-            limelightOnGoalPipeline = true;
-        }
-
-        // Turret tracking when on goal pipeline
-        if (limelightOnGoalPipeline && limelight.isValid()) {
-            turret.trackTarget(limelight.getTx(), autoTrackingGain, TurretConstants.AUTO_ALIGN_DEADBAND);
-            wasTrackingValid = true;
-        } else if (!limelight.isValid()) {
-            if (wasTrackingValid) {
-                llResetTimer.resetTimer();
-                wasTrackingValid = false;
-            }
-            if (llResetTimer.getElapsedTimeSeconds() > TurretConstants.RESET_TIMEOUT_SEC) {
-                turret.setPosition(autoTurretResetPosition);
-            }
+            turret.setTxCorrectionEnabled(true);   // On goal pipeline, enable correction
         }
     }
 
     @Override
     public void stop() {
+        // Save ending pose for Auto → TeleOp handoff
+        OdometryConstants.endingAutonPose = follower.getPose();
         CommandScheduler.getInstance().reset();
     }
 }

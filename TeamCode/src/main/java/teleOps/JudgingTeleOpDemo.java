@@ -207,8 +207,8 @@ public class JudgingTeleOpDemo extends CommandOpMode {
         // 4. Turret tracking via Limelight Tx
         updateLimelightTracking();
 
-        // 5. Demo LUT - hood adjustment ONLY (no velocity changes for safety)
-        shooter.prepareForShotHoodOnly(limelight.getTy());
+        // 5. Demo mode - fixed hood position (no velocity changes for safety)
+        shooter.setHoodAngle(ShooterConstants.HOOD_POSE_MID);
 
         // 6. Telemetry
         telemetry.addLine("=== JUDGING DEMO MODE ===");

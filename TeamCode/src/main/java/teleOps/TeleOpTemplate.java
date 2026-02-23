@@ -9,14 +9,18 @@ import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.pedropathing.geometry.Pose;
 
 import Constants.DriveConstants;
 import Constants.EnumConstants;
+import Constants.FieldMap;
 import Constants.LimelightConstants;
+import Constants.OdometryConstants;
 import Constants.ShooterConstants;
 import Constants.SpindexerConstants;
 import Constants.TurretConstants;
+import commands.RelocalizePinpointCommand;
+import commands.ResetPositionCommand;
 import commands.ShootingCommands;
 import commands.SortedShootCommand;
 import subsystems.Intake;
@@ -30,18 +34,9 @@ import utility.TelemetryHelper;
 
 /**
  * Abstract TeleOp template for command-based architecture.
- * Subclasses set alliance color and limelight pipeline.
+ * Uses odometry-based turret tracking and distance-based shooter LUT.
  *
- * Preserves all control mappings from old TeleOpBlue/Red:
- * - Left trigger: slow mode (0.3x speed)
- * - PS button: reset IMU yaw
- * - Right trigger: intake deploy + start + auto-intake distribution
- * - Right bumper: intake reverse + deploy
- * - A pressed/released: linkage up/down (manual single-shot)
- * - Y pressed: shoot all 3 balls from current position
- * - DpadLeft/Right: rotate spindexer (touch sensor guarded)
- * - DpadUp: go to pose 2
- * - Left bumper: sorted shooting
+ * Subclasses set alliance color and limelight pipeline.
  */
 abstract public class TeleOpTemplate extends CommandOpMode {
     protected RobotHardware robot;
@@ -54,26 +49,21 @@ abstract public class TeleOpTemplate extends CommandOpMode {
     protected TelemetryHelper telemetryHelper;
     protected GamepadEx driverGamepad;
 
-    // Limelight tracking state
-    private boolean wasTrackingValid = false;
-    private ElapsedTime llResetTimer;
-
-    // Auto-intake distribution timing
-    private boolean autoIntakeReady = true;
-    private ElapsedTime autoIntakeTimer;
-
-    // Cached IMU heading (read once per loop, shared by drive + limelight)
-    private double cachedHeadingRad = 0;
-
     /** Subclass returns the goal-tracking pipeline (3=Blue, 2=Red) */
     protected abstract int getGoalPipeline();
 
     /** Subclass returns the alliance color */
     protected abstract EnumConstants.AllianceColor getAllianceColor();
 
+    /** Drive input multiplier: 1.0 for Red (default), -1.0 for Blue (driver faces opposite) */
+    protected double getDriveDirectionMultiplier() { return 1.0; }
+
     @Override
     public void initialize() {
         CommandScheduler.getInstance().reset();
+
+        // Set alliance color globally
+        FieldMap.allianceColor = getAllianceColor();
 
         driverGamepad = new GamepadEx(gamepad1);
         robot = RobotHardware.getInstance();
@@ -88,8 +78,23 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         limelight = new Limelight();
         telemetryHelper = new TelemetryHelper();
 
+        // Link turret <-> shooter references
+        shooter.setTurret(turret);
+
         // Configure shooter PID for teleop
         shooter.configureForTeleOp();
+
+        // Set pinpoint starting position from auto handoff or alliance default
+        Pose startPose;
+        if (OdometryConstants.endingAutonPose != null) {
+            startPose = OdometryConstants.endingAutonPose;
+        } else {
+            startPose = (getAllianceColor() == EnumConstants.AllianceColor.Red)
+                    ? OdometryConstants.redStartPoint
+                    : OdometryConstants.blueStartPoint;
+        }
+        robot.pinpoint.setPosition(OdometryConstants.toPose2D(startPose));
+        robot.pinpoint.update();
 
         // Init limelight
         limelight.start();
@@ -104,9 +109,11 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         // Init hood to mid
         shooter.setHoodAngle(ShooterConstants.HOOD_POSE_MID);
 
-        // Timers
-        llResetTimer = new ElapsedTime();
-        autoIntakeTimer = new ElapsedTime();
+        // Enable odometry-based turret tracking and distance-based auto-aim
+        turret.setLimelight(limelight);
+        turret.setTrackingEnabled(true);
+        turret.setTxCorrectionEnabled(true);
+        shooter.setAutoAimEnabled(true);
 
         // Register subsystems with the command scheduler
         register(mecanumDrive, intake, shooter, spindexer, turret, limelight);
@@ -117,18 +124,18 @@ abstract public class TeleOpTemplate extends CommandOpMode {
 
     /**
      * Configure all button bindings for TeleOp controls.
-     * Uses FTCLib's GamepadButton and Trigger for command-based control.
      */
     protected void configureButtonBindings() {
         // Default command for driving (field-relative mecanum with slow mode on left trigger)
         mecanumDrive.setDefaultCommand(
             new RunCommand(() -> {
-                double ly = driverGamepad.getLeftY();
-                double lx = driverGamepad.getLeftX();
+                double dir = getDriveDirectionMultiplier();
+                double ly = driverGamepad.getLeftY() * dir;
+                double lx = driverGamepad.getLeftX() * dir;
                 double rx = driverGamepad.getRightX();
                 double speed = (gamepad1.left_trigger > DriveConstants.TRIGGER_THRESHOLD)
                     ? DriveConstants.SLOW_MODE_FACTOR : 1.0;
-                mecanumDrive.drive(ly, lx, rx, speed, cachedHeadingRad);
+                mecanumDrive.drive(ly, lx, rx, speed, robot.cachedHeading);
             }, mecanumDrive)
         );
 
@@ -141,9 +148,7 @@ abstract public class TeleOpTemplate extends CommandOpMode {
             .whenActive(() -> {
                 intake.startIntaking();
                 intake.deploy();
-                // Auto-intake distribution on a 300ms interval
                 spindexer.autoIntake();
-
             })
             .whenInactive(() -> {
                 intake.stopIntaking();
@@ -193,6 +198,10 @@ abstract public class TeleOpTemplate extends CommandOpMode {
                 new InstantCommand(turret::center);
             });
 
+        // Dpad Down: Reset pinpoint position to alliance default
+        new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_DOWN)
+            .whenPressed(() -> schedule(new ResetPositionCommand()));
+
         // Left bumper: Sorted shooting
         new GamepadButton(driverGamepad, GamepadKeys.Button.LEFT_BUMPER)
             .whenPressed(() -> {
@@ -200,11 +209,15 @@ abstract public class TeleOpTemplate extends CommandOpMode {
                     schedule(SortedShootCommand.build(spindexer, limelight));
                 } else {
                     spindexer.setPoseTwo();
-                    // Wait for rotation to settle, then sorted shoot
                     schedule(new WaitCommand(SpindexerConstants.ROTATION_SETTLE_MS)
                         .andThen(SortedShootCommand.build(spindexer, limelight)));
                 }
             });
+
+        // B button: Relocalize pinpoint via Limelight MegaTag2
+        new GamepadButton(driverGamepad, GamepadKeys.Button.B)
+            .whenPressed(() -> schedule(
+                new RelocalizePinpointCommand(limelight, turret, getGoalPipeline())));
     }
 
     @Override
@@ -212,43 +225,29 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         // 1. Clear bulk cache (must happen before any hardware reads)
         robot.clearBulkCache();
 
-        // 2. Cache IMU heading once per loop (used by drive + limelight)
-        cachedHeadingRad = robot.imu.getRobotYawPitchRollAngles().getYaw(
-                org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS);
+        // 2. Update pinpoint odometry
+        robot.pinpoint.update();
 
-        // 3. Run command scheduler + subsystem periodic() methods
+        // 3. Cache pose fields for this loop iteration
+        robot.updateCachedPose();
+
+        // 4. Run command scheduler + subsystem periodic() methods
+        //    turret.periodic() handles odometry-based tracking
+        //    shooter.periodic() handles distance-based auto-aim
         super.run();
 
-        // 4. Update limelight orientation
-        limelight.updateOrientation(Math.toDegrees(cachedHeadingRad));
+        // 5. Update limelight orientation with cached heading
+        limelight.updateOrientation(Math.toDegrees(robot.cachedHeading));
 
-        // 5. Turret tracking via Limelight Tx
-        updateLimelightTracking();
-
-        // 6. Auto-aim shooter from LUT based on Ty
-        shooter.prepareForShot(limelight.getTy());
-
-        // 7. Telemetry
+        // 6. Telemetry
         telemetryHelper.update(telemetry, shooter, turret, spindexer, limelight);
-    }
-
-    private void updateLimelightTracking() {
-        if (limelight.isValid()) {
-            turret.trackTarget(
-                limelight.getTx(),
-                TurretConstants.TELEOP_GAIN,
-                TurretConstants.TRACKING_DEADBAND
-            );
-            wasTrackingValid = true;
-        } else {
-            if (wasTrackingValid) {
-                llResetTimer.reset();
-                wasTrackingValid = false;
-            }
-            // Auto-center turret after timeout with no valid target
-            if (llResetTimer.seconds() > TurretConstants.RESET_TIMEOUT_SEC) {
-                turret.center();
-            }
-        }
+        telemetry.addData("Pose", "X:%.1f Y:%.1f H:%.1f",
+                robot.cachedPoseX, robot.cachedPoseY,
+                Math.toDegrees(robot.cachedHeading));
+        telemetry.addData("Distance", "%.1f in", shooter.getLastDistance());
+        telemetry.addData("Turret Deg", "%.1f", turret.getCurrentTargetDegrees());
+        telemetry.addData("Out of Range", turret.isTargetOutOfRange());
+        telemetry.addData("Tx Correction", "%.2f", turret.getLastTxCorrection());
+        telemetry.addData("Reloc", limelight.getLastRelocDebug());
     }
 }
