@@ -47,7 +47,7 @@ public abstract class AutonTemplate extends OpMode {
     // Subclasses set these in init() to configure loop-level tracking
 
     /** Enable continuous limelight tracking + pipeline switching in loop() */
-    protected boolean autoTrackingEnabled = true;
+    protected boolean autoTrackingEnabled = false;
 
     /** Turret proportional gain for auto tracking */
     protected double autoTrackingGain = TurretConstants.AUTO_ALIGN_GAIN;
@@ -126,6 +126,7 @@ public abstract class AutonTemplate extends OpMode {
         FieldMap.allianceColor = (goalPipeline == LimelightConstants.PIPELINE_GOAL_RED)
                 ? EnumConstants.AllianceColor.Red : EnumConstants.AllianceColor.Blue;
 
+
         // Pre-aim turret at goal from starting position
         turret.setTurretAngle(computeInitialTurretAngle(follower.getPose()));
 
@@ -136,6 +137,14 @@ public abstract class AutonTemplate extends OpMode {
 
         // Enable distance-based auto-aim (velocity + hood from LUT)
         shooter.setAutoAimEnabled(true);
+
+        // Manual turret/shooter control — auto calculations disabled
+        // turret.setTurretAngle(computeInitialTurretAngle(follower.getPose()));
+        // turret.setLimelight(limelight);
+        turret.setTrackingEnabled(false);
+        turret.setTxCorrectionEnabled(false);
+        shooter.setAutoAimEnabled(false);
+
 
         // Schedule the autonomous command
         if (autonomousCommand != null) {
