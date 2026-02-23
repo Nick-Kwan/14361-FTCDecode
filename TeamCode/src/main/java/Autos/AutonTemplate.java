@@ -124,7 +124,7 @@ public abstract class AutonTemplate extends OpMode {
 
         // Enable odometry-based turret tracking with Limelight Tx correction
         turret.setLimelight(limelight);
-        turret.setTrackingEnabled(true);
+        turret.setTrackingEnabled(false);
         turret.setTxCorrectionEnabled(true);
 
         // Schedule the autonomous command

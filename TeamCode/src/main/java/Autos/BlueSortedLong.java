@@ -20,7 +20,7 @@ public class BlueSortedLong extends AutonTemplate {
     private final Pose startPose = new Pose(63.5, 8.5, Math.toRadians(90));
     private final Pose collectControlPoint1 = new Pose(34.5, 20);
     private final Pose collectPose1 = new Pose(16, 10, Math.toRadians(180));
-    private final Pose shootPose1 = new Pose(56, 14, Math.toRadians(110));
+    private final Pose shootPose1 = new Pose(51, 16.5, Math.toRadians(110));
     private final Pose collectControlPoint2 = new Pose(65, 38);
     private final Pose collectPose2 = new Pose(19, 38, Math.toRadians(90));
     private final Pose shootControlPoint2 = new Pose(56, 38);
