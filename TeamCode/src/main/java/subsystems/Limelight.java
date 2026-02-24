@@ -1,6 +1,7 @@
 package subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -22,12 +23,20 @@ public class Limelight extends SubsystemBase {
     private double tx = 0;
     private double ty = 0;
 
+    // Pedro follower for coordinate-consistent pose writes
+    private Follower follower;
+
     // Relocalization state
     private Pose limelightPose = null;
     private String lastRelocDebug = "none";
 
     public Limelight() {
         this.robot = RobotHardware.getInstance();
+    }
+
+    /** Set the Pedro follower for coordinate-consistent relocalization */
+    public void setFollower(Follower follower) {
+        this.follower = follower;
     }
 
     /** Start the Limelight sensor */
@@ -126,8 +135,14 @@ public class Limelight extends SubsystemBase {
             return false;
         }
 
-        robot.pinpoint.setPosition(OdometryConstants.toPose2D(limelightPose));
-        robot.pinpoint.update();
+        if (follower != null) {
+            // Write through Pedro's coordinate system (single source of truth)
+            follower.setStartingPose(limelightPose);
+        } else {
+            // Fallback to raw pinpoint (no follower configured)
+            robot.pinpoint.setPosition(OdometryConstants.toPose2D(limelightPose));
+            robot.pinpoint.update();
+        }
         lastRelocDebug = String.format("APPLIED (%.1f, %.1f)",
                 limelightPose.getX(), limelightPose.getY());
         limelightPose = null;

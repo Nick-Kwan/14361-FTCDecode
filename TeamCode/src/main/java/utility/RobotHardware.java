@@ -166,18 +166,9 @@ public class RobotHardware {
         // Limelight
         limelight = hardwareMap.get(Limelight3A.class, NamingConstants.LIMELIGHT);
 
-        // Pinpoint odometry
+        // Pinpoint odometry — Pedro configures encoder directions, offsets, and IMU reset
+        // in its constructor. Only set yawScalar here (Pedro doesn't configure this).
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, NamingConstants.PINPOINT);
-        pinpoint.setEncoderDirections(
-                GoBildaPinpointDriver.EncoderDirection.FORWARD,
-                GoBildaPinpointDriver.EncoderDirection.FORWARD);
-        pinpoint.setOffsets(1.91661417, 7.13570866, DistanceUnit.INCH); // From PedroPathing Constants
-        pinpoint.resetPosAndIMU();
-        try {
-            Thread.sleep(300); // Wait for IMU calibration
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
         pinpoint.setYawScalar(OdometryConstants.yawScalar);
 
         // LED

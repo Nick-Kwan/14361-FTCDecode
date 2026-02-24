@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 
 import Constants.DriveConstants;
@@ -19,6 +20,7 @@ import Constants.OdometryConstants;
 import Constants.ShooterConstants;
 import Constants.SpindexerConstants;
 import Constants.TurretConstants;
+import pedroPathing.Constants;
 import commands.RelocalizePinpointCommand;
 import commands.ResetPositionCommand;
 import commands.ShootingCommands;
@@ -40,6 +42,7 @@ import utility.TelemetryHelper;
  */
 abstract public class TeleOpTemplate extends CommandOpMode {
     protected RobotHardware robot;
+    protected Follower follower;
     protected MecanumDrive mecanumDrive;
     protected Intake intake;
     protected Shooter shooter;
@@ -69,6 +72,9 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         robot = RobotHardware.getInstance();
         robot.init(hardwareMap, driverGamepad);
 
+        // Create Pedro follower (single source of truth for coordinates)
+        follower = Constants.createFollower(hardwareMap);
+
         // Create subsystems
         mecanumDrive = new MecanumDrive();
         intake = new Intake();
@@ -84,7 +90,7 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         // Configure shooter PID for teleop
         shooter.configureForTeleOp();
 
-        // Set pinpoint starting position from auto handoff or alliance default
+        // Set starting pose through Pedro follower (auto handoff or alliance default)
         Pose startPose;
         if (OdometryConstants.endingAutonPose != null) {
             startPose = OdometryConstants.endingAutonPose;
@@ -93,10 +99,10 @@ abstract public class TeleOpTemplate extends CommandOpMode {
                     ? OdometryConstants.redStartPoint
                     : OdometryConstants.blueStartPoint;
         }
-        robot.pinpoint.setPosition(OdometryConstants.toPose2D(startPose));
-        robot.pinpoint.update();
+        follower.setStartingPose(startPose);
 
-        // Init limelight
+        // Init limelight and wire follower for coordinate-consistent relocalization
+        limelight.setFollower(follower);
         limelight.start();
         limelight.switchPipeline(getGoalPipeline());
 
@@ -200,7 +206,7 @@ abstract public class TeleOpTemplate extends CommandOpMode {
 
         // Dpad Down: Reset pinpoint position to alliance default
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_DOWN)
-            .whenPressed(() -> schedule(new ResetPositionCommand()));
+            .whenPressed(() -> schedule(new ResetPositionCommand(follower)));
 
         // Left bumper: Sorted shooting
         new GamepadButton(driverGamepad, GamepadKeys.Button.LEFT_BUMPER)
@@ -225,11 +231,14 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         // 1. Clear bulk cache (must happen before any hardware reads)
         robot.clearBulkCache();
 
-        // 2. Update pinpoint odometry
-        robot.pinpoint.update();
+        // 2. Update Pedro follower (reads pinpoint through Pedro's coordinate system)
+        follower.update();
 
-        // 3. Cache pose fields for this loop iteration
-        robot.updateCachedPose();
+        // 3. Cache pose from follower (single source of truth for coordinates)
+        Pose currentPose = follower.getPose();
+        robot.cachedPoseX = currentPose.getX();
+        robot.cachedPoseY = currentPose.getY();
+        robot.cachedHeading = currentPose.getHeading();
 
         // 4. Run command scheduler + subsystem periodic() methods
         //    turret.periodic() handles odometry-based tracking
