@@ -44,7 +44,7 @@ public class BlueRelease15 extends AutonTemplate {
 
     @Override
     protected void buildPaths() {
-        follower.setStartingPose(startPose);
+        follower.setStartingPose(super.startPose);
 
         scorePreload = new Path(new BezierLine(startPose, shootOnePose));
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), shootOnePose.getHeading());
@@ -125,6 +125,7 @@ public class BlueRelease15 extends AutonTemplate {
 
     @Override
     public void init() {
+        super.startPose = startPose;
         super.init();
 
         // Configure auto tracking

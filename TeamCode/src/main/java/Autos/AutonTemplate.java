@@ -20,6 +20,7 @@ import subsystems.Limelight;
 import subsystems.Shooter;
 import subsystems.Spindexer;
 import subsystems.Turret;
+import utility.FieldDrawing;
 import utility.RobotHardware;
 
 /**
@@ -63,6 +64,7 @@ public abstract class AutonTemplate extends OpMode {
 
     // Tracking state (managed by updateAutoTracking)
     private Timer llResetTimer;
+    protected Pose startPose = new Pose(-67,-67,Math.toRadians(-67));
 
     /**
      * Subclasses must implement this to build paths.
@@ -106,6 +108,8 @@ public abstract class AutonTemplate extends OpMode {
         // Register subsystems with the command scheduler
         CommandScheduler.getInstance().registerSubsystem(intake, shooter, turret, spindexer, limelight);
 
+        FieldDrawing.init();
+
         // Subclass builds paths (and sets starting pose)
         buildPaths();
 
@@ -115,6 +119,12 @@ public abstract class AutonTemplate extends OpMode {
 
     @Override
     public void init_loop() {
+        follower.updatePose();
+        super.init_loop();
+        follower.setPose(startPose);
+        // Pre-aim turret at goal from starting position
+        turret.setTurretAngle(computeInitialTurretAngle(follower.getPose()));
+        telemetry.addData("init pose", follower.getPose());
     }
 
     @Override
@@ -127,12 +137,10 @@ public abstract class AutonTemplate extends OpMode {
                 ? EnumConstants.AllianceColor.Red : EnumConstants.AllianceColor.Blue;
 
 
-        // Pre-aim turret at goal from starting position
-        turret.setTurretAngle(computeInitialTurretAngle(follower.getPose()));
 
         // Enable odometry-based turret tracking with Limelight Tx correction
         turret.setLimelight(limelight);
-        turret.setTrackingEnabled(true                     );
+        turret.setTrackingEnabled(true);
         turret.setTxCorrectionEnabled(true);
 
         // Enable distance-based auto-aim (velocity + hood from LUT)
@@ -141,9 +149,6 @@ public abstract class AutonTemplate extends OpMode {
         // Manual turret/shooter control — auto calculations disabled
         // turret.setTurretAngle(computeInitialTurretAngle(follower.getPose()));
         // turret.setLimelight(limelight);
-        turret.setTrackingEnabled(false);
-        turret.setTxCorrectionEnabled(false);
-        shooter.setAutoAimEnabled(false);
 
 
         // Schedule the autonomous command
@@ -166,7 +171,7 @@ public abstract class AutonTemplate extends OpMode {
         robotHardware.clearBulkCache();
 
         // Update pinpoint odometry and cache pose for turret tracking
-        robotHardware.pinpoint.update();
+//        robotHardware.pinpoint.update();
         robotHardware.updateCachedPose();
 
         // Update limelight orientation BEFORE scheduler runs periodic()
@@ -180,6 +185,8 @@ public abstract class AutonTemplate extends OpMode {
         if (autoTrackingEnabled) {
             updateAutoTracking();
         }
+
+        FieldDrawing.drawFollowerDebug(follower);
 
         // Telemetry
         if (autonomousCommand != null) {
