@@ -1,23 +1,23 @@
 package commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 
 import Constants.EnumConstants;
 import Constants.FieldMap;
 import Constants.OdometryConstants;
-import com.pedropathing.geometry.Pose;
-
-import utility.RobotHardware;
 
 /**
- * Instant command that resets the pinpoint position to the alliance default start.
+ * Instant command that resets the position to the alliance default start.
+ * Writes through Pedro's Follower so coordinates stay consistent.
  * Used for DPad_Down button binding when position has drifted.
  */
 public class ResetPositionCommand extends CommandBase {
-    private final RobotHardware robot;
+    private final Follower follower;
 
-    public ResetPositionCommand() {
-        this.robot = RobotHardware.getInstance();
+    public ResetPositionCommand(Follower follower) {
+        this.follower = follower;
     }
 
     @Override
@@ -25,8 +25,7 @@ public class ResetPositionCommand extends CommandBase {
         Pose resetPose = (FieldMap.allianceColor == EnumConstants.AllianceColor.Red)
                 ? OdometryConstants.redStartPoint
                 : OdometryConstants.blueStartPoint;
-        robot.pinpoint.setPosition(OdometryConstants.toPose2D(resetPose));
-        robot.pinpoint.update();
+        follower.setStartingPose(resetPose);
     }
 
     @Override

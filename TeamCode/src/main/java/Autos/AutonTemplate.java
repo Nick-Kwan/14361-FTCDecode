@@ -98,7 +98,8 @@ public abstract class AutonTemplate extends OpMode {
         // Init hood for auto
         shooter.setHoodAngle(ShooterConstants.HOOD_POSE_AUTO);
 
-        // Init limelight
+        // Init limelight and wire follower for coordinate-consistent relocalization
+        limelight.setFollower(follower);
         limelight.start();
         limelight.switchPipeline(LimelightConstants.PIPELINE_APRILTAG);
         limelight.resetAprilID();
@@ -138,14 +139,6 @@ public abstract class AutonTemplate extends OpMode {
         // Enable distance-based auto-aim (velocity + hood from LUT)
         shooter.setAutoAimEnabled(true);
 
-        // Manual turret/shooter control — auto calculations disabled
-        // turret.setTurretAngle(computeInitialTurretAngle(follower.getPose()));
-        // turret.setLimelight(limelight);
-        turret.setTrackingEnabled(false);
-        turret.setTxCorrectionEnabled(false);
-        shooter.setAutoAimEnabled(false);
-
-
         // Schedule the autonomous command
         if (autonomousCommand != null) {
             CommandScheduler.getInstance().schedule(autonomousCommand);
@@ -165,9 +158,11 @@ public abstract class AutonTemplate extends OpMode {
         // Clear bulk cache
         robotHardware.clearBulkCache();
 
-        // Update pinpoint odometry and cache pose for turret tracking
-        robotHardware.pinpoint.update();
-        robotHardware.updateCachedPose();
+        // Cache pose from Pedro follower (single source of truth for coordinates)
+        Pose currentPose = follower.getPose();
+        robotHardware.cachedPoseX = currentPose.getX();
+        robotHardware.cachedPoseY = currentPose.getY();
+        robotHardware.cachedHeading = currentPose.getHeading();
 
         // Update limelight orientation BEFORE scheduler runs periodic()
         double yaw = robotHardware.imu.getRobotYawPitchRollAngles().getYaw();

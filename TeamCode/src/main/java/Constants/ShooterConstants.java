@@ -32,27 +32,26 @@ public final class ShooterConstants {
     // TUNE ON ROBOT — these are starting estimates
 
     // Distance-based Velocity LUT: {distance_inches, velocity_power}
-    // Increased by 20 for now
     public static double[][] VELOCITY_DATA = {
-        {20,    0.55},   // Closest possible
-        {60,   0.55},   // ~Ty=15 equivalent
-        {80,   0.57},   // ~Ty=10 equivalent
-        {100,   0.62},   // ~Ty=5 equivalent
-        {120,  0.72},   // ~Ty=0 equivalent
-        {135,  0.76},   // ~Ty=-1.2 equivalent
-        {150,  0.82},   // ~Ty=-2.7 equivalent
+        {0,    0.55},   // Closest possible
+        {40,   0.55},   // ~Ty=15 equivalent
+        {60,   0.57},   // ~Ty=10 equivalent
+        {80,   0.62},   // ~Ty=5 equivalent
+        {100,  0.72},   // ~Ty=0 equivalent
+        {115,  0.76},   // ~Ty=-1.2 equivalent
+        {130,  0.82},   // ~Ty=-2.7 equivalent
         {200,  0.82},   // Fallback for extreme distances
     };
 
     // Distance-based Hood Angle LUT: {distance_inches, hood_servo_position}
     public static double[][] HOOD_DATA = {
-        {20,    0.6},
-        {60,   0.6},
-        {80,   0.52},
-        {100,   0.435},
-        {120,  0.23},
-        {135,  0.22},
-        {150,  0.2},
+        {0,    0.6},
+        {40,   0.6},
+        {60,   0.52},
+        {80,   0.435},
+        {100,  0.23},
+        {115,  0.22},
+        {130,  0.2},
         {200,  0.2},
     };
 }
