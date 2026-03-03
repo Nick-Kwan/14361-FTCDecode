@@ -1,4 +1,4 @@
-package Autos;
+package Autos.Red;
 
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -7,39 +7,42 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import Autos.AutonTemplate;
 import Constants.EnumConstants;
 import Constants.LimelightConstants;
 import Constants.TurretConstants;
 import commands.CommandSequenceBuilder;
 
-@Autonomous(name = "Blue 15 Release", group = "Auto")
-public class BlueRelease15 extends AutonTemplate {
+@Autonomous(name = "Red 15 Release", group = "Red")
+public class RedRelease15 extends AutonTemplate {
 
     // ===== POSES =====
     // Updated from Kwan hkhk commit (d32cdda) for improved path following
-    private final Pose startPose = new Pose(18.5, 114, Math.toRadians(90));
-    private final Pose shootOnePose = new Pose(53.5, 90, Math.toRadians(180));
-    private final Pose collectOnePose = new Pose(46, 62, Math.toRadians(180));
-    private final Pose goCollectOnePose = new Pose(25, 62,Math.toRadians(180));
-    private final Pose shootControlTwoPose = new Pose(46.8, 64.8);
-    private final Pose shootTwoPose = new Pose(54.7, 77.9, Math.toRadians(180));
-    private final Pose releasePose = new Pose(13, 59, Math.toRadians(150));
-    private final Pose releaseControlPose = new Pose(40, 61.3, Math.toRadians(180));
-    private final Pose shootThreePose = new Pose(54.7, 77.9, Math.toRadians(180));
-    private final Pose shootControlThreePose = new Pose(40, 61.3, Math.toRadians(180));
-    private final Pose collectControlTwoPose = new Pose(54, 89);
-    private final Pose collectTwoPose = new Pose(24, 89, Math.toRadians(180));
-    private final Pose shootFourPose = new Pose(57, 89, Math.toRadians(180));
-    private final Pose collectThreePose = new Pose(46, 37, Math.toRadians(180));
-    private final Pose goCollectThreePose = new Pose(23, 37, Math.toRadians(180));
-    private final Pose shootControlFourPose = new Pose(39, 37);
-    private final Pose shootControl2FourPose = new Pose(34, 88);
-    private final Pose shootFivePose = new Pose(61.7, 105.3, Math.toRadians(180));
-    private final Pose parkPose = new Pose(24, 88, Math.toRadians(180));
+    private final Pose startPose = new Pose(125.5, 114, Math.toRadians(90));
+    private final Pose shootOnePose = new Pose(90.5, 90, Math.toRadians(0));
+    private final Pose collectOnePose = new Pose(100, 57, Math.toRadians(0));
+    private final Pose goCollectOnePose = new Pose(119, 57,Math.toRadians(0));
+    private final Pose shootControlTwoPose = new Pose(97.2, 64.8);
+    private final Pose shootTwoPose = new Pose(89.3, 77.9, Math.toRadians(0));
+    private final Pose releasePose = new Pose(123, 59, Math.toRadians(0));
+    private final Pose releaseControlPose = new Pose(106, 59, Math.toRadians(0));
+    private final Pose collectReleasePose = new Pose(129, 53, Math.toRadians(10));
+    //    private final Pose collectReleaseControlPose = new Pose(16, 54, Math.toRadians(90));
+    private final Pose shootThreePose = new Pose(89.3, 77.9, Math.toRadians(0));
+    private final Pose shootControlThreePose = new Pose(104, 61.3, Math.toRadians(0));
+    private final Pose collectControlTwoPose = new Pose(90, 82.5);
+    private final Pose collectTwoPose = new Pose(120, 82.5, Math.toRadians(0));
+    private final Pose shootFourPose = new Pose(87, 89, Math.toRadians(0));
+    private final Pose collectThreePose = new Pose(98, 32.5, Math.toRadians(0));
+    private final Pose goCollectThreePose = new Pose(121, 32.5, Math.toRadians(0));
+    private final Pose shootControlFourPose = new Pose(105, 37);
+    private final Pose shootControl2FourPose = new Pose(110, 88);
+    private final Pose shootFivePose = new Pose(88.3, 105.3, Math.toRadians(0));
+    private final Pose parkPose = new Pose(120, 88, Math.toRadians(0));
 
     // ===== PATHS =====
     private Path scorePreload;
-    private PathChain collectOne, release, scoreOne, collectTwo, goCollectOne, scoreTwo;
+    private PathChain collectOne, release, collectRelease, scoreOne, collectTwo, goCollectOne, scoreTwo;
     private PathChain collectThree, goCollectThree, scoreThree, scoreFour, park;
 
     @Override
@@ -51,33 +54,39 @@ public class BlueRelease15 extends AutonTemplate {
 
         collectOne = follower.pathBuilder()
                 .addPath(new BezierLine(shootOnePose, collectOnePose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
         goCollectOne = follower.pathBuilder()
                 .addPath(new BezierLine(collectOnePose, goCollectOnePose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .addParametricCallback(0.35, () -> spindexer.setPoseThree())
                 .addParametricCallback(0.45, () -> spindexer.setPoseOne())
                 .build();
 
         scoreOne = follower.pathBuilder()
                 .addPath(new BezierCurve(goCollectOnePose, shootControlTwoPose, shootTwoPose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
-                .addParametricCallback(0.8, () -> intake.stopIntaking())
+                .setConstantHeadingInterpolation(Math.toRadians(0))
+//                .addParametricCallback(0.8, () -> intake.stopIntaking())
                 .addParametricCallback(0.9, () -> spindexer.setPoseTwo())
                 .build();
 
         release = follower.pathBuilder()
                 .addPath(new BezierCurve(shootTwoPose,releaseControlPose,releasePose))
                 .setLinearHeadingInterpolation(shootTwoPose.getHeading(),releasePose.getHeading())
-//                .addParametricCallback(0.97, () -> spindexer.setPoseOne())
+                .addParametricCallback(0.5, () -> spindexer.setPoseThree())
+                .build();
+
+        collectRelease = follower.pathBuilder()
+                .addPath(new BezierLine(releasePose,collectReleasePose))
+                .setLinearHeadingInterpolation(releasePose.getHeading(), collectReleasePose.getHeading())
+                .addParametricCallback(0.9, () -> spindexer.setPoseOne())
                 .build();
 
         scoreTwo = follower.pathBuilder()
-                .addPath(new BezierCurve(releasePose,shootControlThreePose,shootThreePose))
-                .setLinearHeadingInterpolation(releasePose.getHeading(), shootThreePose.getHeading())
-                .addParametricCallback(0.05, () -> intake.reverseIntaking())
+                .addPath(new BezierCurve(collectReleasePose,shootControlThreePose,shootThreePose))
+                .setConstantHeadingInterpolation(shootThreePose.getHeading())
+                .addParametricCallback(0.1, () -> intake.reverseIntaking())
                 .addParametricCallback(0.35, () -> intake.startIntaking())
                 .addParametricCallback(0.9, () -> spindexer.setPoseTwo())
                 .build();
@@ -85,41 +94,41 @@ public class BlueRelease15 extends AutonTemplate {
 
         collectTwo = follower.pathBuilder()
                 .addPath(new BezierCurve(shootThreePose, collectControlTwoPose, collectTwoPose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
-                .addParametricCallback(0.5, () -> spindexer.setPoseThree())
-                .addParametricCallback(0.6, () -> spindexer.setPoseOne())
+                .setConstantHeadingInterpolation(Math.toRadians(0))
+                .addParametricCallback(0.58, () -> spindexer.setPoseThree())
+                .addParametricCallback(0.68, () -> spindexer.setPoseOne())
                 .build();
 
 
         scoreThree = follower.pathBuilder()
                 .addPath(new BezierLine(collectTwoPose, shootFourPose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .addParametricCallback(0.6, () -> spindexer.setPoseTwo())
-                .addParametricCallback(0.9, () -> intake.stopIntaking())
+//                .addParametricCallback(0.9, () -> intake.stopIntaking())
                 .build();
 
         collectThree = follower.pathBuilder()
                 .addPath(new BezierLine(shootFourPose, collectThreePose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
         goCollectThree = follower.pathBuilder()
                 .addPath(new BezierLine(collectThreePose, goCollectThreePose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .addParametricCallback(0.33, () -> spindexer.setPoseThree())
                 .addParametricCallback(0.43, () -> spindexer.setPoseOne())
                 .build();
 
         scoreFour = follower.pathBuilder()
                 .addPath(new BezierCurve(goCollectThreePose, shootControlFourPose, shootControl2FourPose, shootFivePose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .addParametricCallback(0.6, () -> spindexer.setPoseTwo())
-                .addParametricCallback(0.9, () -> intake.stopIntaking())
+//                .addParametricCallback(0.9, () -> intake.stopIntaking())
                 .build();
 
         park = follower.pathBuilder()
                 .addPath(new BezierLine(shootFivePose, parkPose))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
     }
 
@@ -129,17 +138,20 @@ public class BlueRelease15 extends AutonTemplate {
         super.init();
 
         // Configure auto tracking
-        goalPipeline = LimelightConstants.PIPELINE_GOAL_BLUE;
+        autoTrackingEnabled = true;
+        goalPipeline = LimelightConstants.PIPELINE_GOAL_RED;
+        aprilTagPipeline = LimelightConstants.PIPELINE_APRILTAG;
         autoTrackingGain = TurretConstants.AUTO_ALIGN_GAIN;
         autoTurretResetPosition = TurretConstants.TURRET_POSE_AUTO;
 
         // Initial turret position
-        turret.setPosition(TurretConstants.TURRET_BLUE_AUTO_POSE);
+        turret.setPosition(TurretConstants.TURRET_RED_AUTO_POSE);
 
         autonomousCommand = new CommandSequenceBuilder(follower, intake, spindexer, limelight, shooter, turret)
                 // Score preload
-                .setShooterVelocity(0.37)
+//                .setShooterVelocity(0.37)
                 .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
+//                .parallel(parallelBuilder -> parallelBuilder.moveTo(scorePreload).delay(2).sortedShoot())
                 .moveTo(scorePreload, 1.0,false)
 
                 // Sorted shoot cycle 1
@@ -160,10 +172,12 @@ public class BlueRelease15 extends AutonTemplate {
                 .intakeStart()
 
                 // Release the gate
-                .moveTo(release,1.0)
-                .delay(0.1)
+                .moveTo(release,1.0,false)
+                .moveTo(collectRelease,1.0,false)
                 .rotateTo(EnumConstants.SpindexerPosition.PoseOne)
-                .delay(0.2)
+//                .delay(0.1)
+//                .rotateTo(EnumConstants.SpindexerPosition.PoseOne)
+//                .delay(0.2)
 //                .delay(0.3)
 
                 // Sorted shoot cycle 2

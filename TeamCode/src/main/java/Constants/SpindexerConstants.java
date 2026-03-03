@@ -1,5 +1,8 @@
 package Constants;
 
+import com.bylazar.configurables.annotations.Configurable;
+
+@Configurable
 public final class SpindexerConstants {
     private SpindexerConstants() {}
 
@@ -13,10 +16,10 @@ public final class SpindexerConstants {
     public static final double LINKAGE_UP = 0;
 
     // Fire state machine timing (ms)
-    public static final long FIRE_TIME_MS = 225;
-    public static final long RETRACT_TIME_MS = 150;
-    public static final long ROTATION_SETTLE_MS = 275;
-    public static final long ROTATION_LONG_SETTLE_MS = 400;
+    public static long FIRE_TIME_MS = 175;
+    public static long RETRACT_TIME_MS = 150;
+    public static long ROTATION_SETTLE_MS = 125;
+    public static long ROTATION_LONG_SETTLE_MS = 380;
 
     // Color sensor thresholds (RGB sum)
     public static final double BALL_PRESENT = 2000;

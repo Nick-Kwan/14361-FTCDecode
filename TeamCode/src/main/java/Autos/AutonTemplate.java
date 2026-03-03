@@ -57,7 +57,7 @@ public abstract class AutonTemplate extends OpMode {
     protected double autoTurretResetPosition = TurretConstants.TURRET_POSE_AUTO;
 
     /** AprilTag pipeline number */
-    protected int aprilTagPipeline = LimelightConstants.PIPELINE_APRILTAG;
+    protected int aprilTagPipeline;
 
     /** Goal-tracking pipeline (2=Red, 3=Blue) — subclass sets in init() */
     protected int goalPipeline = LimelightConstants.PIPELINE_GOAL_BLUE;
@@ -97,14 +97,15 @@ public abstract class AutonTemplate extends OpMode {
         // Configure shooter PID for auto
         shooter.configureForAuto();
 
+
         // Init hood for auto
         shooter.setHoodAngle(ShooterConstants.HOOD_POSE_AUTO);
 
         // Init limelight and wire follower for coordinate-consistent relocalization
         limelight.setFollower(follower);
         limelight.start();
-        limelight.switchPipeline(LimelightConstants.PIPELINE_APRILTAG);
-        limelight.resetAprilID();
+//        limelight.switchPipeline(aprilTagPipeline);
+//        limelight.resetAprilID();
 
         // Register subsystems with the command scheduler
         CommandScheduler.getInstance().registerSubsystem(intake, shooter, turret, spindexer, limelight);
@@ -116,6 +117,8 @@ public abstract class AutonTemplate extends OpMode {
 
         // Connect turret to shooter for distance-based auto-aim
         shooter.setTurret(turret);
+
+
     }
 
     @Override
@@ -123,8 +126,8 @@ public abstract class AutonTemplate extends OpMode {
         follower.updatePose();
         super.init_loop();
         follower.setPose(startPose);
-        // Pre-aim turret at goal from starting position
-        turret.setTurretAngle(computeInitialTurretAngle(follower.getPose()));
+//        // Pre-aim turret at goal from starting position
+//        turret.setTurretAngle(computeInitialTurretAngle(follower.getPose()));
         telemetry.addData("init pose", follower.getPose());
     }
 
@@ -141,11 +144,13 @@ public abstract class AutonTemplate extends OpMode {
 
         // Enable odometry-based turret tracking with Limelight Tx correction
         turret.setLimelight(limelight);
-        turret.setTrackingEnabled(true);
-        turret.setTxCorrectionEnabled(true);
+        turret.setTrackingEnabled(false);
+        turret.setTxCorrectionEnabled(false);
 
         // Enable distance-based auto-aim (velocity + hood from LUT)
         shooter.setAutoAimEnabled(true);
+
+
 
         // Manual turret/shooter control — auto calculations disabled
         // turret.setTurretAngle(computeInitialTurretAngle(follower.getPose()));
@@ -247,14 +252,15 @@ public abstract class AutonTemplate extends OpMode {
      * and enables/disables Tx correction based on whether we're on the goal pipeline.
      */
     private void updateAutoTracking() {
-        int aprilID = limelight.getAprilID();
+        limelight.aprilID = limelight.getAprilID();
 
-        if (aprilID < 20) {
-            limelight.switchPipeline(aprilTagPipeline);
-            turret.setTxCorrectionEnabled(false);  // Not on goal pipeline
-        } else if (aprilID > 20) {
+        if (limelight.aprilID == 21 || limelight.aprilID == 22 || limelight.aprilID == 23) {
             limelight.switchPipeline(goalPipeline);
-            turret.setTxCorrectionEnabled(true);   // On goal pipeline, enable correction
+            turret.setTrackingEnabled(true);
+            turret.setTxCorrectionEnabled(true);  // Not on goal pipeline
+        }
+        else {
+            limelight.switchPipeline(aprilTagPipeline);
         }
     }
 

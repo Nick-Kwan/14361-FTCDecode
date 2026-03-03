@@ -1,4 +1,4 @@
-package Autos;
+package Autos.Blue;
 
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -7,12 +7,13 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import Autos.AutonTemplate;
 import Constants.EnumConstants;
 import Constants.LimelightConstants;
 import Constants.TurretConstants;
 import commands.CommandSequenceBuilder;
 
-@Autonomous(name = "Blue 12 Release", group = "Auto")
+@Autonomous(name = "Blue 12 Release", group = "Blue")
 public class BlueRelease12 extends AutonTemplate {
 
     // ===== POSES =====
@@ -114,6 +115,7 @@ public class BlueRelease12 extends AutonTemplate {
 
         // Configure auto tracking
         goalPipeline = LimelightConstants.PIPELINE_GOAL_BLUE;
+        aprilTagPipeline = LimelightConstants.PIPELINE_APRILTAG;
         autoTrackingGain = TurretConstants.AUTO_ALIGN_GAIN;
         autoTurretResetPosition = TurretConstants.TURRET_POSE_AUTO;
 

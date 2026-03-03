@@ -124,10 +124,11 @@ public class Shooter extends SubsystemBase {
     /** Configure PID for autonomous mode */
     public void configureForAuto() {
         robot.shooterMotors.setVeloCoefficients(
-            ShooterConstants.AUTO_VELO_P,
+            ShooterConstants.SHOOT_P,
             ShooterConstants.SHOOT_I,
             ShooterConstants.SHOOT_D
         );
+        robot.shooterMotors.setFeedforwardCoefficients(0,ShooterConstants.SHOOT_V);
     }
 
     // ==================== Periodic ====================
@@ -138,4 +139,6 @@ public class Shooter extends SubsystemBase {
             updateFromDistance();
         }
     }
+
+
 }

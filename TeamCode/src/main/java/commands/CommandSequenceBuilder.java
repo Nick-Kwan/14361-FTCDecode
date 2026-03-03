@@ -129,8 +129,8 @@ public class CommandSequenceBuilder {
     }
 
     /** No-sorting red: fixed order 1→2→3 */
-    public CommandSequenceBuilder noSortingRed() {
-        commands.add(ShootingCommands.noSortingRed(spindexer));
+    public CommandSequenceBuilder noSortingOne() {
+        commands.add(ShootingCommands.noSortingOne(spindexer));
         return this;
     }
 
@@ -267,6 +267,10 @@ public class CommandSequenceBuilder {
             parallelCommands.add(ShootingCommands.shootAll(spindexer));
             return this;
         }
+        public ParallelBuilder sortedShoot() {
+            parallelCommands.add(new SortedShootCommand(spindexer, limelight));
+            return this;
+        }
         public ParallelBuilder intakeStart() {
             parallelCommands.add(new IntakeStartCommand(intake));
             return this;
@@ -279,10 +283,18 @@ public class CommandSequenceBuilder {
             parallelCommands.add(new WaitCommand((long)(seconds * 1000)));
             return this;
         }
+
+        public ParallelBuilder rotateTo(SpindexerPosition position) {
+            parallelCommands.add(new RotateToCommand(spindexer, position));
+            return this;
+        }
+
+
         public ParallelBuilder addCommand(Command command) {
             parallelCommands.add(command);
             return this;
         }
+
 
         ParallelCommandGroup build() {
             return new ParallelCommandGroup(parallelCommands.toArray(new Command[0]));

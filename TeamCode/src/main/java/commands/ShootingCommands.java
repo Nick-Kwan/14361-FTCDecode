@@ -69,15 +69,28 @@ public class ShootingCommands {
     public static Command shootFromCurrent(Spindexer spindexer,
                                             SpindexerPosition poseB,
                                             SpindexerPosition poseC) {
-        return new SequentialCommandGroup(
-            new FireCommand(spindexer),
-            new RotateToCommand(spindexer, poseB),
-            new WaitCommand(SpindexerConstants.ROTATION_SETTLE_MS),
-            new FireCommand(spindexer),
-            new RotateToCommand(spindexer, poseC),
-            new WaitCommand(SpindexerConstants.ROTATION_LONG_SETTLE_MS),
-            new FireCommand(spindexer)
-        );
+        if (poseB == SpindexerPosition.PoseOne || poseB == SpindexerPosition.PoseThree){
+            return new SequentialCommandGroup(
+                    new FireCommand(spindexer),
+                    new RotateToCommand(spindexer, poseB),
+                    new WaitCommand(SpindexerConstants.ROTATION_SETTLE_MS),
+                    new FireCommand(spindexer),
+                    new RotateToCommand(spindexer, poseC),
+                    new WaitCommand(SpindexerConstants.ROTATION_LONG_SETTLE_MS),
+                    new FireCommand(spindexer)
+            );
+        }
+        else {
+            return new SequentialCommandGroup(
+                    new FireCommand(spindexer),
+                    new RotateToCommand(spindexer, poseB),
+                    new WaitCommand(SpindexerConstants.ROTATION_SETTLE_MS),
+                    new FireCommand(spindexer),
+                    new RotateToCommand(spindexer, poseC),
+                    new WaitCommand(SpindexerConstants.ROTATION_SETTLE_MS),
+                    new FireCommand(spindexer)
+            );
+        }
     }
 
     /**
@@ -116,7 +129,7 @@ public class ShootingCommands {
     /**
      * No-sorting red auto: fixed order 1→2→3 (matches old noSortingRed()).
      */
-    public static Command noSortingRed(Spindexer spindexer) {
+    public static Command noSortingOne(Spindexer spindexer) {
         return shootAtThreePoses(spindexer,
             SpindexerPosition.PoseOne, SpindexerPosition.PoseTwo, SpindexerPosition.PoseThree);
     }

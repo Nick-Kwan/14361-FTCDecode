@@ -29,8 +29,8 @@ public final class TurretConstants {
     public static double TX_CORRECTION_MAX = 5.0;         // Max correction magnitude (degrees)
 
     // Alliance-specific tracking offset (degrees) — tune on robot
-public static double BLUE_TURRET_TRACKING_OFFSET = 2.0;
-    public static double RED_TURRET_TRACKING_OFFSET = -2.0;
+    public static double BLUE_TURRET_TRACKING_OFFSET = -3;
+    public static double RED_TURRET_TRACKING_OFFSET = -4;
 
     // ==================== Legacy Constants (used by AutonTemplate) ====================
 
@@ -40,8 +40,8 @@ public static double BLUE_TURRET_TRACKING_OFFSET = 2.0;
     // Auto turret servo positions
     public static final double TURRET_POSE_AUTO = 0.8;
     public static final double TURRET_POSE_AUTO_LONG = 0.33;
-    public static final double TURRET_BLUE_AUTO_POSE = 1;
-    public static final double TURRET_RED_AUTO_POSE = 0.0;
+    public static final double TURRET_BLUE_AUTO_POSE = 0.9;
+    public static final double TURRET_RED_AUTO_POSE = 0.1;
 
     // Proportional tracking gains (used by auto Tx-based tracking)
     public static final double TELEOP_GAIN = 1.0 / 600;

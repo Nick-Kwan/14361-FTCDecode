@@ -76,7 +76,7 @@ public class SortedShootCommand extends CommandBase {
      * "twoBlue" = ball at PoseTwo is purple, "oneBlue" = ball at PoseOne is purple.
      */
     private static Command buildFromSensors(Spindexer spindexer, Limelight limelight) {
-        int aprilID = limelight.getAprilID();
+        int aprilID = limelight.aprilID;
         boolean twoIsPurple = spindexer.isBlueGreaterThanGreenAtTwo();
         boolean oneIsPurple = spindexer.isBlueGreaterThanGreenAtOne();
 
