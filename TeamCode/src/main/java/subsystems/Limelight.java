@@ -11,6 +11,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.List;
 
+import Constants.EnumConstants;
+import Constants.FieldMap;
 import Constants.LimelightConstants;
 import Constants.OdometryConstants;
 import utility.RobotHardware;
@@ -131,6 +133,10 @@ public class Limelight extends SubsystemBase {
      */
     public boolean relocalizePinpoint() {
         if (limelightPose == null) {
+            Pose resetPose = (FieldMap.allianceColor == EnumConstants.AllianceColor.Red)
+                    ? OdometryConstants.redStartPoint
+                    : OdometryConstants.blueStartPoint;
+            follower.setStartingPose(resetPose);
             lastRelocDebug = "no limelight pose cached";
             return false;
         }
