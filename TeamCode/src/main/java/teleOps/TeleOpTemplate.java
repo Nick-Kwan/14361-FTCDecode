@@ -12,6 +12,10 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+
 import Constants.DriveConstants;
 import Constants.EnumConstants;
 import Constants.FieldMap;
@@ -72,7 +76,14 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         robot = RobotHardware.getInstance();
         robot.init(hardwareMap, driverGamepad);
 
+        // Snapshot the raw Pinpoint position BEFORE Pedro follower creation.
+        // The Pinpoint hardware retains its accumulated position from auton,
+        // but Pedro's PinpointLocalizer constructor overwrites it with (0,0,0).
+        robot.pinpoint.update();
+        Pose2D rawPinpointPose = robot.pinpoint.getPosition();
+
         // Create Pedro follower (single source of truth for coordinates)
+        // NOTE: This resets the pinpoint position internally via setStartPose(default)
         follower = Constants.createFollower(hardwareMap);
 
         // Create subsystems
@@ -91,9 +102,20 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         shooter.configureForTeleOp();
 
         // Set starting pose through Pedro follower (auto handoff or alliance default)
+        // Priority: 1) static variable from auton stop()
+        //           2) raw pinpoint position retained from auton hardware
+        //           3) alliance default corner
         Pose startPose;
         if (OdometryConstants.endingAutonPose != null) {
             startPose = OdometryConstants.endingAutonPose;
+            OdometryConstants.endingAutonPose = null;
+        } else if (Math.abs(rawPinpointPose.getX(DistanceUnit.INCH)) > 1
+                || Math.abs(rawPinpointPose.getY(DistanceUnit.INCH)) > 1) {
+            // Pinpoint retained a non-origin position from auton
+            startPose = new Pose(
+                    rawPinpointPose.getX(DistanceUnit.INCH),
+                    rawPinpointPose.getY(DistanceUnit.INCH),
+                    rawPinpointPose.getHeading(AngleUnit.RADIANS));
         } else {
             startPose = (getAllianceColor() == EnumConstants.AllianceColor.Red)
                     ? OdometryConstants.redStartPoint
@@ -206,7 +228,7 @@ abstract public class TeleOpTemplate extends CommandOpMode {
 
         // Dpad Down: Reset pinpoint position to alliance default
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_DOWN)
-            .whenPressed(() -> schedule(new ResetPositionCommand(follower)));
+            .whenPressed(new ResetPositionCommand(follower));
 
         // Left bumper: Sorted shooting
         new GamepadButton(driverGamepad, GamepadKeys.Button.LEFT_BUMPER)
