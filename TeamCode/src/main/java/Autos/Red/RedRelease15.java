@@ -20,8 +20,8 @@ public class RedRelease15 extends AutonTemplate {
     // Updated from Kwan hkhk commit (d32cdda) for improved path following
     private final Pose startPose = new Pose(125.5, 114, Math.toRadians(90));
     private final Pose shootOnePose = new Pose(90.5, 90, Math.toRadians(0));
-    private final Pose collectOnePose = new Pose(100, 57, Math.toRadians(0));
-    private final Pose goCollectOnePose = new Pose(119, 57,Math.toRadians(0));
+    private final Pose collectOnePose = new Pose(100, 62, Math.toRadians(0));
+    private final Pose goCollectOnePose = new Pose(125, 62,Math.toRadians(0));
     private final Pose shootControlTwoPose = new Pose(97.2, 64.8);
     private final Pose shootTwoPose = new Pose(89.3, 77.9, Math.toRadians(0));
     private final Pose releasePose = new Pose(123, 59, Math.toRadians(0));
@@ -33,8 +33,8 @@ public class RedRelease15 extends AutonTemplate {
     private final Pose collectControlTwoPose = new Pose(90, 82.5);
     private final Pose collectTwoPose = new Pose(120, 82.5, Math.toRadians(0));
     private final Pose shootFourPose = new Pose(87, 89, Math.toRadians(0));
-    private final Pose collectThreePose = new Pose(98, 32.5, Math.toRadians(0));
-    private final Pose goCollectThreePose = new Pose(121, 32.5, Math.toRadians(0));
+    private final Pose collectThreePose = new Pose(98, 38, Math.toRadians(0));
+    private final Pose goCollectThreePose = new Pose(121, 38, Math.toRadians(0));
     private final Pose shootControlFourPose = new Pose(105, 37);
     private final Pose shootControl2FourPose = new Pose(110, 88);
     private final Pose shootFivePose = new Pose(88.3, 105.3, Math.toRadians(0));
@@ -60,8 +60,8 @@ public class RedRelease15 extends AutonTemplate {
         goCollectOne = follower.pathBuilder()
                 .addPath(new BezierLine(collectOnePose, goCollectOnePose))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addParametricCallback(0.35, () -> spindexer.setPoseThree())
-                .addParametricCallback(0.45, () -> spindexer.setPoseOne())
+                .addParametricCallback(0.3, () -> spindexer.setPoseOne())
+                .addParametricCallback(0.4, () -> spindexer.setPoseThree())
                 .build();
 
         scoreOne = follower.pathBuilder()
@@ -86,7 +86,7 @@ public class RedRelease15 extends AutonTemplate {
         scoreTwo = follower.pathBuilder()
                 .addPath(new BezierCurve(collectReleasePose,shootControlThreePose,shootThreePose))
                 .setConstantHeadingInterpolation(shootThreePose.getHeading())
-                .addParametricCallback(0.1, () -> intake.reverseIntaking())
+                .addParametricCallback(0.2, () -> intake.reverseIntaking())
                 .addParametricCallback(0.35, () -> intake.startIntaking())
                 .addParametricCallback(0.9, () -> spindexer.setPoseTwo())
                 .build();
@@ -115,8 +115,8 @@ public class RedRelease15 extends AutonTemplate {
         goCollectThree = follower.pathBuilder()
                 .addPath(new BezierLine(collectThreePose, goCollectThreePose))
                 .setConstantHeadingInterpolation(Math.toRadians(0))
-                .addParametricCallback(0.33, () -> spindexer.setPoseThree())
-                .addParametricCallback(0.43, () -> spindexer.setPoseOne())
+                .addParametricCallback(0.28, () -> spindexer.setPoseOne())
+                .addParametricCallback(0.38, () -> spindexer.setPoseThree())
                 .build();
 
         scoreFour = follower.pathBuilder()
@@ -157,12 +157,13 @@ public class RedRelease15 extends AutonTemplate {
                 // Sorted shoot cycle 1
 //                .delay(0.5)
                 .sortedShoot()
-                .rotateTo(EnumConstants.SpindexerPosition.PoseThree)
+                .rotateTo(EnumConstants.SpindexerPosition.PoseOne)
                 .intakeStart()
 
                 // Collect 1
                 .moveTo(collectOne, 1.0,false)
                 .moveTo(goCollectOne, 0.35,false)
+                .delay(0.3)
 
                 .moveTo(scoreOne, 1.0,false)
 //                .intakeStop()
@@ -174,6 +175,7 @@ public class RedRelease15 extends AutonTemplate {
                 // Release the gate
                 .moveTo(release,1.0,false)
                 .moveTo(collectRelease,1.0,false)
+                .delay(0.3)
                 .rotateTo(EnumConstants.SpindexerPosition.PoseOne)
 //                .delay(0.1)
 //                .rotateTo(EnumConstants.SpindexerPosition.PoseOne)
@@ -197,7 +199,7 @@ public class RedRelease15 extends AutonTemplate {
 //                .intakeStop()
                 .delay(0.1)
                 .sortedShoot()
-                .rotateTo(EnumConstants.SpindexerPosition.PoseThree)
+                .rotateTo(EnumConstants.SpindexerPosition.PoseOne)
                 .intakeStart()
 
                 // Collect 3

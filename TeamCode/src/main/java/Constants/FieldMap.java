@@ -13,6 +13,10 @@ public final class FieldMap {
     public static EnumConstants.AllianceColor allianceColor = EnumConstants.AllianceColor.Blue;
 
     /** Get the goal position for the current alliance */
+
+    public static EnumConstants.AllianceColor getAlliance() {
+        return allianceColor;
+    }
     public static Pose getGoalPosition() {
         if (allianceColor == EnumConstants.AllianceColor.Red) {
             return new Pose(OdometryConstants.RED_GOAL_X, OdometryConstants.RED_GOAL_Y, 0);

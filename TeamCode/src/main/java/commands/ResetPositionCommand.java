@@ -22,18 +22,18 @@ public class ResetPositionCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        Pose resetPose;
-        if (FieldMap.allianceColor == EnumConstants.AllianceColor.Red){
-            resetPose = OdometryConstants.redStartPoint;
-        }
-        else {
-            resetPose = OdometryConstants.blueStartPoint;
-        }
-//        Pose resetPose = (FieldMap.allianceColor == EnumConstants.AllianceColor.Red)
-//                ? OdometryConstants.redStartPoint
-//                : OdometryConstants.blueStartPoint;
+//        Pose resetPose;
+//        if (FieldMap.allianceColor == EnumConstants.AllianceColor.Red){
+//            resetPose = OdometryConstants.redStartPoint;
+//        }
+//        else {
+//            resetPose = OdometryConstants.blueStartPoint;
+//        }
+        Pose resetPose = (FieldMap.allianceColor == EnumConstants.AllianceColor.Red)
+                ? OdometryConstants.redStartPoint
+                : OdometryConstants.blueStartPoint;
 //        OdometryConstants.endingAutonPose = resetPose;
-        follower.setStartingPose(resetPose);
+        follower.setPose(resetPose);
     }
 
     @Override

@@ -37,7 +37,7 @@ public class RelocalizePinpointCommand extends CommandBase {
     @Override
     public void initialize() {
         // Center turret so Limelight has a clear view for AprilTag scan
-        turret.setPosition(0.5);
+//        turret.setPosition(0.5);
         limelight.switchToLocalizationPipeline();
         timer.reset();
         success = false;

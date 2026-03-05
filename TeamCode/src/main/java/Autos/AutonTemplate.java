@@ -211,6 +211,7 @@ public abstract class AutonTemplate extends OpMode {
             Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("Spindexer", spindexer.getCurrentPosition());
         telemetry.addData("April ID", limelight.getAprilID());
+        telemetry.addData("Al Color", FieldMap.getAlliance());
         telemetry.addData("Flick State", spindexer.getFlickState());
         telemetry.addData("LL Valid", limelight.isValid());
         telemetry.addData("Tx", "%.2f", limelight.getTx());
@@ -252,10 +253,12 @@ public abstract class AutonTemplate extends OpMode {
      * and enables/disables Tx correction based on whether we're on the goal pipeline.
      */
     private void updateAutoTracking() {
-        limelight.aprilID = limelight.getAprilID();
+        Limelight.aprilID = limelight.getAprilID();
 
-        if (limelight.aprilID == 21 || limelight.aprilID == 22 || limelight.aprilID == 23) {
-            limelight.switchPipeline(goalPipeline);
+        if (Limelight.aprilID == 21 || Limelight.aprilID == 22 || Limelight.aprilID == 23) {
+            if (limelight.getLatestResult().getPipelineIndex() != goalPipeline) {
+                limelight.switchPipeline(goalPipeline);
+            }
             turret.setTrackingEnabled(true);
             turret.setTxCorrectionEnabled(true);  // Not on goal pipeline
         }

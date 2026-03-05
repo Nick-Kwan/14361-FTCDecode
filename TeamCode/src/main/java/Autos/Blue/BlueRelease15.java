@@ -149,13 +149,10 @@ public class BlueRelease15 extends AutonTemplate {
 
         autonomousCommand = new CommandSequenceBuilder(follower, intake, spindexer, limelight, shooter, turret)
                 // Score preload
-//                .setShooterVelocity(0.37)
                 .rotateTo(EnumConstants.SpindexerPosition.PoseTwo)
-//                .parallel(parallelBuilder -> parallelBuilder.moveTo(scorePreload).delay(2).sortedShoot())
                 .moveTo(scorePreload, 1.0,false)
 
                 // Sorted shoot cycle 1
-//                .delay(0.5)
                 .sortedShoot()
                 .rotateTo(EnumConstants.SpindexerPosition.PoseThree)
                 .intakeStart()
@@ -164,8 +161,8 @@ public class BlueRelease15 extends AutonTemplate {
                 .moveTo(collectOne, 1.0,false)
                 .moveTo(goCollectOne, 0.35,false)
 
+                // Sorted shoot cycle 2
                 .moveTo(scoreOne, 1.0,false)
-//                .intakeStop()
                 .delay(0.1)
                 .sortedShoot()
                 .rotateTo(EnumConstants.SpindexerPosition.PoseThree)

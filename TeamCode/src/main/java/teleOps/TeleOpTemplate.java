@@ -15,6 +15,7 @@ import com.pedropathing.geometry.Pose;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import Constants.DriveConstants;
 import Constants.EnumConstants;
@@ -268,7 +269,8 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         super.run();
 
         // 5. Update limelight orientation with cached heading
-        limelight.updateOrientation(Math.toDegrees(robot.cachedHeading));
+        double turretDegreeOffset = (turret.getPosition()-0.5)*141;
+        limelight.updateOrientation(Math.toDegrees(robot.cachedHeading) + turretDegreeOffset);
 
         // 6. Telemetry
         telemetryHelper.update(telemetry, shooter, turret, spindexer, limelight);
@@ -277,6 +279,10 @@ abstract public class TeleOpTemplate extends CommandOpMode {
                 Math.toDegrees(robot.cachedHeading));
         telemetry.addData("Distance", "%.1f in", shooter.getLastDistance());
         telemetry.addData("Turret Deg", "%.1f", turret.getCurrentTargetDegrees());
+        Pose3D llposeez = limelight.getLatestResult().getBotpose();
+        Pose3D llpose = limelight.getLatestResult().getBotpose_MT2();
+        telemetry.addData("Limelight Pose MT1", "%.1f, %.1f, %.1f", (llposeez.getPosition().x+(72*(1.0/LimelightConstants.METERS_TO_INCHES))) * LimelightConstants.METERS_TO_INCHES, (llposeez.getPosition().y+(72*(1.0/LimelightConstants.METERS_TO_INCHES))) * LimelightConstants.METERS_TO_INCHES, llposeez.getOrientation().getYaw(AngleUnit.DEGREES) + 180);
+        telemetry.addData("Limelight Pose MT2", "%.1f, %.1f, %.1f", (llpose.getPosition().x+(72*(1.0/LimelightConstants.METERS_TO_INCHES))) * LimelightConstants.METERS_TO_INCHES, (llpose.getPosition().y+(72*(1.0/LimelightConstants.METERS_TO_INCHES))) * LimelightConstants.METERS_TO_INCHES, llpose.getOrientation().getYaw(AngleUnit.DEGREES) + 180);
         telemetry.addData("Out of Range", turret.isTargetOutOfRange());
         telemetry.addData("Tx Correction", "%.2f", turret.getLastTxCorrection());
         telemetry.addData("Reloc", limelight.getLastRelocDebug());

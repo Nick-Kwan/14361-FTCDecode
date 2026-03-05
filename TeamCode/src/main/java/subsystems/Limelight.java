@@ -100,7 +100,7 @@ public class Limelight extends SubsystemBase {
         LLResult result = robot.limelight.getLatestResult();
         if (result != null && result.isValid()
                 && !result.getFiducialResults().isEmpty()) {
-            Pose3D botpose = result.getBotpose();
+            Pose3D botpose = result.getBotpose_MT2();
             if (botpose != null) {
                 // Convert from meters to inches
                 double xInches = botpose.getPosition().x * LimelightConstants.METERS_TO_INCHES;
