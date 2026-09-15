@@ -10,8 +10,8 @@ public final class EnumConstants {
         Idle, Start, Extended, Retracted
     }
 
-    public enum SpindexerPosition {
-        PoseOne, PoseTwo, PoseThree
+    public enum SpindexerState {
+        IDLE, SPINNING, ALIGNED, FLIPPING, RETRACTING, COOLDOWN
     }
 
     public enum IntakeState {

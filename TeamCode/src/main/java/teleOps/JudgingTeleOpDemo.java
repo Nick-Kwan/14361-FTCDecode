@@ -11,13 +11,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import Constants.DriveConstants;
-import Constants.EnumConstants;
 import Constants.LimelightConstants;
 import Constants.ShooterConstants;
-import Constants.SpindexerConstants;
 import Constants.TurretConstants;
 import commands.ShootingCommands;
-import commands.SortedShootCommand;
 import subsystems.Intake;
 import subsystems.Limelight;
 import subsystems.Shooter;
@@ -38,10 +35,9 @@ import utility.TelemetryHelper;
  * - Right trigger: Deploy intake and start intaking
  * - Right bumper: Reverse intake
  * - A button: Manual single-shot (linkage up/down)
- * - Y button: Shoot all 3 balls from current position
- * - Left bumper: Sorted shooting
- * - DpadLeft/Right: Rotate spindexer
- * - DpadUp: Go to pose 2
+ * - Y button: Shoot all 4 slots
+ * - Left bumper: Shoot all 4 slots
+ * - DpadLeft/Right/Up: Advance spindexer one slot
  * - PS button: Reset IMU yaw
  */
 @TeleOp(name = "Judging Demo", group = "Tuning")
@@ -58,10 +54,6 @@ public class JudgingTeleOpDemo extends CommandOpMode {
     // Limelight tracking state
     private boolean wasTrackingValid = false;
     private ElapsedTime llResetTimer;
-
-    // Auto-intake distribution timing
-    private boolean autoIntakeReady = true;
-    private ElapsedTime autoIntakeTimer;
 
     @Override
     public void initialize() {
@@ -89,15 +81,11 @@ public class JudgingTeleOpDemo extends CommandOpMode {
         // Init turret to center
         turret.center();
 
-        // Init spindexer to pose 1
-        spindexer.setPoseOne();
-
         // Init hood to mid
         shooter.setHoodAngle(ShooterConstants.HOOD_POSE_MID);
 
         // Timers
         llResetTimer = new ElapsedTime();
-        autoIntakeTimer = new ElapsedTime();
 
         // Register subsystems with the command scheduler
         register(intake, shooter, spindexer, turret, limelight);
@@ -119,20 +107,11 @@ public class JudgingTeleOpDemo extends CommandOpMode {
         new Trigger(() -> gamepad1.ps)
             .whenActive(new InstantCommand(() -> robot.imu.resetYaw()));
 
-        // Right trigger: Intake deploy + start + auto-intake distribution
+        // Right trigger: Intake deploy + start
         new Trigger(() -> gamepad1.right_trigger > DriveConstants.TRIGGER_THRESHOLD)
             .whenActive(() -> {
                 intake.startIntaking();
                 intake.deploy();
-                // Auto-intake distribution on a 300ms interval
-                if (autoIntakeReady) {
-                    autoIntakeReady = false;
-                    autoIntakeTimer.reset();
-                    spindexer.autoIntake();
-                }
-                if (autoIntakeTimer.milliseconds() >= SpindexerConstants.AUTO_INTAKE_INTERVAL_MS) {
-                    autoIntakeReady = true;
-                }
             })
             .whenInactive(() -> {
                 intake.stopIntaking();
@@ -155,41 +134,25 @@ public class JudgingTeleOpDemo extends CommandOpMode {
             .whenPressed(new InstantCommand(spindexer::linkageUp))
             .whenReleased(new InstantCommand(spindexer::linkageDown));
 
-        // Y button: Shoot all 3 balls from current position
+        // Y button: Shoot all 4 slots sequentially
         new GamepadButton(driverGamepad, GamepadKeys.Button.Y)
-            .whenPressed(() -> schedule(ShootingCommands.shootAll(spindexer)));
+            .whenPressed(() -> schedule(ShootingCommands.shootAllSlots(spindexer)));
 
-        // Dpad Left: Rotate spindexer left (touch sensor guarded)
+        // Dpad Left: Advance spindexer one slot
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_LEFT)
-            .whenPressed(new InstantCommand(() -> {
-                if (!spindexer.getTouchSensorState()) {
-                    spindexer.rotateLeft();
-                }
-            }));
+            .whenPressed(new InstantCommand(spindexer::advanceSlot));
 
-        // Dpad Right: Rotate spindexer right (touch sensor guarded)
+        // Dpad Right: Advance spindexer one slot (CR servo is unidirectional)
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_RIGHT)
-            .whenPressed(new InstantCommand(() -> {
-                if (!spindexer.getTouchSensorState()) {
-                    spindexer.rotateRight();
-                }
-            }));
+            .whenPressed(new InstantCommand(spindexer::advanceSlot));
 
-        // Dpad Up: Go to pose 2
+        // Dpad Up: Advance spindexer one slot
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_UP)
-            .whenPressed(new InstantCommand(spindexer::setPoseTwo));
+            .whenPressed(new InstantCommand(spindexer::advanceSlot));
 
-        // Left bumper: Sorted shooting
+        // Left bumper: Shoot all 4 slots
         new GamepadButton(driverGamepad, GamepadKeys.Button.LEFT_BUMPER)
-            .whenPressed(() -> {
-                if (spindexer.getCurrentPosition() == EnumConstants.SpindexerPosition.PoseTwo) {
-                    schedule(SortedShootCommand.build(spindexer, limelight));
-                } else {
-                    spindexer.setPoseTwo();
-                    // No delay needed - sorted shoot will execute when ready
-                    schedule(SortedShootCommand.build(spindexer, limelight));
-                }
-            });
+            .whenPressed(() -> schedule(ShootingCommands.shootAllSlots(spindexer)));
     }
 
     @Override
@@ -217,8 +180,8 @@ public class JudgingTeleOpDemo extends CommandOpMode {
         telemetry.addLine("Controls:");
         telemetry.addLine("  RT: Intake | RB: Reverse");
         telemetry.addLine("  A: Fire (hold) | Y: Shoot All");
-        telemetry.addLine("  LB: Sorted Shoot");
-        telemetry.addLine("  D-Pad: Rotate Spindexer");
+        telemetry.addLine("  LB: Shoot All");
+        telemetry.addLine("  D-Pad: Advance Spindexer Slot");
     }
 
     private void updateLimelightTracking() {

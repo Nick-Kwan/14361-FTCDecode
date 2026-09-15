@@ -8,6 +8,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -60,7 +61,7 @@ public class RobotHardware {
     public ServoImplEx turretServo;
 
     // Spindexer
-    public Servo spindexerServo;
+    public CRServo spindexerCRServo;
     public Servo spindexerLinkageServo;
     public DigitalChannel touchSensor;
     public DigitalChannel magneticLimitSensor;
@@ -145,7 +146,8 @@ public class RobotHardware {
         turretServo.setPwmRange(new PwmControl.PwmRange(500, 2500)); // Full range for Axon servo
 
         // Spindexer
-        spindexerServo = hardwareMap.servo.get(NamingConstants.SPINDEXER_SERVO);
+        spindexerCRServo = hardwareMap.get(CRServo.class, NamingConstants.SPINDEXER_CR_SERVO);
+        spindexerCRServo.setPower(0);
         spindexerLinkageServo = hardwareMap.servo.get(NamingConstants.SPINDEXER_LINKAGE_SERVO);
         spindexerLinkageServo.setPosition(SpindexerConstants.LINKAGE_DOWN);
 

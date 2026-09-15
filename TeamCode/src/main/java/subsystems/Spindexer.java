@@ -7,217 +7,154 @@ import utility.RobotHardware;
 import Constants.SpindexerConstants;
 import Constants.EnumConstants;
 
+/**
+ * Spindexer subsystem for a 4-slot continuous-rotation design.
+ *
+ * Hardware:
+ *   - 1 Axon MAX v2 CR Servo (continuous rotation) for spinning the carousel
+ *   - 1 stationary Hall Effect / magnetic limit sensor for slot alignment
+ *   - 1 flipper (linkage) servo to push balls upward
+ *
+ * State machine flow (runs in periodic()):
+ *   IDLE → [advanceSlot()] → SPINNING → [magnet detected] → ALIGNED
+ *     → FLIPPING (linkageUp) → RETRACTING (linkageDown) → COOLDOWN (debounce) → IDLE
+ *
+ * The full index cycle (spin → align → flip → retract → cooldown) runs automatically
+ * once advanceSlot() is called. Each cycle services one slot.
+ */
 public class Spindexer extends SubsystemBase {
     private final RobotHardware robot;
 
-    // Current position tracking
-    private EnumConstants.SpindexerPosition currentPosition = EnumConstants.SpindexerPosition.PoseOne;
+    // State machine
+    private EnumConstants.SpindexerState state = EnumConstants.SpindexerState.IDLE;
+    private final ElapsedTime stateTimer = new ElapsedTime();
 
-    // FlickState machine for linkage servo (fire cycle: up -> wait -> down)
-    private EnumConstants.FlickState flickState = EnumConstants.FlickState.Idle;
-    private final ElapsedTime flickTimer = new ElapsedTime();
+    // Slot tracking (0-based, wraps at SLOT_COUNT)
+    private int currentSlot = 0;
+    private int slotsIndexed = 0;
 
     public Spindexer() {
         this.robot = RobotHardware.getInstance();
     }
 
-    // ==================== POSITION CONTROL ====================
-
-    public void setPoseOne() {
-        robot.spindexerServo.setPosition(SpindexerConstants.POSE_ONE);
-        currentPosition = EnumConstants.SpindexerPosition.PoseOne;
-    }
-
-    public void setPoseTwo() {
-        robot.spindexerServo.setPosition(SpindexerConstants.POSE_TWO);
-        currentPosition = EnumConstants.SpindexerPosition.PoseTwo;
-    }
-
-    public void setPoseThree() {
-        robot.spindexerServo.setPosition(SpindexerConstants.POSE_THREE);
-        currentPosition = EnumConstants.SpindexerPosition.PoseThree;
-    }
+    // ==================== PUBLIC API ====================
 
     /**
-     * Rotate left (wrapping through the 3 positions).
-     * Guarded by touch sensor — only rotates when getTouchSensorState() is false,
-     * matching old Spindexer.setPose(moveLeft) behavior.
+     * Start an index cycle: spin the CR servo until the next magnet is detected,
+     * then automatically flip the ball and retract.
+     * Only triggers if the state machine is currently IDLE.
      */
-    public void rotateLeft() {
-        if (getTouchSensorState()) return;
-        switch (currentPosition) {
-            case PoseOne:   setPoseThree(); break;
-            case PoseTwo:   setPoseOne();   break;
-            case PoseThree: setPoseTwo();   break;
+    public void advanceSlot() {
+        if (state == EnumConstants.SpindexerState.IDLE) {
+            state = EnumConstants.SpindexerState.SPINNING;
+            robot.spindexerCRServo.setPower(SpindexerConstants.SPIN_POWER);
         }
     }
 
     /**
-     * Rotate right (wrapping through the 3 positions).
-     * Guarded by touch sensor — same guard as rotateLeft.
+     * Emergency stop — halt the CR servo and return to IDLE immediately.
      */
-    public void rotateRight() {
-        if (getTouchSensorState()) return;
-        switch (currentPosition) {
-            case PoseOne:   setPoseTwo();   break;
-            case PoseTwo:   setPoseThree(); break;
-            case PoseThree: setPoseOne();   break;
-        }
+    public void stop() {
+        robot.spindexerCRServo.setPower(0);
+        state = EnumConstants.SpindexerState.IDLE;
     }
 
-    public EnumConstants.SpindexerPosition getCurrentPosition() {
-        return currentPosition;
+    /** @return current state of the indexing state machine */
+    public EnumConstants.SpindexerState getState() {
+        return state;
     }
 
-    // ==================== LINKAGE CONTROL (FIRE) ====================
+    /** @return true if the state machine is idle and ready for the next advance */
+    public boolean isIdle() {
+        return state == EnumConstants.SpindexerState.IDLE;
+    }
 
-    /** Raise the linkage (fires a ball into the shooter) */
+    /** @return current slot index (0 to SLOT_COUNT-1) */
+    public int getCurrentSlot() {
+        return currentSlot;
+    }
+
+    /** @return total number of slots indexed since last reset */
+    public int getSlotsIndexed() {
+        return slotsIndexed;
+    }
+
+    /** Reset the slot counter to 0 */
+    public void resetSlotCount() {
+        currentSlot = 0;
+        slotsIndexed = 0;
+    }
+
+    // ==================== LINKAGE (FLIPPER) MANUAL CONTROL ====================
+
+    /** Raise the flipper (pushes ball upward into shooter) */
     public void linkageUp() {
         robot.spindexerLinkageServo.setPosition(SpindexerConstants.LINKAGE_UP);
     }
 
-    /** Lower the linkage (retract after firing) */
+    /** Lower the flipper (retract after pushing) */
     public void linkageDown() {
         robot.spindexerLinkageServo.setPosition(SpindexerConstants.LINKAGE_DOWN);
-    }
-
-    /**
-     * Start a flick cycle: linkage up -> FIRE_TIME_MS -> linkage down -> RETRACT_TIME_MS -> idle.
-     * Only triggers if currently idle.
-     */
-    public void triggerFlick() {
-        if (flickState == EnumConstants.FlickState.Idle) {
-            flickState = EnumConstants.FlickState.Start;
-        }
-    }
-
-    public boolean isFlickIdle() {
-        return flickState == EnumConstants.FlickState.Idle;
-    }
-
-    public EnumConstants.FlickState getFlickState() {
-        return flickState;
-    }
-
-    private void flickStateMachinePeriodic() {
-        if (flickState == EnumConstants.FlickState.Idle) return;
-
-        switch (flickState) {
-            case Start:
-                linkageUp();
-                flickTimer.reset();
-                flickState = EnumConstants.FlickState.Extended;
-                break;
-            case Extended:
-                if (flickTimer.milliseconds() < SpindexerConstants.FIRE_TIME_MS) break;
-                linkageDown();
-                flickTimer.reset();
-                flickState = EnumConstants.FlickState.Retracted;
-                break;
-            case Retracted:
-                if (flickTimer.milliseconds() < SpindexerConstants.RETRACT_TIME_MS) break;
-                flickState = EnumConstants.FlickState.Idle;
-                break;
-        }
     }
 
     // ==================== SENSORS ====================
 
     /**
-     * Raw touch sensor state.
-     * Returns true when the digital channel reads HIGH (sensor not activated).
-     * Old code checked: if (!getTouchSensorState()) { allow rotation }
+     * Magnetic sensor: returns true when a slot's magnet is aligned
+     * with the stationary Hall Effect sensor (circuit active / pin LOW).
      */
-    public boolean getTouchSensorState() {
-        return robot.touchSensor.getState();
-    }
-
-    /** Magnetic limit switch: true when closed (circuit active) */
-    public boolean isLimitSwitchClosed() {
+    public boolean isMagnetDetected() {
         return !robot.magneticLimitSensor.getState();
     }
 
-    // Color sensor RGB sum accessors (one pair per spindexer position)
-    public double detectColorOne_1() {
-        return robot.colorSensorOne_1.red() + robot.colorSensorOne_1.green() + robot.colorSensorOne_1.blue();
-    }
-    public double detectColorOne_2() {
-        return robot.colorSensorOne_2.red() + robot.colorSensorOne_2.green() + robot.colorSensorOne_2.blue();
-    }
-    public double detectColorTwo_1() {
-        return robot.colorSensorTwo_1.red() + robot.colorSensorTwo_1.green() + robot.colorSensorTwo_1.blue();
-    }
-    public double detectColorTwo_2() {
-        return robot.colorSensorTwo_2.red() + robot.colorSensorTwo_2.green() + robot.colorSensorTwo_2.blue();
-    }
-    public double detectColorThree_1() {
-        return robot.colorSensorThree_1.red() + robot.colorSensorThree_1.green() + robot.colorSensorThree_1.blue();
-    }
-    public double detectColorThree_2() {
-        return robot.colorSensorThree_2.red() + robot.colorSensorThree_2.green() + robot.colorSensorThree_2.blue();
-    }
+    // ==================== STATE MACHINE (runs in periodic) ====================
 
-    /** Ball present at position 1: either sensor exceeds BALL_PRESENT threshold */
-    public boolean isBallPresentAtOne() {
-        return detectColorOne_1() > SpindexerConstants.BALL_PRESENT
-            || detectColorOne_2() > SpindexerConstants.BALL_PRESENT;
-    }
-    public boolean isBallPresentAtTwo() {
-        return detectColorTwo_1() > SpindexerConstants.BALL_PRESENT
-            || detectColorTwo_2() > SpindexerConstants.BALL_PRESENT;
-    }
-    public boolean isBallPresentAtThree() {
-        return detectColorThree_1() > SpindexerConstants.BALL_PRESENT
-            || detectColorThree_2() > SpindexerConstants.BALL_PRESENT;
-    }
+    private void indexStateMachine() {
+        switch (state) {
+            case IDLE:
+                // Nothing to do — waiting for advanceSlot() call
+                break;
 
-    /**
-     * Slot empty check at position 2: either sensor below BALL_ABSENT threshold.
-     * Uses OR (not AND) — matches old autoIntake behavior exactly.
-     */
-    public boolean isSlotEmptyAtTwo() {
-        return detectColorTwo_1() < SpindexerConstants.BALL_ABSENT
-            || detectColorTwo_2() < SpindexerConstants.BALL_ABSENT;
-    }
-
-    /** Blue > green comparison for sorting decisions (uses primary sensor _1) */
-    public boolean isBlueGreaterThanGreenAtOne() {
-        return robot.colorSensorOne_1.blue() > robot.colorSensorOne_1.green();
-    }
-    public boolean isBlueGreaterThanGreenAtTwo() {
-        return robot.colorSensorTwo_1.blue() > robot.colorSensorTwo_1.green();
-    }
-
-    // ==================== AUTO-INTAKE DISTRIBUTION ====================
-
-    /**
-     * Auto-intake ball distribution logic.
-     * Moves spindexer to an empty slot when current slot detects a ball.
-     * Preserves exact behavior from old Spindexer.autoIntake():
-     * - PoseOne: two independent if checks (second can override first)
-     * - PoseTwo/PoseThree: else-if checks (first match wins)
-     */
-    public void autoIntake() {
-        switch (currentPosition) {
-            case PoseOne:
-                if (isBallPresentAtThree() && isSlotEmptyAtTwo()) {
-                    setPoseTwo();
-                } else if (isBallPresentAtOne() && isSlotEmptyAtTwo()) {
-                    setPoseThree();
+            case SPINNING:
+                // CR servo is running; poll the magnet sensor
+                if (isMagnetDetected()) {
+                    // Slot aligned — halt CR servo immediately
+                    robot.spindexerCRServo.setPower(0);
+                    state = EnumConstants.SpindexerState.ALIGNED;
                 }
                 break;
-            case PoseTwo:
-                if (isBallPresentAtOne() && isSlotEmptyAtTwo()) {
-                    setPoseOne();
-                } else if (isBallPresentAtThree() && isSlotEmptyAtTwo()) {
-                    setPoseThree();
+
+            case ALIGNED:
+                // Magnet detected and CR servo stopped — begin flipper cycle
+                linkageUp();
+                stateTimer.reset();
+                state = EnumConstants.SpindexerState.FLIPPING;
+                break;
+
+            case FLIPPING:
+                // Wait for flipper to fully extend
+                if (stateTimer.milliseconds() >= SpindexerConstants.FIRE_TIME_MS) {
+                    linkageDown();
+                    stateTimer.reset();
+                    state = EnumConstants.SpindexerState.RETRACTING;
                 }
                 break;
-            case PoseThree:
-                if (isBallPresentAtThree() && isSlotEmptyAtTwo()) {
-                    setPoseOne();
-                } else if (isBallPresentAtOne() && isSlotEmptyAtTwo()) {
-                    setPoseTwo();
+
+            case RETRACTING:
+                // Wait for flipper to fully retract
+                if (stateTimer.milliseconds() >= SpindexerConstants.RETRACT_TIME_MS) {
+                    // Update slot tracking
+                    currentSlot = (currentSlot + 1) % SpindexerConstants.SLOT_COUNT;
+                    slotsIndexed++;
+                    stateTimer.reset();
+                    state = EnumConstants.SpindexerState.COOLDOWN;
+                }
+                break;
+
+            case COOLDOWN:
+                // Debounce delay — prevent re-triggering on the same magnet
+                if (stateTimer.milliseconds() >= SpindexerConstants.DEBOUNCE_MS) {
+                    state = EnumConstants.SpindexerState.IDLE;
                 }
                 break;
         }
@@ -227,6 +164,6 @@ public class Spindexer extends SubsystemBase {
 
     @Override
     public void periodic() {
-        flickStateMachinePeriodic();
+        indexStateMachine();
     }
 }

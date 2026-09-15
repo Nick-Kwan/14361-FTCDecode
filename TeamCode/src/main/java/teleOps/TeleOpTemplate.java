@@ -4,7 +4,6 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -23,8 +22,6 @@ import Constants.FieldMap;
 import Constants.LimelightConstants;
 import Constants.OdometryConstants;
 import Constants.ShooterConstants;
-import Constants.SpindexerConstants;
-import Constants.TurretConstants;
 import pedroPathing.Constants;
 import commands.RelocalizePinpointCommand;
 import commands.ResetPositionCommand;
@@ -132,9 +129,6 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         // Init turret to center
         turret.center();
 
-        // Init spindexer to pose 1
-        spindexer.setPoseOne();
-
         // Init hood to mid
         shooter.setHoodAngle(ShooterConstants.HOOD_POSE_MID);
 
@@ -172,12 +166,11 @@ abstract public class TeleOpTemplate extends CommandOpMode {
         new Trigger(() -> gamepad1.ps)
             .whenActive(new InstantCommand(mecanumDrive::resetYaw));
 
-        // Right trigger: Intake deploy + start + auto-intake distribution
+        // Right trigger: Intake deploy + start
         new Trigger(() -> gamepad1.right_trigger > DriveConstants.TRIGGER_THRESHOLD)
             .whenActive(() -> {
                 intake.startIntaking();
                 intake.deploy();
-                spindexer.autoIntake();
             })
             .whenInactive(() -> {
                 intake.stopIntaking();
@@ -200,48 +193,29 @@ abstract public class TeleOpTemplate extends CommandOpMode {
             .whenPressed(new InstantCommand(spindexer::linkageUp))
             .whenReleased(new InstantCommand(spindexer::linkageDown));
 
-        // Y button: Shoot all 3 balls from current position
+        // Y button: Shoot all 4 slots sequentially
         new GamepadButton(driverGamepad, GamepadKeys.Button.Y)
-            .whenPressed(() -> schedule(ShootingCommands.shootAll(spindexer)));
+            .whenPressed(() -> schedule(ShootingCommands.shootAllSlots(spindexer)));
 
-        // Dpad Left: Rotate spindexer left (touch sensor guarded)
+        // Dpad Left: Advance spindexer one slot (index cycle)
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_LEFT)
-            .whenPressed(new InstantCommand(() -> {
-                if (!spindexer.getTouchSensorState()) {
-                    spindexer.rotateLeft();
-                }
-            }));
+            .whenPressed(new InstantCommand(spindexer::advanceSlot));
 
-        // Dpad Right: Rotate spindexer right (touch sensor guarded)
+        // Dpad Right: Advance spindexer one slot (same as left — CR servo is unidirectional)
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_RIGHT)
-            .whenPressed(new InstantCommand(() -> {
-                if (!spindexer.getTouchSensorState()) {
-                    spindexer.rotateRight();
-                }
-            }));
+            .whenPressed(new InstantCommand(spindexer::advanceSlot));
 
-        // Dpad Up: Go to pose 2
+        // Dpad Up: Advance one slot
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_UP)
-            .whenPressed(() -> {
-                new InstantCommand(spindexer::setPoseTwo);
-                new InstantCommand(turret::center);
-            });
+            .whenPressed(new InstantCommand(spindexer::advanceSlot));
 
         // Dpad Down: Reset pinpoint position to alliance default
         new GamepadButton(driverGamepad, GamepadKeys.Button.DPAD_DOWN)
             .whenPressed(new ResetPositionCommand(follower));
 
-        // Left bumper: Sorted shooting
+        // Left bumper: Shoot all slots (sorted shoot deprecated, falls through to shootAll)
         new GamepadButton(driverGamepad, GamepadKeys.Button.LEFT_BUMPER)
-            .whenPressed(() -> {
-                if (spindexer.getCurrentPosition() == EnumConstants.SpindexerPosition.PoseTwo) {
-                    schedule(SortedShootCommand.build(spindexer, limelight));
-                } else {
-                    spindexer.setPoseTwo();
-                    schedule(new WaitCommand(SpindexerConstants.ROTATION_SETTLE_MS)
-                        .andThen(SortedShootCommand.build(spindexer, limelight)));
-                }
-            });
+            .whenPressed(() -> schedule(ShootingCommands.shootAllSlots(spindexer)));
 
         // B button: Relocalize pinpoint via Limelight MegaTag2
         new GamepadButton(driverGamepad, GamepadKeys.Button.B)

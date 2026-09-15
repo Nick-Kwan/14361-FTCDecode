@@ -2,13 +2,13 @@ package commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import Constants.EnumConstants.FlickState;
 import subsystems.Spindexer;
 
 /**
- * Triggers the spindexer linkage flick cycle (one fire).
- * Sequence: linkageUp -> FIRE_TIME_MS -> linkageDown -> RETRACT_TIME_MS -> idle.
- * Waits for the state machine to return to Idle before finishing.
+ * Triggers one full spindexer index cycle:
+ *   spin CR servo → detect magnet → stop → flip ball up → retract → cooldown → idle.
+ *
+ * Calls advanceSlot() and waits for the state machine to return to IDLE.
  */
 public class FireCommand extends CommandBase {
     private final Spindexer spindexer;
@@ -22,26 +22,31 @@ public class FireCommand extends CommandBase {
     @Override
     public void initialize() {
         triggered = false;
-        if (spindexer.isFlickIdle()) {
-            spindexer.triggerFlick();
+        if (spindexer.isIdle()) {
+            spindexer.advanceSlot();
             triggered = true;
         }
     }
 
     @Override
     public void execute() {
-        if (!triggered && spindexer.isFlickIdle()) {
-            spindexer.triggerFlick();
+        // If we couldn't trigger in initialize (state machine was busy), retry
+        if (!triggered && spindexer.isIdle()) {
+            spindexer.advanceSlot();
             triggered = true;
         }
     }
 
     @Override
     public boolean isFinished() {
-        return triggered && spindexer.isFlickIdle();
+        // Done when we've triggered the cycle and it's returned to IDLE
+        return triggered && spindexer.isIdle();
     }
 
     @Override
     public void end(boolean interrupted) {
+        if (interrupted) {
+            spindexer.stop();
+        }
     }
 }

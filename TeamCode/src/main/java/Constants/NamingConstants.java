@@ -22,7 +22,7 @@ public final class NamingConstants {
     public static final String TURRET = "turret";
 
     // Spindexer
-    public static final String SPINDEXER_SERVO = "spindexerServo";
+    public static final String SPINDEXER_CR_SERVO = "spindexerServo";
     public static final String SPINDEXER_LINKAGE_SERVO = "spindexerLinkageServo";
     public static final String TOUCH_SENSOR = "touchSensor";
     public static final String MAGNETIC_LIMIT_SENSOR = "magneticLimitSensor";
